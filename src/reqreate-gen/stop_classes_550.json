@@ -1,0 +1,14 @@
+{
+  "mandatory_stop_ids": {
+    "000220102005": "Bettembourg terminal and regional interchange",
+    "000220503003": "Hellange locality anchor at Kierch",
+    "000220502004": "Frisange locality anchor at Op der Kräizong",
+    "000220501002": "Aspelt station and regional interchange",
+    "000210501004": "Altwies locality anchor at Millbaach",
+    "000210503005": "Mondorf-les-Bains locality anchor at Kleng Gare",
+    "000210503003": "Mondorf-les-Bains interchange at Christophorus",
+    "000210502001": "Ellange station and locality anchor",
+    "000210103001": "Erpeldange (Bous) locality anchor at Kräizgaass",
+    "000210701006": "Remich terminal and regional interchange"
+  }
+}
