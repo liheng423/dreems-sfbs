@@ -22,8 +22,8 @@ using Statistics
 
 include("types.jl")
 include("routes.jl")
-include("network.jl")
-include("output.jl")
+include(joinpath("input_adapters", "network.jl"))
+include(joinpath("output_adapters", "output.jl"))
 
 include(joinpath(@__DIR__, "..", "utilities", "utilities.jl"))
 
@@ -65,13 +65,13 @@ end
 """Return median travel minutes, sample counts, selected observation count, and the network."""
 function build_mat(crawl, obs_rows)
     sel_obs = closest_obs_by_evt(obs_rows)
-    net, timetable_pats, _ = build_net(crawl, Dict("mandatory_stop_ids" => Dict()))
+    net, timetable_patterns, _ = build_net(crawl, Dict("mandatory_stop_ids" => Dict()))
     trav_samps = Dict{String, Vector{Float64}}()
     samp_counts = Dict{String, Int}()
 
-    for (pat, net_pat) in zip(timetable_pats, net.patterns)
-        logi_ids = net_pat.stops
-        for trip in pat.trips
+    for (pattern, net_pattern) in zip(timetable_patterns, net.patterns)
+        logi_ids = net_pattern.stops
+        for trip in pattern.trips
             evts = trip["stop_times"]
             trip_id = String(trip["trip_id"])
             delays = Dict{Int, Int}()
@@ -135,7 +135,7 @@ function write_mat(crawl, obs_path::String, out_path::String)
         routes=routes,  # Original GTFS route metadata.
         service_date=svc_date,  # Service date shared by the schedule and observations.
         network=(
-            stops=[id for pat in net.patterns for id in pat.stops],
+            stops=[id for pattern in net.patterns for id in pattern.stops],
             routes=net_out.routes,
             patterns=net_out.patterns,
             source_stop_ids=net.source_stop_ids,

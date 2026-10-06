@@ -39,18 +39,18 @@ function stop_xy(net, stop_id)
     return Float64(xy[1]), Float64(xy[2])
 end
 
-function scen_reqs(inst, pat)
+function scen_reqs(inst, pattern)
     [(kind=book_type, org=Int(req["origin"]), dst=Int(req["destination"]))
      for book_type in ("prebooked", "dynamic")
      for req in values(inst["requests"][book_type])
-     if req["route_id"] == pat["route_id"] && req["pattern_id"] == pat["pattern_id"]]
+     if req["route_id"] == pattern["route_id"] && req["pattern_id"] == pattern["pattern_id"]]
 end
 
-function pat_title(inst, pat, req_count)
+function pattern_title(inst, pattern, req_count)
     scen = String(inst["config"]["scenario"])
     line = String(inst["config"]["dataset"])
     date = String(inst["config"]["service_date"])
-    return "Line $line · $scen demand · $date\n$(pat["label"]) ($req_count requests)"
+    return "Line $line · $scen demand · $date\n$(pattern["label"]) ($req_count requests)"
 end
 
 function draw_reqs!(plt, inst, reqs)
@@ -65,10 +65,10 @@ function draw_reqs!(plt, inst, reqs)
     end
 end
 
-function draw_stops!(plt, net, pat; lbl_stops::Bool=false)
-    stop_ids = Int.(pat["stops"])
+function draw_stops!(plt, net, pattern; lbl_stops::Bool=false)
+    stop_ids = Int.(pattern["stops"])
     mand_ids = Set(Int.(net["mandatory_stops"]))
-    term_ids = Set(Int.(pat["terminal_ids"]))
+    term_ids = Set(Int.(pattern["terminal_ids"]))
     opt_ids = [id for id in stop_ids if !(id in mand_ids)]
     mand_stop_ids = [id for id in stop_ids if id in mand_ids && !(id in term_ids)]
 
@@ -92,16 +92,16 @@ function draw_stops!(plt, net, pat; lbl_stops::Bool=false)
     end
 end
 
-function plot_pat(inst, pat; compact::Bool=false, lbl_stops::Bool=false)
+function plot_pattern(inst, pattern; compact::Bool=false, lbl_stops::Bool=false)
     net = inst["network"]
-    stop_ids = Int.(pat["stops"])
+    stop_ids = Int.(pattern["stops"])
     xy = [stop_xy(net, id) for id in stop_ids]
-    reqs = scen_reqs(inst, pat)
+    reqs = scen_reqs(inst, pattern)
     scen = String(inst["config"]["scenario"])
-    pat_label = String(pat["label"])
+    pattern_label = String(pattern["label"])
     req_count = length(reqs)
-    overview_title = "$scen · n=$req_count\n$(replace(pat_label, " -> " => " → "))"
-    plt = plot(; title=compact ? overview_title : pat_title(inst, pat, req_count),
+    overview_title = "$scen · n=$req_count\n$(replace(pattern_label, " -> " => " → "))"
+    plt = plot(; title=compact ? overview_title : pattern_title(inst, pattern, req_count),
              xlabel=compact ? "" : "longitude",
              ylabel=compact ? "" : "latitude",
              legend=compact ? false : :outerright,
@@ -113,7 +113,7 @@ function plot_pat(inst, pat; compact::Bool=false, lbl_stops::Bool=false)
     plot!(plt, first.(xy), last.(xy); color=COLORS.route, linewidth=2.2,
           alpha=0.9, label="scheduled stop order")
     draw_reqs!(plt, inst, reqs)
-    draw_stops!(plt, net, pat; lbl_stops=lbl_stops && !compact)
+    draw_stops!(plt, net, pattern; lbl_stops=lbl_stops && !compact)
     return plt
 end
 
@@ -129,12 +129,12 @@ function main(args=ARGS)
     ovw = Plots.Plot[]
     for inst in insts
         scen = String(inst["config"]["scenario"])
-        for (pat_idx, pat) in enumerate(inst["network"]["patterns"])
+        for (pattern_idx, pattern) in enumerate(inst["network"]["patterns"])
             dataset = inst["config"]["dataset"]
-            out_path = joinpath(out_dir, "$(dataset)_$(scen)_pattern_$(pat_idx).png")
-            savefig(plot_pat(inst, pat; lbl_stops=lbl_stops), out_path)
+            out_path = joinpath(out_dir, "$(dataset)_$(scen)_pattern_$(pattern_idx).png")
+            savefig(plot_pattern(inst, pattern; lbl_stops=lbl_stops), out_path)
             println("Saved $out_path")
-            push!(ovw, plot_pat(inst, pat; compact=true))
+            push!(ovw, plot_pattern(inst, pattern; compact=true))
         end
     end
     ovw_plot = plot(ovw...; layout=(length(insts), length(first(insts)["network"]["patterns"])),

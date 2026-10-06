@@ -3,7 +3,7 @@
 
 This crawler deliberately stops at source data: it does not classify stops,
 generate passenger requests, or create optimization instances. Those steps are
-implemented in Julia under ``src/reqreate-gen`` and use shared helpers from
+implemented in Julia under ``src/reqreate_gen`` and use shared helpers from
 ``src/tools``.
 """
 

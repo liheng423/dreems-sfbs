@@ -28,9 +28,11 @@ const CLASS_PATH = joinpath(SCRIPT_DIR, "stop_classes_550.json")
 include(joinpath(@__DIR__, "..", "utilities", "utilities.jl"))
 
 include("routes.jl")
-include("network.jl")
-include("demand.jl")
-include("output.jl")
+include(joinpath("input_adapters", "network.jl"))
+include(joinpath("demand_generators", "eligibility.jl"))
+include(joinpath("demand_generators", "allocations.jl"))
+include(joinpath("demand_generators", "demand.jl"))
+include(joinpath("output_adapters", "output.jl"))
 
 """
 Read GTFS from in_path and write the corridor, timetable, candidate pool, and scenarios to out_dir.
@@ -40,7 +42,7 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
     out_dir = abspath(out_dir)
     crawl = JSON3.read(read(in_path, String))
     class_cfg = JSON3.read(read(class_path, String))
-    net, timetable_pats, hrs = build_net(crawl, class_cfg)
+    net, timetable_patterns, hrs = build_net(crawl, class_cfg)
     net_out = net_output(net)
 
     crawls = route_crawls(crawl)
@@ -103,11 +105,11 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
         active_service_ids=unique([String(id) for src in crawls for id in src["active_service_ids"]]),  # GTFS service IDs active on the selected date.
         service_calendars=[src["service_calendar"] for src in crawls],  # Weekly GTFS service rules and date exceptions.
         network=net_out,  # Original GTFS stop records with names and coordinates.
-        patterns=timetable_pats,  # Pattern timetables containing original trip stop events.
+        patterns=timetable_patterns,  # Pattern timetables containing original trip stop events.
     )
     write_json(joinpath(out_dir, "timetable_$(dataset).json"), timetable)
 
-    cands = build_cand_pool(timetable_pats, net)
+    cands = build_cand_pool(timetable_patterns, net)
     cand_meta = (
         # Description of the candidate sampling or scenario selection method.
         method="Julia-native pool sampled uniformly from feasible scheduled trip/stop pairs",
@@ -116,9 +118,9 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
         candidate_count_per_booking_route_pattern_cell=CAND_COUNT_PER_CELL,
         schema_version=2,
         candidate_pool=[(
-            booking_type=book_type, route_id=pat.route_id, pattern_id=pat.pattern_id,
-            candidates=[cand_output(cand, net) for cand in cands[(book_type, pat.route_id, pat.pattern_id)]],
-        ) for pat in net.patterns for book_type in ("prebooked", "dynamic")],
+            booking_type=book_type, route_id=pattern.route_id, pattern_id=pattern.pattern_id,
+            candidates=[cand_output(cand, net) for cand in cands[(book_type, pattern.route_id, pattern.pattern_id)]],
+        ) for pattern in net.patterns for book_type in ("prebooked", "dynamic")],
         lead_time_rules=(  # Configured minimum and maximum booking leads in minutes.
             # Minimum and maximum pre-booking leads converted from whole days.
             prebooked_minutes=[first(PREBOOK_LEAD_DAYS), last(PREBOOK_LEAD_DAYS)] .* 1440,
@@ -131,7 +133,8 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
     write_json(joinpath(out_dir, "candidate_pool_$(dataset).json"), cand_meta)
 
     for (scen, total) in SCEN_REQ_COUNTS
-        reqs, allocs = inst_reqs(cands, total, net)
+        sel, allocs = select_instance_candidates(cands, total, net)
+        reqs = requests_output(sel, net)
         prebook_count = length(reqs.prebooked)
         dyn_count = length(reqs.dynamic)
         inst_cfg = (;
@@ -171,7 +174,7 @@ end
 # Three optional paths are sufficient for this script's command-line interface.
 if abspath(PROGRAM_FILE) == abspath(@__FILE__)
     if ARGS == ["--help"] || ARGS == ["-h"]
-        println("Usage: julia --project=. src/reqreate-gen/generate.jl [in_path] [out_dir] [class_path]")
+        println("Usage: julia --project=. src/reqreate_gen/generate.jl [in_path] [out_dir] [class_path]")
         println("Defaults: $CRAWLED_PATH → $DATA_DIR")
     else
         main(ARGS...)

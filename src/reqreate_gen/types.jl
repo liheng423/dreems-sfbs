@@ -72,25 +72,25 @@ struct NetworkData
 end
 
 """
-Store one feasible scheduled trip and ordered origin/destination combination.
+Store one scheduled trip and ordered origin/destination combination.
 
 # Fields
 
-- `org`: Origin logical stop ID.
-- `dst`: Destination logical stop ID after the origin.
-- `des_min`: Scheduled pickup time in whole service-day minutes.
-- `sched_arr_min`: Scheduled destination arrival in whole service-day minutes.
-- `src_trip_id`: Original GTFS trip ID supplying this pair.
+- `origin`: Origin logical stop ID.
+- `destination`: Destination logical stop ID after the origin.
+- `pickup_minute`: Scheduled departure at the origin in whole service-day minutes.
+- `destination_departure_minute`: Scheduled departure at the destination in whole service-day minutes.
+- `source_trip_id`: Original GTFS trip ID supplying this pair.
 """
-struct SchedPair
+struct ScheduledPair
     # Demand-generation fields.
-    org::Int
-    dst::Int
-    des_min::Int
+    origin::Int
+    destination::Int
+    pickup_minute::Int
+    destination_departure_minute::Int
 
-    # Source and output fields; not used to make demand decisions.
-    sched_arr_min::Int
-    src_trip_id::String
+    # Source trip ID is retained for provenance.
+    source_trip_id::String
 end
 
 """
@@ -105,7 +105,7 @@ Store a sampled request with logical stop IDs and its source trip.
 - `desired_time`: Desired pickup time in service-day minutes.
 - `request_time`: Booking submission time in service-day minutes, possibly negative.
 - `source_trip_id`: Original GTFS trip ID used to generate the candidate.
-- `scheduled_arrival_minute`: Source trip's destination arrival in whole service-day minutes.
+- `destination_departure_minute`: Source trip's destination departure in whole service-day minutes.
 """
 struct Candidate
     # Demand-generation fields.
@@ -118,5 +118,10 @@ struct Candidate
 
     # Source and output fields; not used to make demand decisions.
     source_trip_id::String
-    scheduled_arrival_minute::Int
+    destination_departure_minute::Int
 end
+
+"""Build a candidate from a scheduled pair and a booking lead in whole minutes."""
+Candidate(candidate_id::String, pair::ScheduledPair, booking_type::String, lead_min::Int) =
+    Candidate(candidate_id, pair.origin, pair.destination, booking_type, pair.pickup_minute,
+              pair.pickup_minute - lead_min, pair.source_trip_id, pair.destination_departure_minute)

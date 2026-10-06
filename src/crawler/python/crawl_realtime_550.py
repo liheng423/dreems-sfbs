@@ -4,7 +4,7 @@
 The ATP API exposes live departure boards, not a historical archive. This
 script records only departures for which HAFAS returns ``rtTime`` and matches
 each record to the selected day's static GTFS trip. The resulting JSON Lines
-file is input for ``src/reqreate-gen/travel_time_matrix.jl``.
+file is input for ``src/reqreate_gen/travel_time_matrix.jl``.
 
 Set ``ATP_API_KEY`` to the personal key issued by ATP before running. The key
 is sent to the API and is never written to the output file.

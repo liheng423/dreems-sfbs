@@ -14,14 +14,26 @@ function med_min(vals::Vector{Int})
 end
 
 """
-Return the logical network, pattern timetables, and operating hours from GTFS data and stop classes.
+    build_net(crawl, class_cfg)
+
+Build pattern-specific logical stops, stop classes, and median scheduled travel
+times from normalized GTFS data.
+
+# Arguments
+- `crawl`: One normalized route snapshot or a vector of route snapshots.
+- `class_cfg`: Stop classification with `mandatory_stop_ids` mapping source stop IDs to reasons.
+
+# Returns
+- `net`: `NetworkData` with logical routes and stops, classifications, and travel times.
+- `timetable_patterns`: Pattern records with logical stop IDs and original GTFS trips.
+- `hrs`: Named tuple with `start_minute` and `end_minute` for corridor-wide service hours.
 """
 function build_net(crawl, class_cfg)
     crawls = route_crawls(crawl)
     stops_by_src = Dict(String(stop["stop_id"]) => stop for src in crawls for stop in src["stops"])
     reason_by_src = Dict{String, String}(String(k) => String(v)
                                          for (k, v) in pairs(class_cfg["mandatory_stop_ids"]))
-    pats = RoutePattern[]
+    patterns = RoutePattern[]
     next_logi_id = 1
     mand_ids = Int[]
     coords = Dict{String, Vector{Float64}}()
@@ -29,16 +41,16 @@ function build_net(crawl, class_cfg)
     src_ids_by_logi = Dict{String, String}()
     class_reasons = Dict{String, String}()
     trav_samps = Dict{String, Vector{Int}}()
-    timetable_pats = NamedTuple[]
+    timetable_patterns = NamedTuple[]
 
     # A physical GTFS stop used by both directions receives one logical ID in
     # each pattern. This makes direction and scheduled travel-time lookup
     # explicit while preserving the source stop ID and coordinates.
-    for src in crawls, pat in src["patterns"]
+    for src in crawls, pattern in src["patterns"]
         src_route_id = String(src["route"]["route_id"])
-        src_dir_id = String(pat["direction_id"])
+        src_dir_id = String(pattern["direction_id"])
         route_id = "$(src_route_id)_$(src_dir_id)"
-        src_ids = String.(pat["stop_ids"])
+        src_ids = String.(pattern["stop_ids"])
         logi_ids = collect(next_logi_id:(next_logi_id + length(src_ids) - 1))
         next_logi_id += length(src_ids)
         for (src_id, logi_id) in zip(src_ids, logi_ids)
@@ -57,7 +69,7 @@ function build_net(crawl, class_cfg)
             end
         end
 
-        for trip in pat["trips"]
+        for trip in pattern["trips"]
             evts = trip["stop_times"]
             for idx in eachindex(evts)
                 evt = evts[idx]
@@ -71,10 +83,10 @@ function build_net(crawl, class_cfg)
             end
         end
 
-        period = pat["service_period"]
-        push!(pats, RoutePattern(
+        period = pattern["service_period"]
+        push!(patterns, RoutePattern(
             route_id,
-            String(pat["pattern_id"]),
+            String(pattern["pattern_id"]),
             logi_ids,
             ServicePeriod(
                 Int(period["first_departure_seconds"]),
@@ -82,23 +94,23 @@ function build_net(crawl, class_cfg)
             ),
             src_route_id,
             src_dir_id,
-            String(pat["label"]),
+            String(pattern["label"]),
         ))
-        push!(timetable_pats, (
+        push!(timetable_patterns, (
             route_id=route_id,
-            pattern_id=String(pat["pattern_id"]),
+            pattern_id=String(pattern["pattern_id"]),
             stops=logi_ids,  # Source IDs are resolved through the network.
-            trips=pat["trips"],  # Original GTFS trips with their stop events.
+            trips=pattern["trips"],  # Original GTFS trips with their stop events.
         ))
     end
 
     trav_times = Dict{String, Int}(od => med_min(samps)
                                    for (od, samps) in trav_samps)
-    dwell_times = Dict(string(id) => 0 for pat in pats for id in pat.stops)
-    first_min = minimum(s2m(pat.service_period.start_seconds) for pat in pats)
-    last_min = maximum(cld(pat.service_period.end_seconds, 60) for pat in pats)
+    dwell_times = Dict(string(id) => 0 for pattern in patterns for id in pattern.stops)
+    first_min = minimum(s2m(pattern.service_period.start_seconds) for pattern in patterns)
+    last_min = maximum(cld(pattern.service_period.end_seconds, 60) for pattern in patterns)
     net = NetworkData(
-        pats,
+        patterns,
         trav_times,
         mand_ids,
         coords,
@@ -109,7 +121,7 @@ function build_net(crawl, class_cfg)
     )
     return (
         net,  # Logical network with stop classes and scheduled travel times.
-        timetable_pats,  # Pattern records retaining the original GTFS trips.
+        timetable_patterns,  # Pattern records retaining the original GTFS trips.
         (
             start_minute=first_min,  # Corridor service start in service-day minutes.
             end_minute=last_min,  # Corridor service end in service-day minutes.
