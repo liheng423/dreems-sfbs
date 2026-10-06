@@ -15,20 +15,19 @@ volumes below are generated study scenarios; they are not observed ridership.
 | `src/reqreate-gen/demand_config.jl` | Demand seed, candidate count per cell, pickup half-window, booking lead ranges, and scenario request counts. |
 | `src/reqreate-gen/types.jl` | Core records used repeatedly in network and demand calculations. One-off JSON envelopes and metadata are named tuples at their construction sites. |
 | `src/reqreate-gen/output.jl` | Reconstruct derived network and candidate fields when writing the existing JSON schema. |
-| `src/reqreate-gen/directions.jl` | Assign logical stop IDs and shared direction fields for both scheduled and real-time matrices. |
-| `src/reqreate-gen/types.jl` | Typed fixed-shape records for the network, demand, and generated JSON documents. |
+| `src/reqreate-gen/routes.jl` | Network lookups for route patterns and physical/logical stop IDs. |
 | `src/reqreate-gen/network.jl` | Build direction-specific logical stops, stop classes, and scheduled travel times. |
 | `src/reqreate-gen/travel_time_matrix.jl` | Build a separate real-time-adjusted travel-time matrix from captured HAFAS estimates. |
 | `src/reqreate-gen/demand.jl` | Enumerate feasible scheduled trip/stop pairs, sample the candidate pool, and allocate scenarios. |
-| `src/utilities/utilities.jl` | Shared JSON conversion, file-writing, service-time, and ordered-pair helpers used by the generator. |
+| `src/utilities/utilities.jl` | Shared file-writing, service-time, and ordered-pair helpers used by the generator. |
 | `src/vis/visualize.jl` | Render a separate map for each scenario direction and a six-panel PDF overview. |
-| `src/reqreate-gen/stop_classes_550.json` | Reviewable source-stop mapping for mandatory anchors and interchanges. Stops absent from this mapping are optional. |
+| `src/reqreate-gen/stop_classes_550.json` | Reviewable source-stop mapping for mandatory anchors and interchanges. Other stops are optional; pattern terminals are always mandatory. |
 | `data/crawled_550.json` | Normalized output from the Python crawler, including every active trip's stop events. |
 | `data/realtime_550_{service-date}.jsonl` | Append-only live departure estimates captured by the second Python crawler, split by service date. |
 | `data/travel_time_matrix_550.json` | Ordered stop-pair matrix estimated from matched live departure observations. |
 | `data/corridor_550.json` | Shared route network and operating parameters without passenger demand. |
 | `data/timetable_550.json` | Full trip timetable, route-relevant weekly calendar rules, date exceptions, and active service metadata. |
-| `data/candidate_pool_550.json` | Seeded 8,000-request candidate pool (2,000 per booking-type/direction cell) used to sample scenarios. |
+| `data/candidate_pool_550.json` | Seeded 8,000-request candidate pool (2,000 per booking-type/route/pattern cell) used to sample scenarios. |
 | `data/instances/550_{low,base,high}.json` | 50, 100, and 200 request instances. |
 | `visualizations/` | Per-scenario, per-direction PNGs and the overview PDF. |
 
@@ -37,7 +36,7 @@ volumes below are generated study scenarios; they are not observed ridership.
 Julia function and local variable names use `snake_case`; constants use
 `SCREAMING_SNAKE_CASE`. Shared domain terms use the abbreviations below in
 functions, parameters, and local variables. Keep established short names such
-as `main`, `asdict`, and `write_json`. Struct fields that represent JSON schema
+as `main` and `write_json`. Struct fields that represent JSON schema
 fields keep the schema spelling. Input/output JSON keys, file names, and CLI
 flags remain unchanged because they are part of the data or command-line
 interfaces.
@@ -46,7 +45,7 @@ interfaces.
 | --- | --- | --- |
 | `s2m` | convert seconds to a whole minute | `s2m` |
 | `sec` | second(s) | `trav_sec` |
-| `val` / `vals` | value(s) | `asdict(val)`, `med_min(vals)` |
+| `val` / `vals` | value(s) | `write_json(path, val)`, `med_min(vals)` |
 | `in` / `out` | input / output | `in_path`, `out_dir` |
 | `min` | whole minute(s) | `med_min` |
 | `med` | median | `med_min` |
@@ -59,8 +58,6 @@ interfaces.
 | `src` | source | `src_stop_idx` |
 | `idx` | index | `src_stop_idx` |
 | `net` | network | `build_net` |
-| `elig` | eligible | `elig_sched_pairs` |
-| `sched` | scheduled | `elig_sched_pairs` |
 | `cand` | candidate | `build_cand_pool` |
 | `meta` | metadata | `cand_meta` |
 | `book` | booking type | `book_type` |
@@ -80,7 +77,7 @@ interfaces.
 | `pat` | pattern | `logi_stops_by_pat` |
 | `mat` | matrix | `build_mat`, `write_mat` |
 | `xy` | coordinate pair | `stop_xy` |
-| `dir` | direction | `dir_title`, `plot_dir` |
+| `dir` | source direction | `src_dir_id` |
 | `cfg` | configuration | `class_cfg` |
 | `params` | parameters | `params` |
 | `hrs` | hours | `hrs` |
@@ -101,20 +98,19 @@ The renamed function map is:
 | `pair_key` | `od_key` |
 | `whole_minute_median` | `med_min` |
 | `build_network` | `build_net` |
-| `eligible_scheduled_pairs` | `elig_sched_pairs` |
 | `build_candidate_pool` | `build_cand_pool` |
 | `scenario_allocations` | `scen_allocs` |
 | `instance_requests` | `inst_reqs` |
 | `read_observations` | `read_obs` |
 | `closest_observation_by_event` | `closest_obs_by_evt` |
-| `logical_stops_by_pattern` | `build_dirs` |
+| `logical_stops_by_pattern` | `build_net` |
 | `build_matrix` | `build_mat` |
 | `write_matrix` | `write_mat` |
 | `point_for` | `stop_xy` |
 | `scenario_requests` | `scen_reqs` |
-| `direction_title` | `dir_title` |
+| `direction_title` | `pat_title` |
 | `draw_requests!` | `draw_reqs!` |
-| `plot_direction` | `plot_dir` |
+| `plot_direction` | `plot_pat` |
 
 The bang suffix marks functions that mutate an existing object.
 
@@ -123,17 +119,69 @@ Variable examples include `input_path` → `in_path`, `output_dir` → `out_dir`
 `destination_index` → `dst_idx`, `request_id` → `req_id`, and
 `plot_object` → `plt`.
 
-`ColorPalette` in `src/vis/visualize.jl` declares the fixed route, booking, and
-stop-category colors as struct fields instead of a string-keyed dictionary.
+`COLORS` in `src/vis/visualize.jl` stores the fixed route, booking, and
+stop-category colors in a named tuple.
 
 Schema keys such as `"origin"`, `"destination"`, and `"request_time"` remain
 unchanged in generated JSON.
 
-`types.jl` defines fixed-shape records for service periods, directions,
-networks, candidates, requests, scenario allocations, and generated JSON
-documents. JSON3 writes those structs using their declared field names;
-ID-indexed lookup tables remain dictionaries because their keys vary with the
-feed or sampled requests.
+`types.jl` defines fixed-shape records for service periods, route patterns,
+networks, scheduled pairs, and candidates. Output adapters expand network and
+candidate records into named tuples; scenario requests are built directly as
+named tuples in `inst_reqs`. ID-indexed lookup tables remain dictionaries
+because their keys vary with the feed or sampled requests.
+
+## Directed routes and network stop mapping (schema version 2)
+
+An internal `route_id` is `<GTFS route_id>_<GTFS direction_id>`: the two
+orientations of a bus line are separate routes. `source_route_id` and
+`source_direction_id` retain the original feed identity. A route can contain
+multiple `pattern_id` values for branches and short turns. Pattern IDs are
+scoped to their directed route, not assumed globally unique.
+
+`network.routes` lists directed routes and their pattern IDs. `network.patterns`
+stores ordered logical stop occurrences and service windows. Each occurrence
+has its own logical ID, including repeated visits to one physical stop.
+`network.source_stop_ids` owns the logical-to-GTFS mapping. Use
+`src_stop_id(net, logi_id)` to resolve a source ID, `logi_stop_ids(net, src_id)`
+to find all occurrences, and `stop_pat(net, logi_id)` to obtain route context.
+No source-stop map is copied into the internal route patterns or requests.
+Raw source trip events remain in the timetable for provenance.
+
+The generator accepts either the existing single-route crawler object or a
+JSON array of those objects. All objects must come from the same GTFS feed and
+service date, with each source route included once. Crawl each bus line using
+`--route-short-name`, then combine its normalized snapshot into the array.
+The live crawler remains specific to line 550; this refactor does not add
+multi-line live capture or transfer journeys.
+
+```bash
+julia --project=. src/reqreate-gen/generate.jl \
+  data/crawled_network.json data/network src/reqreate-gen/stop_classes_550.json
+```
+
+The optional third argument supplies the source-stop classification file for
+that network. Pattern terminals are mandatory even without a configured source
+stop entry. Single-line filenames use its short name (e.g. `550_low.json`);
+multi-line filenames use `network` (e.g. `network_low.json`).
+
+Demand cells use `(booking_type, route_id, pattern_id)` internally. The JSON
+candidate pool is an array of cell objects with these fields and a `candidates`
+array. Allocation metadata is an array named `route_pattern_booking_allocations`
+with a `count` per cell. Requests replace the old `direction` field with
+`route_id` and `pattern_id`. Equal allocation is by pattern, so a route with
+more patterns receives more requests; this is a synthetic scenario assumption.
+For remainders, pre-booked allocation starts at the first pattern and dynamic
+allocation starts halfway through the pattern list. Both use fixed cyclic
+orders so larger scenarios retain smaller scenarios' candidate prefixes.
+Snapshot/pattern order determines logical numbering and seeded draw order.
+
+These changes replace the version-1 JSON layout; regenerate datasets before
+using the updated visualizer. Pickup eligibility, lead-time rules, and seeded
+sampling remain unchanged for the existing two-pattern Route 550 input.
+
+Checks: `julia --project=. test/requests.jl` and
+`julia --project=. test/routes.jl`.
 
 ## Sources and provenance
 
@@ -236,7 +284,8 @@ python3 src/crawler/python/crawl_gtfs.py \
 
 If no `--gtfs-zip` is supplied, Python downloads the pinned archive URL. For
 another bus line, pass `--route-short-name`, `--service-date`, and an output
-path. Pass `--route-id` if the feed has more than one route with that short
+path. The crawler requires equal arrival and departure times at each stop.
+Pass `--route-id` if the feed has more than one route with that short
 name. The crawler records the archive name, SHA-256, source URL, feed date
 range, selected services, and route ID in its JSON output.
 
@@ -309,15 +358,16 @@ the scheduled `network.travel_times` field.
 ## Input fields and time units
 
 Internal records avoid storing values that can be derived from the network:
-`Direction` keeps its stop sequence without copying source IDs or terminal IDs;
-`NetworkData` keeps direction sequences and mandatory IDs without separate all-stop,
+`RoutePattern` keeps its stop sequence without copying source IDs or terminal IDs;
+`NetworkData` keeps route pattern sequences and mandatory IDs without separate all-stop,
 optional-stop, or terminal lists. `ServicePeriod` stores seconds only, preserving
 precision while minute bounds are calculated as needed. `SchedPair` and `Candidate`
 keep logical stop IDs and trip-specific provenance; source stop IDs, candidate
 directions, pickup windows, and dynamic lead limits are derived when needed.
 Trip IDs and scheduled arrival times remain because aggregate network travel
-times cannot reconstruct a particular trip. `Request` also derives its direction
-and pickup window at output time; `output.jl` assembles the unchanged JSON schema.
+times cannot reconstruct a particular trip. `inst_reqs` derives each request's route and pattern
+and pickup window when constructing its final JSON fields; `output.jl` assembles
+the network and candidate JSON schemas.
 
 The corridor and scenario files retain the reference instance sections
 `config`, `network`, `requests`, and `parameters`. There is intentionally no
@@ -328,15 +378,15 @@ availability are separate extensions identified in the first-step email.
 | Field | Meaning |
 | --- | --- |
 | `network.stops` | Ordered logical stop IDs. Each physical GTFS stop gets a separate logical ID in each direction. |
-| `network.directions` | Direction ID, GTFS pattern, label, ordered logical/source stop IDs, terminal IDs, and direction-specific operating period. |
+| `network.patterns` | Directed route ID, GTFS pattern, label, logical stop IDs, terminal IDs, and pattern-specific operating period. |
 | `network.coordinates` | Logical stop ID → `[longitude, latitude]` from `stops.txt`. |
 | `network.source_stop_ids`, `network.stop_names` | Maps logical IDs back to the GTFS stop ID and name. |
 | `network.mandatory_stops`, `network.optional_stops` | Complete, non-overlapping logical stop classification. |
 | `network.class_reasons` | Reason for every mandatory/optional assignment. Mandatory source-stop choices are editable in `src/reqreate-gen/stop_classes_550.json`. |
 | `network.travel_times` | `"origin_id,destination_id"` → scheduled whole minutes. Only forward-ordered pairs within one direction are present; cross-direction pairs have no route meaning. |
-| `network.dwell_times` | Logical stop ID → median GTFS dwell, floored to whole minutes. A negative source dwell is an input error. |
-| `timetable_550.service_calendar` | Weekly GTFS rules and date exceptions for the service IDs used by the selected route, plus the active IDs for the selected date. |
-| `requests.prebooked`, `requests.dynamic` | Maps from request ID to the KU Leuven request fields plus `direction`. |
+| `network.dwell_times` | Logical stop ID → zero dwell minutes; the crawler accepts only equal arrival and departure times at a stop. |
+| `timetable_550.service_calendars` | Weekly GTFS rules and date exceptions for the service IDs used by the selected route, plus the active IDs for the selected date. |
+| `requests.prebooked`, `requests.dynamic` | Maps from request ID to the KU Leuven request fields plus `route_id` and `pattern_id`. |
 | `parameters.operating_hours` | `[start, end]` in minutes from GTFS service-day start. End may exceed 1440 for trips after midnight. |
 | `parameters.promise_window` | Early and late pickup allowances, both 5 minutes. |
 | `generation`, `metadata` | Seed, candidate construction, scenario allocations, provenance, and explicit scope notes. |
@@ -364,8 +414,8 @@ Edit `src/reqreate-gen/demand_config.jl` to change demand-generation settings,
 then rerun `generate.jl`. Lead-time metadata and scenario counts are derived
 from these settings. Pre-booking leads use whole days; dynamic leads and pickup
 half-windows use minutes. Scenario totals must be even and their per-cell
-allocations must fit the candidate pool. Booking types and directions 0/1
-remain evenly balanced. The values below describe the default settings.
+allocations must fit the candidate pool. Booking types remain evenly balanced; each booking total is spread across
+route patterns using integer division and deterministic remainders. The values below describe the default settings.
 
 The Julia-native pool is REQreate-inspired and samples only from the crawled
 corridor and timetable; Python does not generate demand. Julia first enumerates
@@ -380,15 +430,15 @@ each candidate has a stable ID for request ordering.
 
 | Scenario | Requests | Pre-booked | Dynamic | Direction split |
 | --- | ---: | ---: | ---: | --- |
-| Low | 50 | 25 | 25 | 25 each; booking/direction cells are balanced 12/13 deterministically |
-| Base | 100 | 50 | 50 | 50 each; 25 in every booking/direction cell |
-| High | 200 | 100 | 100 | 100 each; 50 in every booking/direction cell |
+| Low | 50 | 25 | 25 | 25 each; booking/route/pattern cells are balanced 12/13 deterministically |
+| Base | 100 | 50 | 50 | 50 each; 25 in every booking/route/pattern cell |
+| High | 200 | 100 | 100 | 100 each; 50 in every booking/route/pattern cell |
 
 Pre-booked lead times are sampled uniformly from 1–3 days. Dynamic lead times
 are sampled uniformly from 5–30 minutes and remain within service hours.
 Every pickup window is desired time ±5 minutes. Candidate samples are
 nested across scenarios and selected without replacement within each
-booking/direction cell. This makes the three demand levels comparable while
+booking/route/pattern cell. This makes the three demand levels comparable while
 keeping the total assumptions explicit. The fixed seed is 42.
 
 The candidate pool stores source trip and source stop IDs so its provenance

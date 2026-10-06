@@ -1,179 +1,140 @@
 #=
-Sample seeded passenger demand from feasible Route 550 timetable pairs.
+Generate demand in three steps:
+1. Enumerate feasible scheduled trip/OD pairs in timetable order.
+2. Sample booking leads and shuffle a candidate pool for each booking/route/pattern cell.
+3. Take cell prefixes, sort by booking time, and number the scenario requests.
+
+Larger scenarios reuse the same prefixes, so their candidate samples are nested.
 
 Included by `generate.jl`; settings are defined in `demand_config.jl`.
 =#
 
 using Random
 
-"""
-List trip/stop pairs whose pickup windows and scheduled journeys fit the direction timetable.
+"""Check whether a scheduled trip/OD pair fits the pattern's service hours and travel time."""
+function is_eligible_scheduled_pair(pair::SchedPair, net_pat::RoutePattern, net::NetworkData)
+    start_min = s2m(net_pat.service_period.start_seconds)
+    end_min = cld(net_pat.service_period.end_seconds, 60)
+    return start_min + PICKUP_HALF_WIDTH_MIN <= pair.des_min <= end_min - PICKUP_HALF_WIDTH_MIN &&
+           pair.des_min + net.travel_times[od_key(pair.org, pair.dst)] <= pair.sched_arr_min
+end
 
-## SchedPair fields
-
-- `org`: Origin logical stop ID.
-- `dst`: Destination logical stop ID after the origin.
-- `des_min`: Scheduled pickup time in whole service-day minutes.
-- `sched_arr_min`: Scheduled destination arrival in whole service-day minutes.
-- `src_trip_id`: Original GTFS trip ID supplying this pair.
 """
-function elig_sched_pairs(pat, dir::Direction, net::NetworkData)
-    logi_stops = dir.stops
-    start_min = s2m(dir.service_period.start_seconds)
-    end_min = cld(dir.service_period.end_seconds, 60)
-    sched_pairs = SchedPair[]
+List trip/stop pairs whose pickup windows and scheduled journeys fit the pattern timetable.
+"""
+function eligible_scheduled_pairs(pat, net_pat::RoutePattern, net::NetworkData)
+    logi_stops = net_pat.stops
+    scheduled_pairs = SchedPair[]
 
     # Each eligible trip/OD combination contributes one sampling opportunity.
     # Frequencies in the timetable therefore shape the desired-time profile.
-    for trip in pat["trips"]
+    for trip in pat.trips
         evts = trip["stop_times"]
         for org_idx in 1:(length(logi_stops) - 1)
             org = logi_stops[org_idx]
             des_min = s2m(Int(evts[org_idx]["departure_seconds"]))
             for dst_idx in (org_idx + 1):length(logi_stops)
                 dst = logi_stops[dst_idx]
-                arr_min = s2m(Int(evts[dst_idx]["arrival_seconds"]))
-                dur_min = net.travel_times[od_key(org, dst)]
-                if des_min - PICKUP_HALF_WIDTH_MIN < start_min ||
-                   des_min + dur_min > arr_min ||
-                   des_min + PICKUP_HALF_WIDTH_MIN > end_min
-                    continue
-                end
-                push!(sched_pairs, SchedPair(
-                    org,
-                    dst,
-                    des_min,
-                    arr_min,
-                    String(trip["trip_id"]),
-                ))
+                arr_min = s2m(Int(evts[dst_idx]["departure_seconds"]))
+                pair = SchedPair(org, dst, des_min, arr_min, String(trip["trip_id"]))
+                is_eligible_scheduled_pair(pair, net_pat, net) && push!(scheduled_pairs, pair)
             end
         end
     end
-    return sched_pairs
+    return scheduled_pairs
 end
 
 """
-Sample and shuffle seeded candidate requests for each booking type and direction.
-
-## Candidate fields
-
-- `candidate_id`: Unique booking-type_direction_index identifier within the candidate pool.
-- `origin`: Origin logical stop ID.
-- `destination`: Destination logical stop ID.
-- `booking_type`: Booking category: "prebooked" or "dynamic".
-- `desired_time`: Desired pickup time in service-day minutes.
-- `request_time`: Booking submission time in service-day minutes, possibly negative.
-- `source_trip_id`: Original GTFS trip ID used to generate the candidate.
-- `scheduled_arrival_minute`: Source trip's destination arrival in whole service-day minutes.
+Sample and shuffle seeded candidate requests for each booking type and route pattern.
 """
-function build_cand_pool(crawl, net; seed::Int=SEED)
+function build_cand_pool(timetable_pats, net; seed::Int=SEED)
     rng = MersenneTwister(seed)
-    cands = Dict{String, Vector{Candidate}}()
-    pats = Dict(String(pat["pattern_id"]) => pat for pat in crawl["patterns"])
-    for dir in net.directions
-        dir_id = dir.direction_id
-        pat = pats[dir.pattern_id]
-        sched_pairs = elig_sched_pairs(pat, dir, net)
-        start_min = s2m(dir.service_period.start_seconds)
-        for book_type in ("prebooked", "dynamic")
-            # Booking lead and pickup width are independently configurable.
-            # Dynamic pairs need enough lead time after service starts.
-            elig_pairs = book_type == "dynamic" ?
-                filter(pair -> pair.des_min - start_min >= first(DYN_LEAD_MIN), sched_pairs) : sched_pairs
+    cands = Dict()
+    pats = Dict((pat.route_id, pat.pattern_id) => pat for pat in timetable_pats)
+    for (pat_idx, net_pat) in enumerate(net.patterns)
+        pat = pats[(net_pat.route_id, net_pat.pattern_id)]
+        scheduled_pairs = eligible_scheduled_pairs(pat, net_pat, net)
+        start_min = s2m(net_pat.service_period.start_seconds)
+        # Dynamic bookings need room for their minimum lead after service starts.
+        dyn_pairs = filter(pair -> pair.des_min - start_min >= first(DYN_LEAD_MIN), scheduled_pairs)
+        # Preserve cell order and draw pair → lead → shuffle for seeded reproducibility.
+        for (book_type, eligible_pairs) in (("prebooked", scheduled_pairs), ("dynamic", dyn_pairs))
             cand_cell = Candidate[]
             for cand_idx in 1:CAND_COUNT_PER_CELL
-                pair = rand(rng, elig_pairs)
-                max_lead = min(last(DYN_LEAD_MIN), pair.des_min - start_min)
-                lead = book_type == "prebooked" ?
-                    rand(rng, PREBOOK_LEAD_DAYS) * 1440 : rand(rng, first(DYN_LEAD_MIN):max_lead)
-                des_min = pair.des_min
+                pair = rand(rng, eligible_pairs)
+                lead = if book_type == "prebooked"
+                    rand(rng, PREBOOK_LEAD_DAYS) * 1440
+                else
+                    max_lead = min(last(DYN_LEAD_MIN), pair.des_min - start_min)
+                    rand(rng, first(DYN_LEAD_MIN):max_lead)
+                end
                 push!(cand_cell, Candidate(
-                    "$(book_type)_$(dir_id)_$(cand_idx)",
+                    "$(book_type)_$(pat_idx)_$(cand_idx)",
                     pair.org,
                     pair.dst,
                     book_type,
-                    des_min,
-                    des_min - lead,
+                    pair.des_min,
+                    pair.des_min - lead,
                     pair.src_trip_id,
                     pair.sched_arr_min,
                 ))
             end
             shuffle!(rng, cand_cell)
-            cands["$(book_type)_$(dir_id)"] = cand_cell
+            cands[(book_type, net_pat.route_id, net_pat.pattern_id)] = cand_cell
         end
     end
     return cands
 end
 
-"""Split an even request total equally across booking types and directions 0/1."""
-function scen_allocs(total::Int)
-    # Request totals are even. The 50-request case has four cells with two
-    # half-cell remainders; put them on opposite booking types per direction.
-    half = total ÷ 2
-    base = half ÷ 2
-    remainder = half % 2
-    return (
-        prebooked_0=base + remainder,  # Pre-booked request count in direction 0.
-        prebooked_1=base,  # Pre-booked request count in direction 1.
-        dynamic_0=base,  # Dynamic request count in direction 0.
-        dynamic_1=base + remainder,  # Dynamic request count in direction 1.
-    )
+"""
+Split an even total equally by booking type and as evenly as possible by pattern.
+Pre-booked remainders go from the first pattern forward; dynamic remainders
+start halfway through the pattern list. Prefixes remain nested as scenario totals increase.
+"""
+function scen_allocs(total::Int, net::NetworkData)
+    count = length(net.patterns)
+    base, remainder = divrem(total ÷ 2, count)
+    return [(
+        booking_type=book_type,
+        route_id=pat.route_id,
+        pattern_id=pat.pattern_id,
+        count=base + (mod(idx - 1 - offset, count) < remainder),
+    ) for (book_type, offset) in (("prebooked", 0), ("dynamic", count ÷ 2))
+      for (idx, pat) in enumerate(net.patterns)]
 end
 
 """
 Return numbered scenario requests and cell allocations from prefixes of the candidate pool.
-
-## RequestGroups fields
-
-- `prebooked`: Request ID → pre-booked request.
-- `dynamic`: Request ID → dynamic request.
-
-## Request fields
-
-- `id`: Zero-based request ID shared across both booking categories.
-- `type`: Booking category: "prebooked" or "dynamic".
-- `origin`: Origin logical stop ID.
-- `destination`: Destination logical stop ID.
-- `desired_time`: Desired pickup time in service-day minutes.
-- `request_time`: Booking submission time in service-day minutes, possibly negative.
 """
 function inst_reqs(cands, total::Int, net::NetworkData)
-    allocs = scen_allocs(total)
-    all_reqs = Candidate[]
-    for (cell_key, n_keep) in pairs(allocs)
-        append!(all_reqs, cands[string(cell_key)][1:n_keep])
-    end
-    sort!(all_reqs; by=item -> (
-        item.request_time,  # Sort first by booking submission time.
-        item.desired_time,  # Break ties by desired pickup time.
-        stop_dir(net, item.origin).direction_id,  # Break remaining ties by direction.
-        item.booking_type,  # Then compare booking categories.
-        item.origin,  # Then compare origin logical IDs.
-        item.destination,  # Then compare destination logical IDs.
-        item.candidate_id,  # Use the unique candidate ID as the final tie-breaker.
+    allocs = scen_allocs(total, net)
+    sel = Candidate[cand for alloc in allocs
+                    for cand in cands[(alloc.booking_type, alloc.route_id, alloc.pattern_id)][1:alloc.count]]
+    # Booking time comes first; the remaining fields deterministically break ties.
+    sort!(sel; by=cand -> (
+        cand.request_time, cand.desired_time, stop_pat(net, cand.origin).route_id,
+        cand.booking_type, cand.origin, cand.destination, cand.candidate_id,
     ))
-    reqs = RequestGroups(
-        Dict{String, Request}(),
-        Dict{String, Request}(),
-    )
-    for (req_idx, item) in enumerate(all_reqs)
-        book_type = item.booking_type
+    reqs = (prebooked=Dict{String, NamedTuple}(), dynamic=Dict{String, NamedTuple}())
+    for (req_idx, cand) in enumerate(sel)
+        book_type = cand.booking_type
         req_id = req_idx - 1
-        req = Request(
-            req_id,
-            book_type,
-            item.origin,
-            item.destination,
-            item.desired_time,
-            item.request_time,
+        # Emit the scenario schema directly; IDs span both booking categories.
+        req = (
+            id=req_id,
+            type=book_type,
+            origin=cand.origin,
+            destination=cand.destination,
+            desired_time=cand.desired_time,
+            time_window=pickup_window(cand.desired_time),
+            request_time=cand.request_time,
+            route_id=stop_pat(net, cand.origin).route_id,
+            pattern_id=stop_pat(net, cand.origin).pattern_id,
         )
         req_map = book_type == "prebooked" ? reqs.prebooked : reqs.dynamic
         req_map[string(req_id)] = req
     end
-    return (
-        reqs,  # Scenario requests grouped by booking category.
-        allocs,  # Request counts for each booking-type/direction cell.
-    )
+    return reqs, allocs
 end
 
 """Return the earliest and latest pickup minutes around a desired service-day time."""

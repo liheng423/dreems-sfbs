@@ -1,6 +1,3 @@
-"""Convert a JSON3 object or other pair collection to a string-keyed dictionary."""
-asdict(val) = Dict{String, Any}(String(key) => item for (key, item) in pairs(val))
-
 """Write a JSON value with indentation, creating its parent directory first."""
 function write_json(path::AbstractString, val)
     mkpath(dirname(path))

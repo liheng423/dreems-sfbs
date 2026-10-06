@@ -1,14 +1,14 @@
 #!/usr/bin/env julia
 
-"""Render direction-aware Route 550 scenario maps and an overview PDF.
+"""Render route-pattern scenario maps and an overview PDF.
 
 Usage:
     julia --project=. src/vis/visualize.jl
     julia --project=. src/vis/visualize.jl [instances_dir] [output_dir]
     julia --project=. src/vis/visualize.jl --label-stops
 
-Each scenario produces one PNG per direction. The overview PDF places the
-three demand levels side by side for both directions. No city-centre pair or
+Each scenario produces one PNG per route pattern. The overview PDF places the
+three demand levels side by side for all patterns. No city-centre pair or
 fleet section is assumed.
 """
 
@@ -17,48 +17,40 @@ ENV["GKSwstype"] = "100"  # Render to files without trying to open a desktop win
 using Plots
 
 const SCRIPT_DIR = @__DIR__
-const BUS550_ROOT = dirname(SCRIPT_DIR)
+const BUS550_ROOT = dirname(dirname(SCRIPT_DIR))
 const DEFAULT_INSTANCE_DIR = joinpath(BUS550_ROOT, "data", "instances")
 const DEFAULT_OUTPUT_DIR = joinpath(BUS550_ROOT, "visualizations")
 
-struct ColorPalette
-    route::Symbol
-    prebooked::Symbol
-    dynamic::Symbol
-    optional::Symbol
-    mandatory::Symbol
-    terminal::Symbol
-end
-
-request_color(colors::ColorPalette, booking_type::String) =
-    booking_type == "prebooked" ? colors.prebooked : colors.dynamic
-
-const COLORS = ColorPalette(
-    :steelblue4,
-    :dodgerblue3,
-    :darkorange2,
-    :gray65,
-    :black,
-    :forestgreen,
+# Fixed colors shared by individual maps and the overview.
+const COLORS = (
+    route=:steelblue4,
+    prebooked=:dodgerblue3,
+    dynamic=:darkorange2,
+    optional=:gray65,
+    mandatory=:black,
+    terminal=:forestgreen,
 )
+
+request_color(colors, book_type::String) =
+    book_type == "prebooked" ? colors.prebooked : colors.dynamic
 
 function stop_xy(net, stop_id)
     xy = net["coordinates"][string(stop_id)]
     return Float64(xy[1]), Float64(xy[2])
 end
 
-function scen_reqs(inst, dir_id)
+function scen_reqs(inst, pat)
     [(kind=book_type, org=Int(req["origin"]), dst=Int(req["destination"]))
      for book_type in ("prebooked", "dynamic")
      for req in values(inst["requests"][book_type])
-     if String(req["direction"]) == dir_id]
+     if req["route_id"] == pat["route_id"] && req["pattern_id"] == pat["pattern_id"]]
 end
 
-function dir_title(inst, dir, req_count)
+function pat_title(inst, pat, req_count)
     scen = String(inst["config"]["scenario"])
-    line = String(inst["config"]["route_short_name"])
+    line = String(inst["config"]["dataset"])
     date = String(inst["config"]["service_date"])
-    return "Line $line · $scen demand · $date\n$(dir["label"]) ($req_count requests)"
+    return "Line $line · $scen demand · $date\n$(pat["label"]) ($req_count requests)"
 end
 
 function draw_reqs!(plt, inst, reqs)
@@ -73,10 +65,10 @@ function draw_reqs!(plt, inst, reqs)
     end
 end
 
-function draw_stops!(plt, net, dir; lbl_stops::Bool=false)
-    stop_ids = Int.(dir["stops"])
+function draw_stops!(plt, net, pat; lbl_stops::Bool=false)
+    stop_ids = Int.(pat["stops"])
     mand_ids = Set(Int.(net["mandatory_stops"]))
-    term_ids = Set(Int.(dir["terminal_ids"]))
+    term_ids = Set(Int.(pat["terminal_ids"]))
     opt_ids = [id for id in stop_ids if !(id in mand_ids)]
     mand_stop_ids = [id for id in stop_ids if id in mand_ids && !(id in term_ids)]
 
@@ -100,16 +92,16 @@ function draw_stops!(plt, net, dir; lbl_stops::Bool=false)
     end
 end
 
-function plot_dir(inst, dir; compact::Bool=false, lbl_stops::Bool=false)
+function plot_pat(inst, pat; compact::Bool=false, lbl_stops::Bool=false)
     net = inst["network"]
-    stop_ids = Int.(dir["stops"])
+    stop_ids = Int.(pat["stops"])
     xy = [stop_xy(net, id) for id in stop_ids]
-    reqs = scen_reqs(inst, String(dir["direction_id"]))
+    reqs = scen_reqs(inst, pat)
     scen = String(inst["config"]["scenario"])
-    dir_label = String(dir["label"])
+    pat_label = String(pat["label"])
     req_count = length(reqs)
-    overview_title = "$scen · n=$req_count\n$(replace(dir_label, " -> " => " → "))"
-    plt = plot(; title=compact ? overview_title : dir_title(inst, dir, req_count),
+    overview_title = "$scen · n=$req_count\n$(replace(pat_label, " -> " => " → "))"
+    plt = plot(; title=compact ? overview_title : pat_title(inst, pat, req_count),
              xlabel=compact ? "" : "longitude",
              ylabel=compact ? "" : "latitude",
              legend=compact ? false : :outerright,
@@ -121,7 +113,7 @@ function plot_dir(inst, dir; compact::Bool=false, lbl_stops::Bool=false)
     plot!(plt, first.(xy), last.(xy); color=COLORS.route, linewidth=2.2,
           alpha=0.9, label="scheduled stop order")
     draw_reqs!(plt, inst, reqs)
-    draw_stops!(plt, net, dir; lbl_stops=lbl_stops && !compact)
+    draw_stops!(plt, net, pat; lbl_stops=lbl_stops && !compact)
     return plt
 end
 
@@ -130,24 +122,25 @@ function main(args=ARGS)
     lbl_stops = "--label-stops" in args
     inst_dir = length(pos_args) >= 1 ? abspath(pos_args[1]) : DEFAULT_INSTANCE_DIR
     out_dir = length(pos_args) >= 2 ? abspath(pos_args[2]) : DEFAULT_OUTPUT_DIR
-    scen_paths = [joinpath(inst_dir, "550_$(name).json") for name in ("low", "base", "high")]
+    scen_paths = sort(filter(path -> endswith(path, ".json"), readdir(inst_dir; join=true)))
     insts = [JSON3.read(read(path, String)) for path in scen_paths]
     mkpath(out_dir)
 
     ovw = Plots.Plot[]
-    for (scen_idx, scen) in enumerate(("low", "base", "high"))
-        inst = insts[scen_idx]
-        for dir in inst["network"]["directions"]
-            dir_id = String(dir["direction_id"])
-            out_path = joinpath(out_dir, "550_$(scen)_direction_$(dir_id).png")
-            savefig(plot_dir(inst, dir; lbl_stops=lbl_stops), out_path)
+    for inst in insts
+        scen = String(inst["config"]["scenario"])
+        for (pat_idx, pat) in enumerate(inst["network"]["patterns"])
+            dataset = inst["config"]["dataset"]
+            out_path = joinpath(out_dir, "$(dataset)_$(scen)_pattern_$(pat_idx).png")
+            savefig(plot_pat(inst, pat; lbl_stops=lbl_stops), out_path)
             println("Saved $out_path")
-            push!(ovw, plot_dir(inst, dir; compact=true))
+            push!(ovw, plot_pat(inst, pat; compact=true))
         end
     end
-    ovw_plot = plot(ovw...; layout=(3, 2), size=(1420, 1510),
-                         plot_title="Route 550 · scheduled corridor and demand scenarios")
-    pdf_path = joinpath(out_dir, "route550_scenarios_overview.pdf")
+    ovw_plot = plot(ovw...; layout=(length(insts), length(first(insts)["network"]["patterns"])),
+                         size=(710 * length(first(insts)["network"]["patterns"]), 500 * length(insts)),
+                         plot_title="Scheduled bus network and demand scenarios")
+    pdf_path = joinpath(out_dir, "network_scenarios_overview.pdf")
     savefig(ovw_plot, pdf_path)
     println("Saved $pdf_path")
 end

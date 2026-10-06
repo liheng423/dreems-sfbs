@@ -69,6 +69,7 @@ def time_seconds(value: str) -> Optional[int]:
 
 
 def stop_event(row: dict) -> dict:
+    """Keep one scheduled second value for stops without dwell time."""
     arrival = row.get("arrival_time", "")
     departure = row.get("departure_time", "")
     arrival_seconds = time_seconds(arrival)
@@ -77,12 +78,15 @@ def stop_event(row: dict) -> dict:
         arrival_seconds = departure_seconds
     if departure_seconds is None:
         departure_seconds = arrival_seconds
+    if arrival_seconds != departure_seconds:
+        raise ValueError(
+            "Stop arrivals and departures differ; the normalized timetable stores one time per stop"
+        )
     return {
         "stop_sequence": int(row["stop_sequence"]),
         "stop_id": row["stop_id"],
         "arrival_time": arrival or departure,
         "departure_time": departure or arrival,
-        "arrival_seconds": arrival_seconds,
         "departure_seconds": departure_seconds,
         "pickup_type": row.get("pickup_type", ""),
         "drop_off_type": row.get("drop_off_type", ""),
@@ -159,7 +163,7 @@ def crawl(
         last_name = stop_table[signature[-1]]["stop_name"]
         pattern_trips = []
         for trip, raw_events in members:
-            events = [stop_event(row) for row in sorted(raw_events, key=lambda row: int(row["stop_sequence"]))]
+            events = [stop_event(row) for row in raw_events]
             used_stop_ids.update(event["stop_id"] for event in events)
             pattern_trips.append(
                 {
@@ -178,7 +182,7 @@ def crawl(
             )
         )
         starts = [trip["stop_times"][0]["departure_seconds"] for trip in pattern_trips]
-        ends = [trip["stop_times"][-1]["arrival_seconds"] for trip in pattern_trips]
+        ends = [trip["stop_times"][-1]["departure_seconds"] for trip in pattern_trips]
         patterns.append(
             {
                 "pattern_id": f"{direction_id or 'unspecified'}-{pattern_number:02d}",
