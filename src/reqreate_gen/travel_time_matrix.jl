@@ -21,6 +21,7 @@ using JSON3
 using Statistics
 
 include("types.jl")
+include("demand_config.jl")
 include("routes.jl")
 include(joinpath("input_adapters", "network.jl"))
 include(joinpath("output_adapters", "output.jl"))

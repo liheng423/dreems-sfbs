@@ -12,15 +12,15 @@ volumes below are generated study scenarios; they are not observed ridership.
 | `src/crawler/python/crawl_gtfs.py` | Extract a selected route and service date from a static GTFS ZIP. It does not classify stops or make demand. |
 | `src/crawler/python/crawl_realtime_550.py` | Capture Route 550 HAFAS real-time departure estimates into append-only JSON Lines. |
 | `src/reqreate_gen/generate.jl` | Read inputs, assemble outputs, and write the corridor, timetable, candidate pool, and scenarios. |
-| `src/reqreate_gen/demand_config.jl` | Demand seed, candidate count per cell, pickup half-window, booking lead ranges, and scenario request counts. |
+| `src/reqreate_gen/demand_config.jl` | Uniform stop dwell, demand seed, candidate count per cell, pickup half-window, booking lead ranges, and scenario request counts. |
 | `src/reqreate_gen/types.jl` | Core records used repeatedly in network and demand calculations. One-off JSON envelopes and metadata are named tuples at their construction sites. |
 | `src/reqreate_gen/output_adapters/output.jl` | Build network, candidate, and scenario-request records for the JSON schema. |
 | `src/reqreate_gen/routes.jl` | Network lookups for route patterns and physical/logical stop IDs. |
 | `src/reqreate_gen/input_adapters/network.jl` | Build direction-specific logical stops, stop classes, and scheduled travel times. |
 | `src/reqreate_gen/travel_time_matrix.jl` | Build a separate real-time-adjusted travel-time matrix from captured HAFAS estimates. |
-| `src/reqreate_gen/demand_generators/eligibility.jl` | Enumerate feasible scheduled trip/stop pairs. |
-| `src/reqreate_gen/demand_generators/allocations.jl` | Allocate scenario requests across booking types and route patterns. |
-| `src/reqreate_gen/demand_generators/demand.jl` | Sample the candidate pool and select scenario candidates. |
+| `src/reqreate_gen/demand_generators/eligibility.jl` | Filter sampled passenger preferences using mandatory-corridor timing. |
+| `src/reqreate_gen/demand_generators/allocations.jl` | Allocate scenario booking counts, select candidates, and assign electric/conventional service. |
+| `src/reqreate_gen/demand_generators/demand.jl` | Sample and filter the candidate pool. |
 | `src/utilities/utilities.jl` | Shared file-writing, service-time, and ordered-pair helpers used by the generator. |
 | `src/vis/visualize.jl` | Render a separate map for each scenario direction and a six-panel PDF overview. |
 | `src/reqreate_gen/stop_classes_550.json` | Reviewable source-stop mapping for mandatory anchors and interchanges. Other stops are optional; pattern terminals are always mandatory. |
@@ -29,7 +29,7 @@ volumes below are generated study scenarios; they are not observed ridership.
 | `data/travel_time_matrix_550.json` | Ordered stop-pair matrix estimated from matched live departure observations. |
 | `data/corridor_550.json` | Shared route network and operating parameters without passenger demand. |
 | `data/timetable_550.json` | Full trip timetable, route-relevant weekly calendar rules, date exceptions, and active service metadata. |
-| `data/candidate_pool_550.json` | Seeded 8,000-request candidate pool (2,000 per booking-type/route/pattern cell) used to sample scenarios. |
+| `data/candidate_pool_550.json` | Surviving candidates from 8,000 seeded raw attempts (4,000 per route pattern). |
 | `data/instances/550_{low,base,high}.json` | 50, 100, and 200 request instances. |
 | `visualizations/` | Per-scenario, per-direction PNGs and the overview PDF. |
 
@@ -65,8 +65,8 @@ interfaces.
 | `book` | booking type | `book_type` |
 | `prebook` | pre-booked | `prebook_count` |
 | `dyn` | dynamic | `dyn_count` |
-| `scen` | scenario | `scen_allocs`, `scen_reqs` |
-| `alloc` / `allocs` | allocation(s) | `scen_allocs` |
+| `scen` | scenario | `scen_reqs` |
+| `alloc` / `allocs` | allocation(s) | `bus_allocs` |
 | `inst` | instance | `inst_cfg` |
 | `req` / `reqs` | request(s) | `draw_reqs!` |
 | `obs` | observation | `read_obs`, `closest_obs_by_evt` |
@@ -100,7 +100,6 @@ The renamed function map is:
 | `whole_minute_median` | `med_min` |
 | `build_network` | `build_net` |
 | `build_candidate_pool` | `build_cand_pool` |
-| `scenario_allocations` | `scen_allocs` |
 | `read_observations` | `read_obs` |
 | `closest_observation_by_event` | `closest_obs_by_evt` |
 | `logical_stops_by_pattern` | `build_net` |
@@ -126,7 +125,7 @@ Schema keys such as `"origin"`, `"destination"`, and `"request_time"` remain
 unchanged in generated JSON.
 
 `types.jl` defines fixed-shape records for service periods, route patterns,
-networks, scheduled pairs, and candidates. Output adapters expand network and
+networks, and candidates. Output adapters expand network and
 candidate records into named tuples; `requests_output` builds scenario request
 named tuples and the ID-keyed dictionaries required by the JSON schema.
 
@@ -164,9 +163,9 @@ that network. Pattern terminals are mandatory even without a configured source
 stop entry. Single-line filenames use its short name (e.g. `550_low.json`);
 multi-line filenames use `network` (e.g. `network_low.json`).
 
-Demand cells use `(booking_type, route_id, pattern_id)` internally. The JSON
-candidate pool is an array of cell objects with these fields and a `candidates`
-array. Allocation metadata is an array named `route_pattern_booking_allocations`
+Candidate pools use `(route_id, pattern_id)` internally and contain unlabeled
+OD/pickup preferences. The JSON pool is an array of pattern objects with a
+`candidates` array. Booking types are assigned during scenario allocation. Allocation metadata is an array named `route_pattern_booking_allocations`
 with a `count` per cell. Requests replace the old `direction` field with
 `route_id` and `pattern_id`. Equal allocation is by pattern, so a route with
 more patterns receives more requests; this is a synthetic scenario assumption.
@@ -176,8 +175,7 @@ orders so larger scenarios retain smaller scenarios' candidate prefixes.
 Snapshot/pattern order determines logical numbering and seeded draw order.
 
 These changes replace the version-1 JSON layout; regenerate datasets before
-using the updated visualizer. Pickup eligibility, lead-time rules, and seeded
-sampling remain unchanged for the existing two-pattern Route 550 input.
+using the updated visualizer. Demand now uses sample-then-filter preferences; see Demand scenario assumptions.
 
 Checks: `julia --project=. test/requests.jl` and
 `julia --project=. test/routes.jl`.
@@ -259,13 +257,12 @@ arrival. Times use the GTFS service-day axis, so the final inbound arrival is
 24:01:50 (minute 1442 after rounding the window end up to a whole minute).
 
 Demand is synthetic and scenario-based, not observed ridership. Low, base, and
-high instances contain 50, 100, and 200 requests respectively, split evenly
+high instances contain 50, 100, and 200 requests respectively, split by the configured booking share
 between pre-booked and dynamic requests and balanced across directions. The
-generator samples seeded, feasible scheduled trip/stop pairs, uses pickup
-windows of desired time ±5 minutes, gives pre-booked requests 1–3 days of lead
-time and dynamic requests 5–30 minutes, and nests the scenario samples using
-seed 42. The detailed eligibility and allocation rules follow under Demand
-scenario assumptions.
+generator samples stop pairs and normally distributed desired pickup times
+independently of scheduled departures, filters corridor timing, uses ±5-minute
+pickup windows, and nests scenario samples with seed 42. Pre-booking leads
+are 1–3 days; dynamic leads are 5–30 minutes. See Demand scenario assumptions.
 
 ## Rebuild the corridor and demand files
 
@@ -360,13 +357,11 @@ Internal records avoid storing values that can be derived from the network:
 `RoutePattern` keeps its stop sequence without copying source IDs or terminal IDs;
 `NetworkData` keeps route pattern sequences and mandatory IDs without separate all-stop,
 optional-stop, or terminal lists. `ServicePeriod` stores seconds only, preserving
-precision while minute bounds are calculated as needed. `ScheduledPair` and `Candidate`
-keep logical stop IDs and trip-specific provenance; source stop IDs, candidate
-directions, pickup windows, and dynamic lead limits are derived when needed.
-Trip IDs and scheduled arrival times remain because aggregate network travel
-times cannot reconstruct a particular trip. `requests_output` derives each
-request's route, pattern, and pickup window when constructing its final JSON
-fields; `output.jl` also assembles the network and candidate JSON schemas.
+precision while minute bounds are calculated as needed. `Candidate` stores
+sampled passenger preferences independently of scheduled
+trips. Source stop IDs, routes, patterns, and pickup windows are derived for
+output. The timetable sidecar retains original GTFS trips for provenance;
+candidates do not claim a source trip or scheduled arrival.
 
 The corridor and scenario files retain the reference instance sections
 `config`, `network`, `requests`, and `parameters`. There is intentionally no
@@ -383,7 +378,7 @@ availability are separate extensions identified in the first-step email.
 | `network.mandatory_stops`, `network.optional_stops` | Complete, non-overlapping logical stop classification. |
 | `network.class_reasons` | Reason for every mandatory/optional assignment. Mandatory source-stop choices are editable in `src/reqreate_gen/stop_classes_550.json`. |
 | `network.travel_times` | `"origin_id,destination_id"` → scheduled whole minutes. Only forward-ordered pairs within one direction are present; cross-direction pairs have no route meaning. |
-| `network.dwell_times` | Logical stop ID → zero dwell minutes; the crawler accepts only equal arrival and departure times at a stop. |
+| `network.dwell_times` | Logical stop ID → configured `DWELL_MIN` whole minutes (default 0). This service assumption is independent of the GTFS stop timestamps. |
 | `timetable_550.service_calendars` | Weekly GTFS rules and date exceptions for the service IDs used by the selected route, plus the active IDs for the selected date. |
 | `requests.prebooked`, `requests.dynamic` | Maps from request ID to the KU Leuven request fields plus `route_id` and `pattern_id`. |
 | `parameters.operating_hours` | `[start, end]` in minutes from GTFS service-day start. End may exceed 1440 for trips after midnight. |
@@ -407,75 +402,75 @@ are optional. The reasons are recorded per logical stop in
 `network.class_reasons`; update the source-ID mapping and rerun Julia to review
 alternative choices.
 
+## Configured stop dwell
+
+Set `DWELL_MIN` in `src/reqreate_gen/demand_config.jl` to a nonnegative whole
+number of minutes per stop (default `0`; use `1` for Leuven's dwell assumption).
+Run `julia --project=. src/reqreate_gen/generate.jl` to update the network and
+requests, then `julia --project=. src/vis/visualize.jl` to refresh the maps.
+
+The value is written to every logical stop's `network.dwell_times` and used by
+the mandatory-corridor demand filter. It does not modify GTFS timestamps or
+subtract dwell from the scheduled travel-time matrix. The live-matrix builder
+uses the same configuration when constructing its network.
+
 ## Demand scenario assumptions
 
-Edit `src/reqreate_gen/demand_config.jl` to change demand-generation settings,
-then rerun `generate.jl`. Lead-time metadata and scenario counts are derived
-from these settings. Pre-booking leads use whole days; dynamic leads and pickup
-half-windows use minutes. Scenario totals must be even and their per-cell
-allocations must fit the candidate pool. Booking types remain evenly balanced; each booking total is spread across
-route patterns using integer division and deterministic remainders. The values below describe the default settings.
+The generator draws one shared, unlabeled pool per directed route pattern.
+`CAND_COUNT_PER_PATTERN = 4_000` gives 8,000 raw attempts for Route 550, with
+seed 42. Each draw chooses two distinct logical stops uniformly, orders them
+forward, and samples desired pickup time from a normal distribution. Its mean
+is the service-period midpoint and its standard deviation is one-sixth of the
+period; `DES_MEAN_FRACTION` and `DES_STD_FRACTION` configure these values.
 
-The Julia-native pool is REQreate-inspired and samples only from the crawled
-corridor and timetable; Python does not generate demand. The following terms
-describe its demand calculation. All times are whole minutes from service-day
-midnight and may exceed 1,440.
+Candidates contain only an ID, origin, destination, and desired pickup time.
+They have no booking type, submission timestamp, bus type, or source trip.
+Corridor timing rejects impossible pickup preferences, then shuffles survivors
+once per pattern. The filter uses mandatory-stop travel and configured dwell,
+a five-minute terminal buffer, and a full ±5-minute pickup window within
+service hours. It does not establish destination-detour or fleet feasibility.
 
-| Symbol | Term | Definition |
-| --- | --- | --- |
-| $p$ | Route pattern | A directed route and its ordered stop sequence. |
-| $S_p=(s_1,\ldots,s_{m_p})$ | Stops of $p$ | Logical stops in travel order. |
-| $\mathcal T_p$ | Scheduled trips | Active timetable trips following pattern $p$. |
-| $t_{\tau,i}$ | Stop time | Trip $\tau$'s `departure_seconds` at $s_i$, rounded down to a whole minute. |
-| $[a_p,b_p]$ | Service interval | First departure rounded down through last arrival rounded up. |
-| $d(s_i,s_j)$ | Travel time | Network travel time from $s_i$ to $s_j$. |
-| $w$ | Pickup half-width | Five minutes in the default settings. |
-| $q=(\tau,i,j)$ | Scheduled pair | One trip and one ordered origin/destination choice, with $i<j$; stored as `ScheduledPair`. |
-| $\mathcal E_p$ | Eligible scheduled pairs | Pairs satisfying the service-window and travel-time conditions below. |
-| $b$ | Booking type | Either pre-booked or dynamic. |
-| $\mathcal E_{b,p}$ | Booking-eligible pairs | $\mathcal E_p$ for pre-booked bookings; dynamic bookings also require room for the minimum lead. |
-| $c$ | Candidate | One sampled request record, represented by the `Candidate` struct. |
-| $C_{b,p}$ | Candidate pool cell | The ordered candidates for booking type $b$ and pattern $p$. |
+## Booking and bus-type allocation
 
-The local symbols in `eligibility.jl` and `demand.jl` follow this table: for example, `τ` is a trip,
-`q` is a scheduled pair, `ℰₚ` is the eligible set, and `Cᵦₚ` is one pool cell.
+`demand_generators/allocations.jl` selects shared candidates and assigns labels.
+Configure `PREBOOK_SHARE` and `ELECTRIC_SHARE` in `demand_config.jl` (both default
+to 0.5). Dynamic and conventional shares are the complements. Shares range
+from 0 to 1; counts round to the nearest integer, ties up. Odd totals work.
 
-The eligible scheduled pairs are
+For each scenario request slot, cumulative rounding assigns a booking label.
+Each booking category cycles across patterns, with dynamic allocation starting
+halfway through the pattern list. Allocation consumes the next unused candidate
+from that pattern's shared pool, then samples the booking lead: 1–3 whole days
+for pre-booked, or 5–30 whole minutes for dynamic. The request timestamp is the
+desired pickup minus the lead. A dynamic booking before service opening is
+rejected; allocation tries the next candidate for the same slot, without
+relabeling the failed candidate or shortening its lead. Pool exhaustion raises
+an explicit error. A raw candidate is used at most once per scenario.
 
-$$
-\mathcal E_p = \left\{(\tau,i,j) \;\middle|\;
-\tau\in\mathcal T_p,\; 1\leq i<j\leq m_p,\;
-a_p+w\leq t_{\tau,i}\leq b_p-w,\;
-t_{\tau,i}+d(s_i,s_j)\leq t_{\tau,j}
-\right\}.
-$$
+Restarting allocation with the same seed and larger total preserves selected
+candidates, booking labels, and timestamps. Default low/base/high totals remain
+50/100/200. Requests are sorted by booking time and numbered from zero.
+Electric/conventional labels are assigned by cumulative rounding in that output
+order; electric share applies to the whole scenario. Bus labels can change
+between nested scenarios because output positions can change. They represent
+service types, not vehicle dispatch, capacity, battery, or charging feasibility.
 
-Pre-booked candidates draw from $\mathcal E_p$. Dynamic candidates draw from
-$\{(\tau,i,j)\in\mathcal E_p \mid t_{\tau,i}-a_p\geq 5\}$, leaving at least
-five minutes for a booking after service starts. Each cell draws 2,000 pairs
-uniformly with replacement, samples a booking lead, and shuffles the resulting
-candidates. Separate trips with the same origin and destination are separate
-sampling opportunities, so scheduled departure density shapes the desired-time
-distribution. Each candidate has a stable ID for request ordering.
+Each final request retains booking `type` and `bus_type`. Scenario config
+records proportions and realized counts. Allocation metadata records counts
+for each booking type, route, and pattern. Candidate-pool JSON now has no
+booking-type field or request timestamps: regenerate data and visualizations
+after this change.
 
-The implementation reads `departure_seconds` at the destination for
-$t_{\tau,j}$. Julia names this value `destination_departure_minute`; the
-candidate-pool JSON retains the field name `scheduled_arrival_minute`.
+## Rejected-candidate debug output
 
-| Scenario | Requests | Pre-booked | Dynamic | Direction split |
-| --- | ---: | ---: | ---: | --- |
-| Low | 50 | 25 | 25 | 25 each; booking/route/pattern cells are balanced 12/13 deterministically |
-| Base | 100 | 50 | 50 | 50 each; 25 in every booking/route/pattern cell |
-| High | 200 | 100 | 100 | 100 each; 50 in every booking/route/pattern cell |
+The global `DEBUG = true` switch writes
+`data/debug/rejected_candidates_550.debug.json`, explicitly labeled `debug: true`.
+`rejected_candidates` contains raw preferences rejected by corridor timing,
+including reasons and bounds. `rejected_allocations` separately records failed
+dynamic assignments with scenario, candidate details, booking type, timestamp,
+service start, and reason. The same failed draw can appear for several scenarios
+because each scenario restarts allocation from the same seeded sequence.
 
-Pre-booked lead times are sampled uniformly from 1–3 days. Dynamic lead times
-are sampled uniformly from 5–30 minutes and remain within service hours.
-Every pickup window is desired time ±5 minutes. Candidate samples are
-nested across scenarios and selected without replacement within each
-booking/route/pattern cell. This makes the three demand levels comparable while
-keeping the total assumptions explicit. The fixed seed is 42.
-
-The candidate pool stores source trip and source stop IDs so its provenance
-can be inspected. It does not claim to estimate passenger behavior, demand
-rates, transfers, accessibility, or ridership. Those assumptions should be
-replaced when observed or survey-based data becomes available.
+Setting `DEBUG = false` skips debug capture and writing, and removes the previous
+debug file for this dataset on the next completed generator run. Accepted
+requests are identical with debug on or off.

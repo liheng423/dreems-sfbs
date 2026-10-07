@@ -54,7 +54,7 @@ Store the corridor network with stringified logical IDs as JSON dictionary keys.
 - `coordinates`: Logical ID → [longitude, latitude] in degrees.
 - `stop_names`: Logical ID → original GTFS stop name.
 - `source_stop_ids`: Logical ID → original GTFS stop ID.
-- `dwell_times`: Logical ID → zero dwell minutes for normalized stop events.
+- `dwell_times`: Logical ID → configured service dwell in whole minutes.
 - `class_reasons`: Logical ID → explanation of its mandatory or optional classification.
 """
 struct NetworkData
@@ -62,7 +62,7 @@ struct NetworkData
     patterns::Vector{RoutePattern}
     travel_times::Dict{String, Int}
 
-    # Source and output fields; not used to make demand decisions.
+    # Mandatory stops and dwell times also determine demand feasibility.
     mandatory_stops::Vector{Int}
     coordinates::Dict{String, Vector{Float64}}
     stop_names::Dict{String, String}
@@ -72,56 +72,15 @@ struct NetworkData
 end
 
 """
-Store one scheduled trip and ordered origin/destination combination.
+Store a synthetic passenger preference independent of scheduled departures.
 
-# Fields
-
-- `origin`: Origin logical stop ID.
-- `destination`: Destination logical stop ID after the origin.
-- `pickup_minute`: Scheduled departure at the origin in whole service-day minutes.
-- `destination_departure_minute`: Scheduled departure at the destination in whole service-day minutes.
-- `source_trip_id`: Original GTFS trip ID supplying this pair.
-"""
-struct ScheduledPair
-    # Demand-generation fields.
-    origin::Int
-    destination::Int
-    pickup_minute::Int
-    destination_departure_minute::Int
-
-    # Source trip ID is retained for provenance.
-    source_trip_id::String
-end
-
-"""
-Store a sampled request with logical stop IDs and its source trip.
-
-# Fields
-
-- `candidate_id`: Unique booking-type_pattern-index_candidate-index identifier within the candidate pool.
-- `origin`: Origin logical stop ID.
-- `destination`: Destination logical stop ID.
-- `booking_type`: Booking category: "prebooked" or "dynamic".
-- `desired_time`: Desired pickup time in service-day minutes.
-- `request_time`: Booking submission time in service-day minutes, possibly negative.
-- `source_trip_id`: Original GTFS trip ID used to generate the candidate.
-- `destination_departure_minute`: Source trip's destination departure in whole service-day minutes.
+`candidate_id` identifies the raw draw, including gaps left by rejected draws.
+Desired pickup time is in whole service-day minutes. Booking type and
+request timestamp are assigned later by allocation.
 """
 struct Candidate
-    # Demand-generation fields.
     candidate_id::String
     origin::Int
     destination::Int
-    booking_type::String
     desired_time::Int
-    request_time::Int
-
-    # Source and output fields; not used to make demand decisions.
-    source_trip_id::String
-    destination_departure_minute::Int
 end
-
-"""Build a candidate from a scheduled pair and a booking lead in whole minutes."""
-Candidate(candidate_id::String, pair::ScheduledPair, booking_type::String, lead_min::Int) =
-    Candidate(candidate_id, pair.origin, pair.destination, booking_type, pair.pickup_minute,
-              pair.pickup_minute - lead_min, pair.source_trip_id, pair.destination_departure_minute)

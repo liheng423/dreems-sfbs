@@ -1,52 +1,78 @@
 # Run with: julia --project=. test/requests.jl
-# Check the final request schema and selection against the seeded candidate pool.
 include(joinpath(@__DIR__, "..", "src", "reqreate_gen", "generate.jl"))
-
 crawl = JSON3.read(read(CRAWLED_PATH, String))
 class_cfg = JSON3.read(read(CLASS_PATH, String))
-net, timetable_patterns, _ = build_net(crawl, class_cfg)
-cands = build_cand_pool(timetable_patterns, net)
-
-# Every sampled journey obeys the timetable window and its booking lead rules.
+net, _, _ = build_net(crawl, class_cfg)
+debug_rejected = Candidate[]
+cands = build_cand_pool(net; debug_rejected)
+@assert JSON3.write(cands) == JSON3.write(build_cand_pool(net))
+@assert sum(length, values(cands)) + length(debug_rejected) == length(net.patterns) * CAND_COUNT_PER_PATTERN
+@assert !hasfield(Candidate, :booking_type) && !hasfield(Candidate, :request_time)
 for cell in values(cands), cand in cell
-    dir = stop_pattern(net, cand.origin)
-    start_min = s2m(dir.service_period.start_seconds)
-    end_min = cld(dir.service_period.end_seconds, 60)
-    @assert start_min <= cand.desired_time - PICKUP_HALF_WIDTH_MIN
-    @assert cand.desired_time + PICKUP_HALF_WIDTH_MIN <= end_min
-    @assert cand.desired_time + net.travel_times[od_key(cand.origin, cand.destination)] <= cand.destination_departure_minute
-    lead = cand.desired_time - cand.request_time
-    if cand.booking_type == "prebooked"
-        @assert lead in PREBOOK_LEAD_DAYS .* 1440
-    else
-        @assert lead in DYN_LEAD_MIN
-        @assert cand.request_time >= start_min
-    end
+    p = stop_pattern(net, cand.origin)
+    @assert is_eligible_cand(cand, p, pickup_bounds(p, net))
+end
+for cand in debug_rejected
+    @assert !isempty(rejected_cand_output(cand, net).rejection_reasons)
 end
 
-for total in (0, 2, 6, last.(SCEN_REQ_COUNTS)...)
-    sel, allocs = select_instance_candidates(cands, total, net)
-    reqs = requests_output(sel, net)
-    out = JSON3.read(JSON3.write(reqs))
-    req_ids = Int[]
-    for book_type in ("prebooked", "dynamic")
-        @assert length(out[book_type]) == total ÷ 2
-        for (req_id, req) in pairs(out[book_type])
-            push!(req_ids, req.id)
-            @assert string(req.id) == string(req_id)
-            @assert req.type == book_type
-            @assert Set(keys(req)) == Set((:id, :type, :origin, :destination,
-                :desired_time, :time_window, :request_time, :route_id, :pattern_id))
-            @assert collect(req.time_window) == pickup_window(req.desired_time)
-            @assert req.route_id == stop_pattern(net, req.origin).route_id
-            @assert req.pattern_id == stop_pattern(net, req.origin).pattern_id
-            cell_key = (book_type, String(req.route_id), String(req.pattern_id))
-            alloc = only(alloc for alloc in allocs if (alloc.booking_type, alloc.route_id, alloc.pattern_id) == cell_key)
-            sel = cands[cell_key][1:alloc.count]
-            @assert any(cand -> (cand.origin, cand.destination, cand.desired_time, cand.request_time) ==
-                (req.origin, req.destination, req.desired_time, req.request_time), sel)
+# Exact complementary proportions, unique shared candidates, valid leads and schema.
+for total in (0, 1, 7, 50), prebook_share in (0.0, 0.3, 0.5, 1.0), electric_share in (0.0, 0.4, 1.0)
+    sel, allocs = select_instance_candidates(cands, total, net; prebook_share)
+    reqs = requests_output(sel, net; electric_share)
+    @assert length(Set(c.candidate_id for c in sel)) == total
+    @assert length(reqs.prebooked) == floor(Int, total * prebook_share + 0.5)
+    @assert length(reqs.dynamic) == total - length(reqs.prebooked)
+    all_reqs = collect(Iterators.flatten((values(reqs.prebooked), values(reqs.dynamic))))
+    @assert count(req -> req.bus_type == "electric", all_reqs) == floor(Int, total * electric_share + 0.5)
+    @assert sum(a.count for a in allocs) == total
+    @assert sort([req.id for req in all_reqs]) == collect(0:total-1)
+    for cand in sel
+        p = stop_pattern(net, cand.origin)
+        @assert any(raw -> raw.candidate_id == cand.candidate_id && raw.origin == cand.origin &&
+            raw.destination == cand.destination && raw.desired_time == cand.desired_time,
+            cands[(p.route_id, p.pattern_id)])
+        lead = cand.desired_time - cand.request_time
+        if cand.booking_type == "prebooked"
+            @assert lead in PREBOOK_LEAD_DAYS .* 1440
+        else
+            @assert lead in DYN_LEAD_MIN
+            @assert cand.request_time >= s2m(p.service_period.start_seconds)
         end
     end
-    @assert sort(req_ids) == collect(0:(total - 1))
+    for req in all_reqs
+        @assert Set(keys(req)) == Set((:id, :type, :origin, :destination, :desired_time,
+            :time_window, :request_time, :route_id, :pattern_id, :bus_type))
+        @assert req.time_window == pickup_window(req.desired_time)
+    end
 end
-println("Request schema and seeded selection checks passed.")
+small, _ = select_instance_candidates(cands, 50, net)
+large, _ = select_instance_candidates(cands, 100, net)
+@assert issubset(Set(small), Set(large)) # Includes booking labels and request timestamps.
+
+# Known pickup bounds and a dynamic draw that cannot fit even the minimum lead.
+p = RoutePattern("T_0", "p", [1, 2, 3], ServicePeriod(360*60, 540*60), "T", "0", "test")
+fixture = NetworkData([p], Dict("1,2"=>7, "1,3"=>20, "2,3"=>8), [1,3],
+    Dict{String,Vector{Float64}}(), Dict{String,String}(),
+    Dict(string(id)=>"stop_$id" for id in 1:3), Dict("1"=>2,"2"=>0,"3"=>2), Dict{String,String}())
+bounds = pickup_bounds(p, fixture)
+@assert bounds[2] == (369,527)
+@assert is_eligible_cand(Candidate("a",2,3,369), p, bounds)
+@assert !is_eligible_cand(Candidate("a",2,3,368), p, bounds)
+raw = [Candidate("early",1,3,364), Candidate("later",2,3,420)]
+pool = Dict((p.route_id,p.pattern_id)=>raw)
+rejected = NamedTuple[]
+sel, _ = select_instance_candidates(pool, 1, fixture; prebook_share=0.0, debug_rejected=rejected)
+@assert only(sel).candidate_id == "later"
+@assert only(rejected).candidate.candidate_id == "early"
+@assert only(rejected).request_time < 360
+@assert sel == first(select_instance_candidates(pool, 1, fixture; prebook_share=0.0))
+pre, _ = select_instance_candidates(pool, 1, fixture; prebook_share=1.0)
+@assert only(pre).candidate_id == "early" # Same raw pool, label changes lead rules.
+try
+    select_instance_candidates(pool, 3, fixture)
+    error("Expected exhausted pool to fail")
+catch err
+    @assert occursin("Candidate pool exhausted", sprint(showerror, err))
+end
+println("Shared pool, label allocation, leads, debug rejection, nesting, and exhaustion passed.")

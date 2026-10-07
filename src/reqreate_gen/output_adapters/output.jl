@@ -55,7 +55,6 @@ Expand a candidate with network-derived fields for the pool JSON schema.
 - `time_window`: Desired pickup time plus/minus the configured half-width in minutes.
 - `source_origin_stop_id`: Original GTFS origin ID resolved through the network map.
 - `source_destination_stop_id`: Original GTFS destination ID resolved through the network map.
-- `scheduled_arrival_minute`: Existing JSON field for the source trip's destination departure minute.
 """
 function cand_output(cand::Candidate, net::NetworkData)
     return (
@@ -64,14 +63,10 @@ function cand_output(cand::Candidate, net::NetworkData)
         destination=cand.destination,
         route_id=stop_pattern(net, cand.origin).route_id,
         pattern_id=stop_pattern(net, cand.origin).pattern_id,
-        booking_type=cand.booking_type,
         desired_time=cand.desired_time,
-        request_time=cand.request_time,
         time_window=pickup_window(cand.desired_time),
-        source_trip_id=cand.source_trip_id,
         source_origin_stop_id=src_stop_id(net, cand.origin),
         source_destination_stop_id=src_stop_id(net, cand.destination),
-        scheduled_arrival_minute=cand.destination_departure_minute,
     )
 end
 
@@ -88,14 +83,16 @@ Request IDs start at zero and span both booking types.
 # Returns
 - Named tuple with `prebooked` and `dynamic` dictionaries keyed by string request ID.
 """
-function requests_output(sel::Vector{Candidate}, net::NetworkData)
+function requests_output(sel::Vector{<:NamedTuple}, net::NetworkData; electric_share=ELECTRIC_SHARE)
     reqs = (prebooked=Dict{String, NamedTuple}(), dynamic=Dict{String, NamedTuple}())
+    bus_types = bus_allocs(sel; electric_share)
     for (req_idx, cand) in enumerate(sel)
         book_type = cand.booking_type
         req_id = req_idx - 1
         req = (
             id=req_id,
             type=book_type,
+            bus_type=bus_types[req_idx],
             origin=cand.origin,
             destination=cand.destination,
             desired_time=cand.desired_time,
@@ -122,3 +119,16 @@ Compute the inclusive pickup window around a desired service-day minute.
 - Two-element vector: Earliest and latest pickup minutes, each `PICKUP_HALF_WIDTH_MIN` from `des_min`.
 """
 pickup_window(des_min) = [des_min - PICKUP_HALF_WIDTH_MIN, des_min + PICKUP_HALF_WIDTH_MIN]
+
+"""Explain a rejected raw draw using the same bounds as the eligibility filter."""
+function rejected_cand_output(cand::Candidate, net::NetworkData)
+    p = stop_pattern(net, cand.origin)
+    early, late = pickup_bounds(p, net)[cand.origin]
+    a = s2m(p.service_period.start_seconds)
+    b = cld(p.service_period.end_seconds, 60)
+    reasons = String[]
+    cand.desired_time < early && push!(reasons, "pickup_before_earliest_feasible_time")
+    cand.desired_time > late && push!(reasons, "pickup_after_latest_feasible_time")
+    return (; cand_output(cand, net)..., rejection_reasons=reasons,
+        feasible_pickup_bounds=[early, late], operating_hours=[a, b])
+end

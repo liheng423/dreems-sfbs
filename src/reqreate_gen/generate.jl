@@ -55,6 +55,8 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
         dataset=dataset,  # Public route number or short name.
         service_date=svc_date,  # GTFS service date in YYYY-MM-DD form.
         scenario="corridor_only",  # Scenario name, or corridor_only for the shared network.
+        prebooked_share=PREBOOK_SHARE,
+        electric_share=ELECTRIC_SHARE,
         request_count=0,  # Total number of requests in this output.
         prebooked_count=0,  # Number of pre-booked requests.
         dynamic_count=0,  # Number of dynamic requests.
@@ -72,8 +74,8 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
         time_unit="minutes from service-day start; values may exceed 1440 for after-midnight trips",
         # Description of how scheduled travel times are aggregated.
         scheduled_travel_time_method="floor(median scheduled departure-to-arrival seconds / 60) over active trips",
-        # Description of how stop dwell times are aggregated.
-        dwell_time_method="zero; extracted stop arrivals and departures are equal",
+        # Configured service dwell; independent of the source timetable.
+        dwell_time_method="uniform configured service dwell: $(DWELL_MIN) minutes per stop",
     )
     meta = (
         title="Scheduled bus network",  # Readable title describing the dataset.
@@ -109,18 +111,24 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
     )
     write_json(joinpath(out_dir, "timetable_$(dataset).json"), timetable)
 
-    cands = build_cand_pool(timetable_patterns, net)
+    debug_rejected = DEBUG ? Candidate[] : nothing
+    cands = build_cand_pool(net; debug_rejected)
+    debug_path = joinpath(out_dir, "debug", "rejected_candidates_$(dataset).debug.json")
+    debug_allocs = NamedTuple[]
     cand_meta = (
         # Description of the candidate sampling or scenario selection method.
-        method="Julia-native pool sampled uniformly from feasible scheduled trip/stop pairs",
+        method="Independent stop and normal pickup-time draws filtered by mandatory-corridor timing",
         seed=SEED,  # Random seed used to generate the candidate pool.
-        # Number of candidates drawn for each booking-type/route/pattern cell.
-        candidate_count_per_booking_route_pattern_cell=CAND_COUNT_PER_CELL,
+        # Number of raw attempts per route pattern.
+        candidate_attempts_per_pattern=CAND_COUNT_PER_PATTERN,
         schema_version=2,
         candidate_pool=[(
-            booking_type=book_type, route_id=pattern.route_id, pattern_id=pattern.pattern_id,
-            candidates=[cand_output(cand, net) for cand in cands[(book_type, pattern.route_id, pattern.pattern_id)]],
-        ) for pattern in net.patterns for book_type in ("prebooked", "dynamic")],
+            route_id=pattern.route_id, pattern_id=pattern.pattern_id,
+            candidates=[cand_output(cand, net) for cand in cands[(pattern.route_id, pattern.pattern_id)]],
+        ) for pattern in net.patterns],
+        pickup_distribution=(family="normal", mean_service_fraction=DES_MEAN_FRACTION,
+            std_service_fraction=DES_STD_FRACTION),
+        terminal_buffer_minutes=TERM_BUFFER_MIN,
         lead_time_rules=(  # Configured minimum and maximum booking leads in minutes.
             # Minimum and maximum pre-booking leads converted from whole days.
             prebooked_minutes=[first(PREBOOK_LEAD_DAYS), last(PREBOOK_LEAD_DAYS)] .* 1440,
@@ -133,7 +141,15 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
     write_json(joinpath(out_dir, "candidate_pool_$(dataset).json"), cand_meta)
 
     for (scen, total) in SCEN_REQ_COUNTS
-        sel, allocs = select_instance_candidates(cands, total, net)
+        scen_rejected = DEBUG ? NamedTuple[] : nothing
+        sel, allocs = select_instance_candidates(cands, total, net; debug_rejected=scen_rejected)
+        if DEBUG
+            append!(debug_allocs, [(; cand_output(row.candidate, net)...,
+                scenario=scen, booking_type=row.booking_type, request_time=row.request_time,
+                rejection_reasons=["booking_before_service_start"],
+                service_start_minute=s2m(stop_pattern(net, row.candidate.origin).service_period.start_seconds))
+                for row in scen_rejected])
+        end
         reqs = requests_output(sel, net)
         prebook_count = length(reqs.prebooked)
         dyn_count = length(reqs.dynamic)
@@ -142,16 +158,20 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
             scenario=scen,  # Scenario name, or corridor_only for the shared network.
             request_count=total,  # Total number of requests in this output.
             prebooked_count=prebook_count,  # Number of pre-booked requests.
-            dynamic_count=dyn_count,  # Number of dynamic requests.
-            route_pattern_booking_allocations=allocs,  # Request counts for each booking-type/route/pattern cell.
+            dynamic_count=dyn_count,
+            electric_count=count(req -> req.bus_type == "electric",
+                Iterators.flatten((values(reqs.prebooked), values(reqs.dynamic)))),
+            conventional_count=count(req -> req.bus_type == "conventional",
+                Iterators.flatten((values(reqs.prebooked), values(reqs.dynamic)))),  # Number of dynamic requests.
+            route_pattern_booking_allocations=allocs,  # Request counts for each route pattern.
         )
         gen_meta = (
             # Description of the candidate sampling or scenario selection method.
-            method="Seeded feasible scheduled trip/stop-pair pool; nested low/base/high samples",
+            method="Seeded passenger preferences filtered by corridor timing; nested low/base/high samples",
             seed=SEED,  # Random seed used to generate the candidate pool.
             service_date=svc_date,  # GTFS service date in YYYY-MM-DD form.
-            candidate_count_per_cell=CAND_COUNT_PER_CELL,  # Candidate pool size per booking-type/route/pattern cell.
-            route_pattern_booking_allocations=allocs,  # Request counts for each booking-type/route/pattern cell.
+            candidate_attempts_per_pattern=CAND_COUNT_PER_PATTERN,  # Raw attempts per route pattern.
+            route_pattern_booking_allocations=allocs,  # Request counts for each route pattern.
             demand_is_observed=false,  # False because requests are synthetic rather than observed ridership.
         )
         inst = (
@@ -165,6 +185,20 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
         )
         write_json(joinpath(out_dir, "instances", "$(dataset)_$(scen).json"), inst)
         println("Wrote $(scen) scenario: $total requests ($(prebook_count) pre-booked, $(dyn_count) dynamic)")
+    end
+
+    if DEBUG
+        write_json(debug_path, (
+            debug=true, description="Rejected preferences and booking assignments; not scenario input.",
+            seed=SEED, service_date=svc_date,
+            candidate_attempts_per_pattern=CAND_COUNT_PER_PATTERN,
+            rejected_count=length(debug_rejected),
+            rejected_candidates=[rejected_cand_output(cand, net) for cand in debug_rejected],
+            rejected_allocation_count=length(debug_allocs),
+            rejected_allocations=debug_allocs,
+        ))
+    elseif isfile(debug_path)
+        rm(debug_path) # Remove stale debug output for this dataset.
     end
 
     println("Wrote corridor, timetable, candidate pool, and $(length(SCEN_REQ_COUNTS)) instances to $out_dir")

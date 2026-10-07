@@ -14,13 +14,14 @@ function med_min(vals::Vector{Int})
 end
 
 """
-    build_net(crawl, class_cfg)
+    build_net(crawl, class_cfg; dwell_min=DWELL_MIN)
 
 Build pattern-specific logical stops, stop classes, and median scheduled travel
 times from normalized GTFS data.
 
 # Arguments
 - `crawl`: One normalized route snapshot or a vector of route snapshots.
+- `dwell_min`: Uniform modeled stop dwell in whole minutes, from configuration by default.
 - `class_cfg`: Stop classification with `mandatory_stop_ids` mapping source stop IDs to reasons.
 
 # Returns
@@ -28,7 +29,7 @@ times from normalized GTFS data.
 - `timetable_patterns`: Pattern records with logical stop IDs and original GTFS trips.
 - `hrs`: Named tuple with `start_minute` and `end_minute` for corridor-wide service hours.
 """
-function build_net(crawl, class_cfg)
+function build_net(crawl, class_cfg; dwell_min::Int=DWELL_MIN)
     crawls = route_crawls(crawl)
     stops_by_src = Dict(String(stop["stop_id"]) => stop for src in crawls for stop in src["stops"])
     reason_by_src = Dict{String, String}(String(k) => String(v)
@@ -106,7 +107,7 @@ function build_net(crawl, class_cfg)
 
     trav_times = Dict{String, Int}(od => med_min(samps)
                                    for (od, samps) in trav_samps)
-    dwell_times = Dict(string(id) => 0 for pattern in patterns for id in pattern.stops)
+    dwell_times = Dict(string(id) => dwell_min for pattern in patterns for id in pattern.stops)
     first_min = minimum(s2m(pattern.service_period.start_seconds) for pattern in patterns)
     last_min = maximum(cld(pattern.service_period.end_seconds, 60) for pattern in patterns)
     net = NetworkData(

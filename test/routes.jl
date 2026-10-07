@@ -32,6 +32,13 @@ crawls = [
     fixture_crawl("B", [fixture_pattern("full", "0", ["X", "Z"])]),
 ]
 net, timetable_patterns, _ = build_net(crawls, Dict("mandatory_stop_ids" => Dict()))
+# A nonzero configured dwell reaches both JSON and corridor pickup bounds.
+@assert all(==(DWELL_MIN), values(net.dwell_times))
+net_dwell, _, _ = build_net(crawls, Dict("mandatory_stop_ids" => Dict()); dwell_min=2)
+@assert all(==(2), values(net_output(net_dwell).dwell_times))
+p = first(net.patterns)
+@assert pickup_bounds(p, net_dwell)[p.stops[2]] == (72, 125)
+@assert pickup_bounds(p, net)[p.stops[2]] == (70, 125)
 @assert length(net.patterns) == 4
 @assert all(first(pattern.stops) in net.mandatory_stops && last(pattern.stops) in net.mandatory_stops for pattern in net.patterns)
 @assert Set(pattern.route_id for pattern in net.patterns) == Set(["A_0", "A_1", "B_0"])
@@ -42,20 +49,19 @@ out = JSON3.read(JSON3.write(net_output(net)))
 @assert length(out.routes) == 3
 @assert Set(first(out.routes).pattern_ids) == Set(["full", "short"])
 
-cands = build_cand_pool(timetable_patterns, net)
-@assert length(cands) == 8
-for ((book_type, route_id, pattern_id), cell) in cands, cand in cell
+cands = build_cand_pool(net)
+@assert length(cands) == 4
+for ((route_id, pattern_id), cell) in cands, cand in cell
     pattern = stop_pattern(net, cand.origin)
     @assert (pattern.route_id, pattern.pattern_id) == (route_id, pattern_id)
     @assert stop_pattern(net, cand.destination) === pattern
-    @assert cand.booking_type == book_type
 end
 for total in 0:2:40
     sel, allocs = select_instance_candidates(cands, total, net)
     reqs = requests_output(sel, net)
     @assert length(reqs.prebooked) == length(reqs.dynamic) == total ÷ 2
     @assert sum(alloc.count for alloc in allocs) == total
-    next_allocs = scen_allocs(total + 2, net)
+    _, next_allocs = select_instance_candidates(cands, total + 2, net)
     @assert all(a.count <= b.count for (a, b) in zip(allocs, next_allocs))
     for alloc in allocs
         req_map = alloc.booking_type == "prebooked" ? reqs.prebooked : reqs.dynamic
