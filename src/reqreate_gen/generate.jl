@@ -6,18 +6,23 @@ Build a directed-route network, scheduled-time matrix, and demand scenarios.
 The command consumes normalized GTFS JSON from the Python crawler. It writes
 the corridor, full trip timetable, candidate pool, and low/base/high JSON
 instances. Passenger requests are synthetic scenario assumptions, not
-observed ridership.
+observed ridership. Scenario trip energy uses the distance matrix beside the
+GTFS input, named `distance_matrix_<line or network>.json`.
 
 # Arguments
 
 - `in_path`: normalized crawler JSON input (defaults to `data/crawled_550.json`).
 - `out_dir`: directory for generated files (defaults to `data/`).
 - `class_path`: source-stop classification JSON (defaults to Route 550 classes).
+- `--fleet-type`: electric (default) or conventional bus profile.
+- `--energy-rate-kwh-per-km`: optional replacement for the selected profile rate.
 =#
 using JSON3
 
 include("types.jl")
 include("demand_config.jl")
+include("fleet_config.jl")
+include("fleet.jl")
 
 const SCRIPT_DIR = @__DIR__
 const PROJECT_ROOT = dirname(dirname(SCRIPT_DIR))
@@ -35,9 +40,10 @@ include(joinpath("demand_generators", "demand.jl"))
 include(joinpath("output_adapters", "output.jl"))
 
 """
-Read GTFS from in_path and write the corridor, timetable, candidate pool, and scenarios to out_dir.
+Read GTFS and its road-distance matrix, then write the shared data and selected fleet scenarios.
 """
-function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path::String=CLASS_PATH)
+function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path::String=CLASS_PATH;
+              fleet_type::String="electric", energy_rate_kwh_per_km::Union{Nothing, Float64}=nothing)
     in_path = abspath(in_path)
     out_dir = abspath(out_dir)
     crawl = JSON3.read(read(in_path, String))
@@ -51,6 +57,23 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
     svc_date = String(first(crawls)["service_date"])
     all(src -> src["service_date"] == svc_date, crawls) || error("Route snapshots must share a service date")
     dataset = length(crawls) == 1 ? String(first(routes)["route_short_name"]) : "network"
+    haskey(FLEET_PROFILES, fleet_type) || error("Fleet type must be electric or conventional")
+    profile = FLEET_PROFILES[fleet_type]
+    energy_rate_kwh_per_km === nothing || energy_rate_kwh_per_km > 0 || error("Energy rate must be positive")
+    fleet = isnothing(energy_rate_kwh_per_km) ? profile :
+        (; profile..., energy_kwh_per_km=energy_rate_kwh_per_km,
+           energy_reference="User-supplied energy rate")
+    dist_path = joinpath(dirname(in_path), "distance_matrix_$(dataset).json")
+    dist_mat = JSON3.read(read(dist_path, String))
+    trip_energy_out = trip_energy(timetable_patterns, dist_mat, fleet)
+    fleet_out = (;
+        type=fleet_type,
+        fleet...,
+        distance_matrix=basename(dist_path),
+        distance_source=String(dist_mat["metadata"]["source"]),
+        distance_kind=String(dist_mat["metadata"]["distance_kind"]),
+        distance_vehicle_access=String(dist_mat["metadata"]["vehicle_access"]),
+    )
     cfg = (
         dataset=dataset,  # Public route number or short name.
         service_date=svc_date,  # GTFS service date in YYYY-MM-DD form.
@@ -82,8 +105,7 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
         sources=sources,  # Source feed provenance copied from the crawler.
         # Explanation of direction-specific logical stop IDs.
         stop_mapping="Each pattern occurrence has a logical stop ID; network.source_stop_ids owns the physical-stop mapping.",
-        # Statement that fleet and charging inputs are outside this dataset.
-        fleet_data="Not included; vehicle and charging inputs are a separate extension.",
+        fleet_data="Scenario files estimate scheduled-trip energy from OSRM road distances and a selected fleet rate; charging inputs are not included.",
     )
     corridor = (
         schema_version=2,  # Version of this output file format.
@@ -140,6 +162,7 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
         inst_cfg = (;
             cfg...,  # Inherit route, service date, and pickup width from the corridor config.
             scenario=scen,  # Scenario name, or corridor_only for the shared network.
+            fleet_type=fleet_type,  # User-selected electric or conventional bus profile.
             request_count=total,  # Total number of requests in this output.
             prebooked_count=prebook_count,  # Number of pre-booked requests.
             dynamic_count=dyn_count,  # Number of dynamic requests.
@@ -158,12 +181,15 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
             schema_version=2,
             config=inst_cfg,  # Route, service date, and scenario settings.
             network=net_out,  # Shared logical network and scheduled travel times.
+            fleet=fleet_out,  # Selected vehicle type and energy assumption.
+            trip_energy=trip_energy_out,  # Each scheduled trip's estimated road distance and energy.
             requests=reqs,  # Final request records grouped by booking category.
             parameters=params,  # Operating hours, pickup allowances, and time conventions.
             generation=gen_meta,  # Scenario sampling settings and allocation metadata.
             metadata=corridor.metadata,  # Shared corridor provenance and scope notes.
         )
-        write_json(joinpath(out_dir, "instances", "$(dataset)_$(scen).json"), inst)
+        inst_dir = fleet_type == "electric" ? joinpath(out_dir, "instances") : joinpath(out_dir, "instances", fleet_type)
+        write_json(joinpath(inst_dir, "$(dataset)_$(scen).json"), inst)
         println("Wrote $(scen) scenario: $total requests ($(prebook_count) pre-booked, $(dyn_count) dynamic)")
     end
 
@@ -171,12 +197,17 @@ function main(in_path::String=CRAWLED_PATH, out_dir::String=DATA_DIR, class_path
     println("Network has $(length(net_out.stops)) logical stops ($(length(net.mandatory_stops)) mandatory, $(length(net_out.optional_stops)) optional)")
 end
 
-# Three optional paths are sufficient for this script's command-line interface.
+# Optional paths retain their existing order; flags select the fleet assumptions.
 if abspath(PROGRAM_FILE) == abspath(@__FILE__)
     if ARGS == ["--help"] || ARGS == ["-h"]
-        println("Usage: julia --project=. src/reqreate_gen/generate.jl [in_path] [out_dir] [class_path]")
+        println("Usage: julia --project=. src/reqreate_gen/generate.jl [in_path] [out_dir] [class_path] [--fleet-type=electric|conventional] [--energy-rate-kwh-per-km=NUMBER]")
         println("Defaults: $CRAWLED_PATH → $DATA_DIR")
     else
-        main(ARGS...)
+        pos_args = filter(arg -> !startswith(arg, "--"), ARGS)
+        fleet_types = [String(split(arg, "="; limit=2)[2]) for arg in ARGS if startswith(arg, "--fleet-type=")]
+        fleet_type = isempty(fleet_types) ? "electric" : only(fleet_types)
+        energy_rates = [parse(Float64, split(arg, "="; limit=2)[2]) for arg in ARGS if startswith(arg, "--energy-rate-kwh-per-km=")]
+        energy_rate = isempty(energy_rates) ? nothing : only(energy_rates)
+        main(pos_args...; fleet_type=fleet_type, energy_rate_kwh_per_km=energy_rate)
     end
 end
