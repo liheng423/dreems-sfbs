@@ -11,6 +11,8 @@ volumes below are generated study scenarios; they are not observed ridership.
 | --- | --- |
 | `src/crawler/python/crawl_gtfs.py` | Extract a selected route and service date from a static GTFS ZIP. It does not classify stops or make demand. |
 | `src/crawler/python/crawl_realtime_550.py` | Capture Route 550 HAFAS real-time departure estimates into append-only JSON Lines. |
+| `src/crawler/python/crawl_osm_distances.py` | Retrieve a directed physical-stop road-distance matrix from OSM-backed OSRM. |
+| `data/distance_matrix_550.json` | Road distances in metres, indexed by original GTFS stop IDs, with routing and snapping provenance. |
 | `src/reqreate_gen/generate.jl` | Read inputs, assemble outputs, and write the corridor, timetable, candidate pool, and scenarios. |
 | `src/reqreate_gen/demand_config.jl` | Uniform stop dwell, demand seed, candidate count per cell, pickup half-window, booking lead ranges, and scenario request counts. |
 | `src/reqreate_gen/types.jl` | Core records used repeatedly in network and demand calculations. One-off JSON envelopes and metadata are named tuples at their construction sites. |
@@ -177,8 +179,9 @@ Snapshot/pattern order determines logical numbering and seeded draw order.
 These changes replace the version-1 JSON layout; regenerate datasets before
 using the updated visualizer. Demand now uses sample-then-filter preferences; see Demand scenario assumptions.
 
-Checks: `julia --project=. test/requests.jl` and
-`julia --project=. test/routes.jl`.
+Checks: `julia --project=. test/requests.jl`,
+`julia --project=. test/routes.jl`, and
+`julia --project=. test/fleet.jl`.
 
 ## Sources and provenance
 
@@ -351,6 +354,86 @@ not provide historical observations or confirmed arrival times for this
 workflow. The result is separate from `corridor_550.json` and does not replace
 the scheduled `network.travel_times` field.
 
+## Crawl OpenStreetMap road distances
+
+Run the separate standard-library crawler on the existing normalized GTFS file:
+
+```bash
+python3 src/crawler/python/crawl_osm_distances.py \
+  --gtfs-json data/crawled_550.json \
+  --output data/distance_matrix_550.json
+python3 test/crawl_osm_distances.py
+```
+
+The [OSRM Table API](https://project-osrm.org/docs/v5.24.0/api/#table-service)
+returns distances along the fastest routed paths on the OpenStreetMap road
+network, in metres. These are neither Euclidean distances nor minimum-distance
+paths. The default public endpoint uses car access rules, so these are road
+estimates, not measured bus mileage or a reconstruction of the exact line 550
+itinerary. For bus-specific restrictions, use `--osrm-url` with a server
+preprocessed for the intended vehicle; changing `--profile` alone does not
+change a server's prepared graph.
+
+`distances_m[i][j]` is the directed distance from `stop_ids[i]` to `stop_ids[j]`.
+Both axes include all physical stops, including reverse and cross-pattern
+journeys. Stop IDs remain strings with leading zeros. Unreachable pairs are
+`null`, never a straight-line fallback or a zero-distance journey. The crawler
+also accepts an array of route snapshots from the same feed and deduplicates
+shared physical stops. It makes one table request; larger networks exceeding
+the server's coordinate limit will need batched requests or a larger server
+limit. API failures abort the crawl before writing output.
+
+The output retains input coordinates, snapped source/destination locations and
+snap distances, the request URL, retrieval timestamp, input SHA-256, and the OSM
+data version when the server supplies it (`null` otherwise). Inspect snapping
+before interpreting small distance savings: a stop may snap to a different
+road or carriageway. OSM data is credited to
+[OpenStreetMap contributors under ODbL](https://www.openstreetmap.org/copyright).
+The retrieval date does not imply that the OSM graph matches the GTFS service date.
+
+To use the matrix with generated scenarios, resolve logical IDs through
+`network.source_stop_ids`, then find those source IDs in `stop_ids`. For an
+ordered vehicle itinerary, sum entries for **consecutive visited stops**,
+including repositioning/depot legs if their coordinates are included in your
+input. Do not use only the terminal-to-terminal entry for the fixed-line
+baseline: it may shortcut intermediate stops. Summing consecutive GTFS stops
+is a baseline approximation, not proof of the exact scheduled road alignment.
+
+With a common consumption rate `c` in kWh/km, estimated energy savings are
+`(baseline_distance_m - proposed_distance_m) / 1000 * c`. Different vehicle
+types require separate consumption rates for each itinerary. Distance alone
+does not capture acceleration, idling, gradient, passenger load, or HVAC.
+The generator now reads this distance file when writing instances. It sums
+consecutive GTFS stop-to-stop distances for each scheduled bus trip and
+multiplies by the selected profile's kWh/km rate. `trip_energy` in each instance
+contains the source trip ID, directed route and pattern, distance in km, and
+estimated energy in kWh. It does not represent a passenger request's marginal
+energy or the optimized semi-flexible itinerary. The distance file does not
+alter scheduled travel times.
+
+Choose the bus type when generating instances:
+
+```bash
+julia --project=. src/reqreate_gen/generate.jl --fleet-type=electric
+julia --project=. src/reqreate_gen/generate.jl --fleet-type=conventional
+```
+
+Edit `src/reqreate_gen/fleet_config.jl` to change the fleet defaults. The
+electric default is a 12 m eCitaro with 396 kWh installed battery capacity,
+88-passenger capacity, hybrid heating, and 0.87 kWh/km median consumption at
+20–22 °C (Jablonski et al., NEIS 2023, Table 1). The conventional default is
+4.44 kWh/km of **fuel energy equivalent**, the midpoint of the 3.90–4.98
+kWh/km range cited from other studies in that paper's introduction. It is not
+a measured Route 550 bus and is not a monetary cost. Override either rate with
+`--energy-rate-kwh-per-km=NUMBER`. The selected type and rate are recorded in
+`config.fleet_type` and `fleet`; the default electric files keep their existing
+paths, while conventional files go in `data/instances/conventional/`.
+
+These estimates exclude depot legs, charging, usable battery limits, weather,
+passenger load, topography, and the actual bus road alignment. The OSRM matrix
+uses a car access profile, so replace or calibrate it before treating the
+estimates as bus operating measurements.
+
 ## Input fields and time units
 
 Internal records avoid storing values that can be derived from the network:
@@ -363,11 +446,11 @@ trips. Source stop IDs, routes, patterns, and pickup windows are derived for
 output. The timetable sidecar retains original GTFS trips for provenance;
 candidates do not claim a source trip or scheduled arrival.
 
-The corridor and scenario files retain the reference instance sections
-`config`, `network`, `requests`, and `parameters`. There is intentionally no
-`fleet` section: the first deliverable describes corridor and demand inputs;
-fleet composition, energy consumption, charging infrastructure, and vehicle
-availability are separate extensions identified in the first-step email.
+The corridor retains the reference instance sections `config`, `network`,
+`requests`, and `parameters`. Scenario files also include `fleet` and
+`trip_energy` for the user-selected bus type. Charging infrastructure and
+vehicle availability remain separate extensions identified in the first-step
+email.
 
 | Field | Meaning |
 | --- | --- |
