@@ -1,0 +1,7 @@
+.ref
+.venv/
+.DS_Store
+instance-generator/
+.instance-generator/
+__pycache__/
+data/

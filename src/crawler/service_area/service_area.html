@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Route 550 service area</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
+<style>
+  body { margin: 0; font: 16px sans-serif; }
+  #toolbar { padding: 10px; display: flex; gap: 12px; align-items: center; }
+  #map { height: calc(100vh - 54px); }
+</style>
+<div id="toolbar">
+  <span>Draw one rectangle or polygon around the service area, then save it.</span>
+  <button id="save" disabled>Save area and road graphs</button>
+  <span id="status"></span>
+</div>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script>
+  const stops = __STOPS__;
+  const map = L.map('map');
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  const stopLayer = L.featureGroup(stops.map(stop =>
+    L.circleMarker([stop.stop_lat, stop.stop_lon], {radius: 3, color: '#174b9b'})
+      .bindTooltip(stop.stop_name)
+  )).addTo(map);
+  map.fitBounds(stopLayer.getBounds().pad(0.15));
+
+  const selection = new L.FeatureGroup().addTo(map);
+  map.addControl(new L.Control.Draw({
+    edit: {featureGroup: selection},
+    draw: {polygon: true, rectangle: true, polyline: false, circle: false, marker: false, circlemarker: false}
+  }));
+  map.on(L.Draw.Event.CREATED, event => {
+    selection.clearLayers();
+    selection.addLayer(event.layer);
+    document.querySelector('#save').disabled = false;
+  });
+  map.on(L.Draw.Event.DELETED, () => {
+    document.querySelector('#save').disabled = selection.getLayers().length === 0;
+  });
+  map.on(L.Draw.Event.EDITED, () => {
+    document.querySelector('#save').disabled = false;
+  });
+  document.querySelector('#save').onclick = async () => {
+    const geometry = selection.getLayers()[0].toGeoJSON().geometry;
+    const button = document.querySelector('#save');
+    const status = document.querySelector('#status');
+    button.disabled = true;
+    status.textContent = 'Downloading OSM roads; this may take several minutes…';
+    try {
+      const response = await fetch('/save', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(geometry)
+      });
+      status.textContent = await response.text();
+      if (!response.ok) button.disabled = false;
+    } catch (error) {
+      status.textContent = error.message;
+      button.disabled = false;
+    }
+  };
+</script>
+</html>

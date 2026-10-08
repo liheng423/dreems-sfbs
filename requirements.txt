@@ -1,0 +1,9 @@
+# Python 3.12. Prepare the patched .instance-generator/ checkout as described in
+# src/reqreate/README.md, then install with:
+# uv pip install --python .venv/bin/python -r requirements.txt
+networkx
+numpy
+osmnx>=2,<3
+pandas
+shapely
+-e ./.instance-generator
