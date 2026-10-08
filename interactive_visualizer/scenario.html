@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Luxembourg bus demand explorer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <script src="viewer.js" defer></script>
+</head>
+<body>
+  <main class="layout">
+    <aside class="panel">
+      <header class="masthead">
+        <span class="eyebrow">Luxembourg · demand explorer</span>
+        <h1>Bus demand,<br><em>on the map.</em></h1>
+        <p>Explore synthetic passenger requests from the Julia demand generator.</p>
+      </header>
+
+      <section class="file-section" aria-labelledby="file-heading">
+        <div class="section-heading"><h2 id="file-heading">Scenario file</h2><span>01</span></div>
+        <label class="file-button" for="inst-file">Choose instance JSON <span aria-hidden="true">↗</span></label>
+        <input id="inst-file" type="file" accept=".json,application/json">
+        <p id="file-name" class="file-name">Choose a file from data/instances/</p>
+        <p id="file-error" class="error" role="alert" hidden></p>
+        <label class="file-button secondary-file" for="cand-file">Compare candidate pool <span aria-hidden="true">↗</span></label>
+        <input id="cand-file" type="file" accept=".json,application/json" disabled>
+        <p id="cand-name" class="file-name">Optional: data/candidate_pool_*.json</p>
+        <p id="cand-error" class="error" role="alert" hidden></p>
+        <label class="file-button secondary-file" for="timetable-file">Verify source timetable <span aria-hidden="true">↗</span></label>
+        <input id="timetable-file" type="file" accept=".json,application/json" disabled>
+        <p id="timetable-name" class="file-name">Optional: data/timetable_*.json, with candidate pool</p>
+        <p id="timetable-error" class="error" role="alert" hidden></p>
+        <label class="file-button secondary-file" for="dist-file">Choose distance matrix <span aria-hidden="true">↗</span></label>
+        <input id="dist-file" type="file" accept=".json,application/json" disabled>
+        <p id="dist-name" class="file-name">Optional: data/distance_matrix_550.json</p>
+        <p id="dist-error" class="error" role="alert" hidden></p>
+      </section>
+
+      <section aria-labelledby="view-heading">
+        <div class="section-heading"><h2 id="view-heading">Map view</h2><span>02</span></div>
+        <label class="field-label" for="pattern-select">Bus route and direction</label>
+        <select id="pattern-select" disabled><option value="all">All routes</option></select>
+        <div class="filter-title">Booking type</div>
+        <div class="check-row">
+          <label><input id="prebooked-check" type="checkbox" checked> <span class="key prebooked"></span> Pre-booked</label>
+          <label><input id="dynamic-check" type="checkbox" checked> <span class="key dynamic"></span> Dynamic</label>
+        </div>
+        <label class="field-label time-label" for="time-range">Desired pickup by <strong id="time-value">—</strong></label>
+        <input id="time-range" type="range" min="0" max="1440" value="1440" disabled>
+        <div class="range-ends"><span>Start of service day</span><span>End</span></div>
+        <label class="flow-toggle"><input id="flows-check" type="checkbox"> Show origin–destination flows</label>
+        <button id="dist-button" class="dist-button" type="button" aria-pressed="false" disabled>Show road distances</button>
+      </section>
+
+      <section aria-labelledby="demand-heading">
+        <div class="section-heading"><h2 id="demand-heading">Visible demand</h2><span>03</span></div>
+        <div class="metrics">
+          <div><strong id="req-count">—</strong><span>requests</span></div>
+          <div><strong id="stop-count">—</strong><span>active stops</span></div>
+          <div><strong id="pattern-count">—</strong><span>patterns</span></div>
+        </div>
+        <p class="hint">Circle size shows boardings + alightings. Select a stop or request for details.</p>
+      </section>
+
+      <section aria-labelledby="debug-heading">
+        <div class="section-heading"><h2 id="debug-heading">Generator checks</h2><span id="issue-count">—</span></div>
+        <p id="debug-summary" class="hint">Open an instance to check pickup windows, booking leads, stop order, and allocations.</p>
+        <label class="flow-toggle"><input id="issues-check" type="checkbox" disabled> Show flagged requests only</label>
+        <div id="issue-list" class="issue-list" aria-live="polite"></div>
+        <label class="flow-toggle"><input id="debug-mode-check" type="checkbox" disabled> Debug mode: rejected candidates</label>
+        <div id="debug-tools" hidden>
+          <label class="file-button secondary-file" for="debug-file">Choose debug JSON <span aria-hidden="true">↗</span></label>
+          <input id="debug-file" type="file" accept=".json,application/json">
+          <p id="debug-name" class="file-name">data/debug/rejected_candidates_550.debug.json</p>
+          <p id="debug-error" class="error" role="alert" hidden></p>
+          <p id="debug-counts" class="hint">Choose the matching debug file to see rejected candidates.</p>
+          <label class="field-label debug-filter-label" for="debug-reason">Rejection reason</label>
+          <select id="debug-reason" disabled><option value="all">All reasons</option></select>
+          <label class="flow-toggle"><input id="debug-outside-check" type="checkbox" disabled> Outside feasible pickup bounds</label>
+          <div id="debug-warnings" class="debug-warnings" aria-live="polite"></div>
+          <div id="debug-list" class="debug-list"></div>
+        </div>
+        <div id="req-details" class="req-details" hidden></div>
+      </section>
+
+      <section class="requests-section" aria-labelledby="requests-heading">
+        <div class="section-heading"><h2 id="requests-heading">Requests</h2><span id="list-count">00</span></div>
+        <div id="req-list" class="req-list"><p class="empty-list">Open an instance JSON to begin.</p></div>
+      </section>
+      <footer>Synthetic scenarios · not observed ridership</footer>
+    </aside>
+
+    <div class="map-shell">
+      <div id="map" aria-label="Interactive map of Luxembourg bus routes"></div>
+      <div class="map-title"><span id="map-kicker">LUXEMBOURG / NETWORK VIEW</span><strong id="map-title">Choose an instance JSON</strong></div>
+      <div class="map-legend"><span><i class="line-key"></i> Bus pattern</span><span><i class="circle-key"></i> Stop demand</span><span id="debug-legend" hidden><i class="debug-key"></i> Rejected draw</span></div>
+      <button id="fit-button" class="fit-button" type="button" disabled>Fit route ↗</button>
+    </div>
+  </main>
+</body>
+</html>

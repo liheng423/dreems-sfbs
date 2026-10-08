@@ -1,0 +1,6295 @@
+{
+  "source": {
+    "schema": 2,
+    "area_sha256": "fc4376386b4c46a4d1b8de4ebe0844a2a228bd31f2007935c6c04226b0444b59",
+    "walk_graph_sha256": "fab70ba246c56754c949950b4009906192f9af595ff56e61573daa20d2f5149d",
+    "tags": {
+      "amenity": [
+        "arts_centre",
+        "bar",
+        "cafe",
+        "cinema",
+        "clinic",
+        "college",
+        "community_centre",
+        "dentist",
+        "doctors",
+        "fast_food",
+        "hospital",
+        "kindergarten",
+        "library",
+        "marketplace",
+        "nursing_home",
+        "pub",
+        "restaurant",
+        "school",
+        "social_facility",
+        "theatre",
+        "townhall",
+        "university"
+      ],
+      "building": [
+        "commercial",
+        "hotel",
+        "office",
+        "retail",
+        "stadium",
+        "supermarket",
+        "train_station"
+      ],
+      "leisure": [
+        "fitness_centre",
+        "park",
+        "sports_centre",
+        "stadium",
+        "swimming_pool"
+      ],
+      "office": true,
+      "shop": true,
+      "tourism": [
+        "attraction",
+        "gallery",
+        "hotel",
+        "museum",
+        "zoo"
+      ]
+    },
+    "stops": [
+      {
+        "name": "Stop_000210103001",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.327284,
+        "lat": 49.546038
+      },
+      {
+        "name": "Stop_000210103003",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.324773,
+        "lat": 49.542507
+      },
+      {
+        "name": "Stop_000210105001",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.323211,
+        "lat": 49.539419
+      },
+      {
+        "name": "Stop_000210501001",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.257602,
+        "lat": 49.509007
+      },
+      {
+        "name": "Stop_000210501002",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.250079,
+        "lat": 49.50933
+      },
+      {
+        "name": "Stop_000210501003",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.255343,
+        "lat": 49.510054
+      },
+      {
+        "name": "Stop_000210501004",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.26071,
+        "lat": 49.507723
+      },
+      {
+        "name": "Stop_000210502001",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.304688,
+        "lat": 49.515382
+      },
+      {
+        "name": "Stop_000210502002",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.297506,
+        "lat": 49.520264
+      },
+      {
+        "name": "Stop_000210503001",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.270312,
+        "lat": 49.504588
+      },
+      {
+        "name": "Stop_000210503002",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.281589,
+        "lat": 49.506248
+      },
+      {
+        "name": "Stop_000210503003",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.274508,
+        "lat": 49.504642
+      },
+      {
+        "name": "Stop_000210503005",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.266162,
+        "lat": 49.504184
+      },
+      {
+        "name": "Stop_000210503006",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.284231,
+        "lat": 49.508251
+      },
+      {
+        "name": "Stop_000210503007",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.287453,
+        "lat": 49.510042
+      },
+      {
+        "name": "Stop_000210701006",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.368293,
+        "lat": 49.542737
+      },
+      {
+        "name": "Stop_000210701017",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.355633,
+        "lat": 49.547279
+      },
+      {
+        "name": "Stop_000210701024",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.365122,
+        "lat": 49.546434
+      },
+      {
+        "name": "Stop_000220102004",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.110184,
+        "lat": 49.513187
+      },
+      {
+        "name": "Stop_000220102005",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.101996,
+        "lat": 49.516606
+      },
+      {
+        "name": "Stop_000220102007",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.126026,
+        "lat": 49.50614
+      },
+      {
+        "name": "Stop_000220102008",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.118727,
+        "lat": 49.509351
+      },
+      {
+        "name": "Stop_000220501001",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.233064,
+        "lat": 49.517894
+      },
+      {
+        "name": "Stop_000220501002",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.225998,
+        "lat": 49.520283
+      },
+      {
+        "name": "Stop_000220502002",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.198109,
+        "lat": 49.516656
+      },
+      {
+        "name": "Stop_000220502004",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.18877,
+        "lat": 49.515892
+      },
+      {
+        "name": "Stop_000220503001",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.142069,
+        "lat": 49.506158
+      },
+      {
+        "name": "Stop_000220503002",
+        "type": "location",
+        "class": "optional",
+        "lon": 6.158291,
+        "lat": 49.510494
+      },
+      {
+        "name": "Stop_000220503003",
+        "type": "location",
+        "class": "mandatory",
+        "lon": 6.148425,
+        "lat": 49.507551
+      }
+    ],
+    "max_walking_distance_m": 500
+  },
+  "features": [
+    {
+      "osm_type": "node",
+      "osm_id": 266933068,
+      "name": "Cactus",
+      "tags": {
+        "shop": "supermarket"
+      },
+      "lat": 49.5148699,
+      "lon": 6.1069286,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 410074382,
+      "name": null,
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5109345,
+      "lon": 6.1202643,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 416821570,
+      "name": "La Borne des Quatre Seigneurs",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.4938676,
+      "lon": 6.1282735,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 443614074,
+      "name": "Casino 2000",
+      "tags": {
+        "tourism": "hotel"
+      },
+      "lat": 49.5079315,
+      "lon": 6.2791118,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 443615095,
+      "name": "E.Leclerc",
+      "tags": {
+        "shop": "supermarket"
+      },
+      "lat": 49.505561,
+      "lon": 6.2760163,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 443716869,
+      "name": "La Rosarie",
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.4973757,
+      "lon": 6.2814312,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 736634434,
+      "name": "La Rameaudière",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5162263,
+      "lon": 6.3047121,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 777381861,
+      "name": "Teo's Café",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5178467,
+      "lon": 6.1023876,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 777381862,
+      "name": "Le Paris",
+      "tags": {
+        "amenity": "cinema"
+      },
+      "lat": 49.5186896,
+      "lon": 6.1010574,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 988594704,
+      "name": "Restaurant Chalet am Brill",
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.5061956,
+      "lon": 6.2835799,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1179514781,
+      "name": "T'Scheier",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5246501,
+      "lon": 6.2237296,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1179514782,
+      "name": "Guli",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5207825,
+      "lon": 6.2255431,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1196855070,
+      "name": "Café Bousserstuff sarl",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5551604,
+      "lon": 6.3290531,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1415219717,
+      "name": "Parc Hotel",
+      "tags": {
+        "tourism": "hotel"
+      },
+      "lat": 49.5031162,
+      "lon": 6.2836277,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1415789656,
+      "name": "Brasserie Les Arcades",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5051223,
+      "lon": 6.2769285,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1415872726,
+      "name": "Bistro Maus Kätti",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5017143,
+      "lon": 6.2818377,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1431857985,
+      "name": "Sushi Bateau",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5184177,
+      "lon": 6.0982503,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1440383130,
+      "name": null,
+      "tags": {
+        "shop": "vacant"
+      },
+      "lat": 49.5181847,
+      "lon": 6.1010153,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1440383604,
+      "name": "Kebap",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.5195232,
+      "lon": 6.1006161,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1448885231,
+      "name": "Maison du Riz",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5178718,
+      "lon": 6.0990603,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1450890018,
+      "name": "Am Kraeltgen",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5213149,
+      "lon": 6.2248695,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1459737296,
+      "name": "Boulangerie Aux Gourmands - Casa Negrita",
+      "tags": {
+        "shop": "bakery"
+      },
+      "lat": 49.517963,
+      "lon": 6.1077893,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1469362454,
+      "name": "Fischer",
+      "tags": {
+        "shop": "bakery"
+      },
+      "lat": 49.5177353,
+      "lon": 6.1877188,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1472979206,
+      "name": "Celula",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5146746,
+      "lon": 6.0941897,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495288371,
+      "name": "La Casa del Habano",
+      "tags": {
+        "shop": "tobacco"
+      },
+      "lat": 49.5042243,
+      "lon": 6.2755795,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495289153,
+      "name": "De La Poste",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5047178,
+      "lon": 6.275429,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495294657,
+      "name": "Ali Baba",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.5047567,
+      "lon": 6.2734058,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495296595,
+      "name": "Ahir des Sens",
+      "tags": {
+        "shop": "hairdresser"
+      },
+      "lat": 49.5049085,
+      "lon": 6.2716632,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495297200,
+      "name": "L'Évidence",
+      "tags": {
+        "amenity": "bar"
+      },
+      "lat": 49.5047743,
+      "lon": 6.2709421,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495306882,
+      "name": "De La Frontiere",
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.5036308,
+      "lon": 6.2715372,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495308461,
+      "name": "Cafe Insekt",
+      "tags": {
+        "amenity": "bar"
+      },
+      "lat": 49.5045644,
+      "lon": 6.2706306,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495312336,
+      "name": "Pâtisserie Hoffmann",
+      "tags": {
+        "shop": "bakery"
+      },
+      "lat": 49.5040104,
+      "lon": 6.2774457,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495318553,
+      "name": "Paris",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5043144,
+      "lon": 6.2791852,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1495319666,
+      "name": "Gui Lin",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.503892,
+      "lon": 6.2790823,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1524861838,
+      "name": "Fuli",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.544698,
+      "lon": 6.3700205,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1524863949,
+      "name": "Hôtel de l'Esplanade",
+      "tags": {
+        "tourism": "hotel"
+      },
+      "lat": 49.5441892,
+      "lon": 6.36917,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1525096128,
+      "name": "Rock Café",
+      "tags": {
+        "amenity": "bar"
+      },
+      "lat": 49.5473231,
+      "lon": 6.3629124,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1525115906,
+      "name": "Creperie",
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.5428721,
+      "lon": 6.3665803,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534143088,
+      "name": "L's Café",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.518821,
+      "lon": 6.099441,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534143095,
+      "name": "Beierstuff",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5190606,
+      "lon": 6.0999048,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534143751,
+      "name": "Ollean",
+      "tags": {
+        "office": "engineer"
+      },
+      "lat": 49.5191424,
+      "lon": 6.1003284,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534145501,
+      "name": "Hakan Kebab",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.5187745,
+      "lon": 6.1009867,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534146891,
+      "name": "Pyramide d'Or",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5184691,
+      "lon": 6.1007935,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534147127,
+      "name": "Beim Dante",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5183969,
+      "lon": 6.1013475,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534147898,
+      "name": "Emporio",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5183646,
+      "lon": 6.1008713,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534147899,
+      "name": "Hong Kong Garden",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5183124,
+      "lon": 6.1008981,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1534151273,
+      "name": "Um Staminet",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5184714,
+      "lon": 6.1011608,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1559422046,
+      "name": "Taverne Victor Hugo",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.510028,
+      "lon": 6.2571983,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1559485573,
+      "name": "Kohn",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5117593,
+      "lon": 6.2569105,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1559486015,
+      "name": null,
+      "tags": {
+        "shop": "hairdresser"
+      },
+      "lat": 49.5101655,
+      "lon": 6.2571443,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1559509385,
+      "name": "Relais d'Altwies",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5097115,
+      "lon": 6.2573622,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1575662924,
+      "name": "Moes Frères Secs",
+      "tags": {
+        "shop": "bicycle"
+      },
+      "lat": 49.5478808,
+      "lon": 6.356806,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1575666094,
+      "name": "Mosella",
+      "tags": {
+        "shop": "bakery"
+      },
+      "lat": 49.5478111,
+      "lon": 6.3566236,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1575667975,
+      "name": null,
+      "tags": {
+        "shop": "clothes"
+      },
+      "lat": 49.547832,
+      "lon": 6.3563983,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1575667977,
+      "name": null,
+      "tags": {
+        "shop": "doityourself"
+      },
+      "lat": 49.5477067,
+      "lon": 6.3562481,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1575667978,
+      "name": null,
+      "tags": {
+        "shop": "garden_centre"
+      },
+      "lat": 49.5478441,
+      "lon": 6.3562107,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1575671374,
+      "name": null,
+      "tags": {
+        "shop": "gift"
+      },
+      "lat": 49.5479086,
+      "lon": 6.3566478,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1584718886,
+      "name": "Il Limoncello",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5174394,
+      "lon": 6.094589,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1588412896,
+      "name": "Amitie",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5053833,
+      "lon": 6.2715996,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1588412898,
+      "name": "Clement",
+      "tags": {
+        "shop": "butcher"
+      },
+      "lat": 49.5056698,
+      "lon": 6.2712646,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1599892958,
+      "name": "Osé",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5202448,
+      "lon": 6.295718,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1631263430,
+      "name": "Arena",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5163823,
+      "lon": 6.1879856,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1659365146,
+      "name": null,
+      "tags": {
+        "leisure": "sports_centre"
+      },
+      "lat": 49.541361,
+      "lon": 6.3622173,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1659372851,
+      "name": "Salle de Sport",
+      "tags": {
+        "leisure": "sports_centre"
+      },
+      "lat": 49.5469963,
+      "lon": 6.366246,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662133458,
+      "name": "Rennel",
+      "tags": {
+        "shop": "car"
+      },
+      "lat": 49.5468303,
+      "lon": 6.3544312,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662149314,
+      "name": "Clement",
+      "tags": {
+        "shop": "butcher"
+      },
+      "lat": 49.5442519,
+      "lon": 6.3680647,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662154348,
+      "name": "Friture Weyler",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.5424614,
+      "lon": 6.3662267,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662160642,
+      "name": "Café de l’Europe",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5425446,
+      "lon": 6.3659833,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662161038,
+      "name": "Café Schumacher",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5425049,
+      "lon": 6.365524,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662161337,
+      "name": "Brasserie Um Schëff",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5434164,
+      "lon": 6.3675866,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662161420,
+      "name": "Oriental Kebab",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.5438047,
+      "lon": 6.3673981,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662165030,
+      "name": "Claude Feltz",
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.5427816,
+      "lon": 6.3664225,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662165036,
+      "name": null,
+      "tags": {
+        "shop": "convenience"
+      },
+      "lat": 49.5426894,
+      "lon": 6.3662026,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662220782,
+      "name": "Ardennes",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5450487,
+      "lon": 6.364454,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1662224342,
+      "name": "Grenz Kebap",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.542251,
+      "lon": 6.3727139,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1691942973,
+      "name": "AlloTools",
+      "tags": {
+        "office": "company"
+      },
+      "lat": 49.5134118,
+      "lon": 6.3030276,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1691943012,
+      "name": "Firetec",
+      "tags": {
+        "office": "company"
+      },
+      "lat": 49.5135129,
+      "lon": 6.30321,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1691943028,
+      "name": "Mosar",
+      "tags": {
+        "office": "company"
+      },
+      "lat": 49.5131646,
+      "lon": 6.3034836,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1759712759,
+      "name": "Yu Hai Ge",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5316887,
+      "lon": 6.3546147,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1800831250,
+      "name": "beim Figaro",
+      "tags": {
+        "shop": "hairdresser"
+      },
+      "lat": 49.5450924,
+      "lon": 6.3672136,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1810117225,
+      "name": null,
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.5110703,
+      "lon": 6.1202061,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1810126518,
+      "name": null,
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.5115422,
+      "lon": 6.1212228,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1810126532,
+      "name": null,
+      "tags": {
+        "shop": "gift"
+      },
+      "lat": 49.5114411,
+      "lon": 6.121035,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1811435727,
+      "name": "RENTABIKE MISELERLAND",
+      "tags": {
+        "amenity": "bicycle_rental",
+        "shop": "rental"
+      },
+      "lat": 49.5430193,
+      "lon": 6.3683265,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1826067872,
+      "name": "Munnerefer Stuff",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5046704,
+      "lon": 6.2786651,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1826078624,
+      "name": "Musée de l'aviation",
+      "tags": {
+        "tourism": "museum"
+      },
+      "lat": 49.5011617,
+      "lon": 6.2824438,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1826078643,
+      "name": "De Jangeli",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5029924,
+      "lon": 6.2838573,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1826112837,
+      "name": "Feltz",
+      "tags": {
+        "shop": "bakery"
+      },
+      "lat": 49.5027573,
+      "lon": 6.2806092,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1839539613,
+      "name": "Café Um Staminet Jeu de Quilles",
+      "tags": {
+        "amenity": "bar"
+      },
+      "lat": 49.5186389,
+      "lon": 6.1010368,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1858260519,
+      "name": null,
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.519776,
+      "lon": 6.1041673,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1907406787,
+      "name": "Klein",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5183798,
+      "lon": 6.187532,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1960336948,
+      "name": "Pneus Center",
+      "tags": {
+        "shop": "car_repair"
+      },
+      "lat": 49.5187757,
+      "lon": 6.1868864,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1960348312,
+      "name": "Boucherie Meyrer",
+      "tags": {
+        "shop": "butcher"
+      },
+      "lat": 49.5170139,
+      "lon": 6.1874198,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1960349917,
+      "name": "Studio M",
+      "tags": {
+        "shop": "hairdresser"
+      },
+      "lat": 49.517282,
+      "lon": 6.187849,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2026263935,
+      "name": "Il Monello",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5163648,
+      "lon": 6.1032563,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2054203201,
+      "name": null,
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.5248369,
+      "lon": 6.2255729,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2073339599,
+      "name": "Café de la gare",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5086028,
+      "lon": 6.1484223,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2094960193,
+      "name": "Teo's Café",
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.5178678,
+      "lon": 6.1024491,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2169297672,
+      "name": "Q8",
+      "tags": {
+        "amenity": "fuel",
+        "shop": "convenience"
+      },
+      "lat": 49.5105625,
+      "lon": 6.1906074,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2194033477,
+      "name": "Belle Fontaine",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.503135,
+      "lon": 6.2802555,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2194033547,
+      "name": "Muomina",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.505429,
+      "lon": 6.2769617,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2420566237,
+      "name": "Obst und Gemüseland Nennig",
+      "tags": {
+        "shop": "convenience"
+      },
+      "lat": 49.541936,
+      "lon": 6.3735039,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2420566243,
+      "name": "Victor's Fine Dining by Chrisitan Bau",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5349815,
+      "lon": 6.3867325,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2420566246,
+      "name": "Bonsai",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.5420622,
+      "lon": 6.3724927,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2420818956,
+      "name": "Café du Stadion",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5131158,
+      "lon": 6.1099261,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2433781362,
+      "name": "Modehaus Fischer",
+      "tags": {
+        "shop": "clothes"
+      },
+      "lat": 49.5384004,
+      "lon": 6.3770161,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2452632555,
+      "name": "Club8",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5156984,
+      "lon": 6.0980197,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2452641860,
+      "name": "ACP Garage",
+      "tags": {
+        "shop": "car_repair"
+      },
+      "lat": 49.5202656,
+      "lon": 6.0907781,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2466286022,
+      "name": null,
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.5099202,
+      "lon": 6.1494423,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2547499047,
+      "name": "Garage Horsmans & Rosati",
+      "tags": {
+        "shop": "car"
+      },
+      "lat": 49.5209354,
+      "lon": 6.3569202,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2571231625,
+      "name": "Butzenhaus",
+      "tags": {
+        "amenity": "kindergarten"
+      },
+      "lat": 49.5072257,
+      "lon": 6.1452953,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2660328313,
+      "name": null,
+      "tags": {
+        "amenity": "doctors"
+      },
+      "lat": 49.5192663,
+      "lon": 6.1006467,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2701150858,
+      "name": "Sumi",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5162799,
+      "lon": 6.1034512,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2820951922,
+      "name": null,
+      "tags": {
+        "amenity": "dentist"
+      },
+      "lat": 49.5192695,
+      "lon": 6.1006949,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3363543501,
+      "name": "Architektenbuero",
+      "tags": {
+        "office": "architect"
+      },
+      "lat": 49.5452134,
+      "lon": 6.3641013,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3389154083,
+      "name": null,
+      "tags": {
+        "amenity": "doctors"
+      },
+      "lat": 49.5127046,
+      "lon": 6.1892735,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3447315120,
+      "name": "Leonidas",
+      "tags": {
+        "shop": "chocolate"
+      },
+      "lat": 49.5482728,
+      "lon": 6.360707,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3523867253,
+      "name": "Barfuss-Pfad",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5172171,
+      "lon": 6.1178428,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3523867254,
+      "name": "Bieberbau",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5135665,
+      "lon": 6.1189532,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3523867261,
+      "name": "Kletterburg",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5136827,
+      "lon": 6.1182631,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3523867262,
+      "name": "Kletterburg",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5137255,
+      "lon": 6.1187048,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3523867263,
+      "name": "Kletterburg",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.513888,
+      "lon": 6.1190946,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3523867270,
+      "name": "Piratenschiff",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5135103,
+      "lon": 6.1180702,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3523870402,
+      "name": "Schallwellen",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5136042,
+      "lon": 6.118845,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3523875290,
+      "name": "Traumhochzeit im Park Bettenburg",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5130101,
+      "lon": 6.1217037,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3527739014,
+      "name": "Spinnennetz",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5135953,
+      "lon": 6.1185323,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3527739042,
+      "name": "Imbiss",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.511143,
+      "lon": 6.1199369,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3741534908,
+      "name": "Ikebana",
+      "tags": {
+        "shop": "florist"
+      },
+      "lat": 49.5196126,
+      "lon": 6.1006434,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4048771435,
+      "name": "Fleischerei Könen",
+      "tags": {
+        "shop": "butcher"
+      },
+      "lat": 49.5390492,
+      "lon": 6.3765024,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4133519876,
+      "name": null,
+      "tags": {
+        "amenity": "townhall"
+      },
+      "lat": 49.5029082,
+      "lon": 6.2718109,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4419113857,
+      "name": "Fu Shun Ju",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5463673,
+      "lon": 6.3273191,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4553823689,
+      "name": "Domaine Viticole Krier-Welbes",
+      "tags": {
+        "shop": "alcohol"
+      },
+      "lat": 49.5161833,
+      "lon": 6.3037305,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4771391916,
+      "name": "Star of Tokyo",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5046963,
+      "lon": 6.2734957,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5024788757,
+      "name": "D'innah",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5420125,
+      "lon": 6.3652397,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5024788764,
+      "name": "Café Um Moart",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5440459,
+      "lon": 6.3683542,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5024788765,
+      "name": "Marco Polo",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5431439,
+      "lon": 6.3670881,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5024788772,
+      "name": "Ghandi Restaurant",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5427814,
+      "lon": 6.3658507,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5024788776,
+      "name": "Mëtschekëscht",
+      "tags": {
+        "amenity": "cafe"
+      },
+      "lat": 49.5442951,
+      "lon": 6.36936,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5024788777,
+      "name": "Pizza Hut",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.546997,
+      "lon": 6.363908,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5028383611,
+      "name": null,
+      "tags": {
+        "shop": "wine"
+      },
+      "lat": 49.5277308,
+      "lon": 6.3481398,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5125951445,
+      "name": "Fleurs Vry",
+      "tags": {
+        "shop": "garden_centre"
+      },
+      "lat": 49.508938,
+      "lon": 6.1521892,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5237562428,
+      "name": "Café de la Poste",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5438408,
+      "lon": 6.3674697,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5237612676,
+      "name": "Queens",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5412191,
+      "lon": 6.3641015,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5237612686,
+      "name": "Salon Sylvie",
+      "tags": {
+        "shop": "hairdresser"
+      },
+      "lat": 49.5428237,
+      "lon": 6.3660453,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5245758583,
+      "name": null,
+      "tags": {
+        "shop": "jewelry"
+      },
+      "lat": 49.5129038,
+      "lon": 6.0944514,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5245758584,
+      "name": null,
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5126585,
+      "lon": 6.0934823,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5245758586,
+      "name": "k kiosk",
+      "tags": {
+        "shop": "newsagent"
+      },
+      "lat": 49.512866,
+      "lon": 6.0940841,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5245768549,
+      "name": "Emile Weber",
+      "tags": {
+        "shop": "travel_agency"
+      },
+      "lat": 49.5128577,
+      "lon": 6.0939442,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5245768550,
+      "name": "Milady",
+      "tags": {
+        "shop": "perfumery"
+      },
+      "lat": 49.5128431,
+      "lon": 6.0938063,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5245768551,
+      "name": "Cactus",
+      "tags": {
+        "shop": "supermarket"
+      },
+      "lat": 49.5124184,
+      "lon": 6.0940762,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5383159138,
+      "name": "Eden Green",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.521907,
+      "lon": 6.1009698,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5482950162,
+      "name": "O.P.D. Service Point",
+      "tags": {
+        "shop": "car_repair"
+      },
+      "lat": 49.5403802,
+      "lon": 6.3815425,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5482950172,
+      "name": "Schnitzelhaus Nennig",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5402462,
+      "lon": 6.3817169,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5483495858,
+      "name": "Wieser Stuff",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.538671,
+      "lon": 6.3763042,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5484597153,
+      "name": "Immobilien Bart",
+      "tags": {
+        "office": "estate_agent"
+      },
+      "lat": 49.5414506,
+      "lon": 6.3739599,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5484603877,
+      "name": "Die Brille",
+      "tags": {
+        "shop": "optician"
+      },
+      "lat": 49.5441616,
+      "lon": 6.368061,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5525332347,
+      "name": "Mosella",
+      "tags": {
+        "shop": "bakery"
+      },
+      "lat": 49.5437094,
+      "lon": 6.3676474,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5647632583,
+      "name": "Restaurant Little India",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5171807,
+      "lon": 6.0950718,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5647636361,
+      "name": "Free Use",
+      "tags": {
+        "amenity": "library"
+      },
+      "lat": 49.5178308,
+      "lon": 6.0969855,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5653843494,
+      "name": "Kalendula",
+      "tags": {
+        "shop": "supermarket"
+      },
+      "lat": 49.5180301,
+      "lon": 6.2552781,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5768380453,
+      "name": "Hatakki",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5181043,
+      "lon": 6.1010855,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5786872723,
+      "name": null,
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.5342396,
+      "lon": 6.3874268,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5981172761,
+      "name": "Kiosk",
+      "tags": {
+        "shop": "kiosk"
+      },
+      "lat": 49.5056182,
+      "lon": 6.2758894,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6030834746,
+      "name": "Cafe Michels",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.5464742,
+      "lon": 6.3599152,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6112427689,
+      "name": "Fischer",
+      "tags": {
+        "shop": "bakery"
+      },
+      "lat": 49.5186122,
+      "lon": 6.0987547,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6182409753,
+      "name": "B&B",
+      "tags": {
+        "office": "accountant"
+      },
+      "lat": 49.5049461,
+      "lon": 6.2717611,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6270102674,
+      "name": null,
+      "tags": {
+        "amenity": "vending_machine",
+        "shop": "bakery"
+      },
+      "lat": 49.5042692,
+      "lon": 6.2756067,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6532835550,
+      "name": "Reuter",
+      "tags": {
+        "shop": "estate_agent"
+      },
+      "lat": 49.5435602,
+      "lon": 6.3669603,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6801703801,
+      "name": "Café du Centenaire",
+      "tags": {
+        "amenity": "pub"
+      },
+      "lat": 49.518786,
+      "lon": 6.0992534,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6801703802,
+      "name": null,
+      "tags": {
+        "amenity": "doctors"
+      },
+      "lat": 49.518547,
+      "lon": 6.0985822,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6801703827,
+      "name": "Agence immobilière RBI",
+      "tags": {
+        "office": "estate_agent"
+      },
+      "lat": 49.5183699,
+      "lon": 6.0981068,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6801703828,
+      "name": "Haircut",
+      "tags": {
+        "shop": "hairdresser"
+      },
+      "lat": 49.5186615,
+      "lon": 6.0989182,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6925680545,
+      "name": "Art et Création a.s.b.l.",
+      "tags": {
+        "amenity": "arts_centre"
+      },
+      "lat": 49.5211647,
+      "lon": 6.2983459,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6937810828,
+      "name": "Cine Waasserhaus",
+      "tags": {
+        "amenity": "cinema"
+      },
+      "lat": 49.5011123,
+      "lon": 6.2829423,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7736767859,
+      "name": null,
+      "tags": {
+        "amenity": "library"
+      },
+      "lat": 49.5164832,
+      "lon": 6.1876263,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7801055186,
+      "name": "Neofisc",
+      "tags": {
+        "office": "tax_advisor"
+      },
+      "lat": 49.5079823,
+      "lon": 6.1918483,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7992464791,
+      "name": "Garage Auto-Tec sàrl",
+      "tags": {
+        "shop": "car_repair"
+      },
+      "lat": 49.5151583,
+      "lon": 6.3072393,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8599130128,
+      "name": "Dream Bike Shop",
+      "tags": {
+        "shop": "bicycle"
+      },
+      "lat": 49.5123277,
+      "lon": 6.0940216,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8614421283,
+      "name": "Weltbuttek",
+      "tags": {
+        "shop": "yes"
+      },
+      "lat": 49.5155188,
+      "lon": 6.1045689,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8614421421,
+      "name": "CNS",
+      "tags": {
+        "office": "insurance"
+      },
+      "lat": 49.5163695,
+      "lon": 6.1026733,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8614421482,
+      "name": "Le Coin Tranquille",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5163247,
+      "lon": 6.1033619,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8615074736,
+      "name": "Hëllef Doheem - Centre de jour Rousegärtchen",
+      "tags": {
+        "amenity": "social_facility"
+      },
+      "lat": 49.5215925,
+      "lon": 6.098202,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8615074897,
+      "name": "Haus fir Grouss a Kleng",
+      "tags": {
+        "amenity": "social_facility"
+      },
+      "lat": 49.5207136,
+      "lon": 6.0998268,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8641658178,
+      "name": "Husky Buvett",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.5138727,
+      "lon": 6.1193946,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8741880326,
+      "name": "Munhowen Drinx",
+      "tags": {
+        "office": "company"
+      },
+      "lat": 49.5080646,
+      "lon": 6.0934183,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8741880327,
+      "name": "Parquet Bembé",
+      "tags": {
+        "office": "company"
+      },
+      "lat": 49.5085532,
+      "lon": 6.0938501,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8903841612,
+      "name": "Gasthaus zur Post",
+      "tags": {
+        "amenity": "restaurant",
+        "tourism": "hostel"
+      },
+      "lat": 49.5293293,
+      "lon": 6.3834509,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8903945901,
+      "name": "Victor's Landgasthaus die Scheune",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5344716,
+      "lon": 6.386742,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9281188951,
+      "name": "dimmi si",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.504414,
+      "lon": 6.2771267,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9519528241,
+      "name": "Gianni Paoloni",
+      "tags": {
+        "shop": "optician"
+      },
+      "lat": 49.5048899,
+      "lon": 6.2769592,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9743544699,
+      "name": "La Borne des Trois Seigneurs",
+      "tags": {
+        "tourism": "attraction"
+      },
+      "lat": 49.4924128,
+      "lon": 6.1267042,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10131150545,
+      "name": "Domaine la Forêt",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5478779,
+      "lon": 6.3578422,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10608759187,
+      "name": "Fischer",
+      "tags": {
+        "shop": "bakery"
+      },
+      "lat": 49.5042027,
+      "lon": 6.0932253,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11061746197,
+      "name": "Dolce Vita",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5039397,
+      "lon": 6.2800525,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11061746198,
+      "name": null,
+      "tags": {
+        "tourism": "hotel"
+      },
+      "lat": 49.5039339,
+      "lon": 6.2800369,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11589059777,
+      "name": "Baptista Dental Group Est",
+      "tags": {
+        "amenity": "dentist"
+      },
+      "lat": 49.5455599,
+      "lon": 6.3670542,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11589059779,
+      "name": "Sender Stefan",
+      "tags": {
+        "amenity": "dentist"
+      },
+      "lat": 49.5453061,
+      "lon": 6.367863,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11589059780,
+      "name": "Manz Klaus",
+      "tags": {
+        "amenity": "doctors"
+      },
+      "lat": 49.5453466,
+      "lon": 6.3679168,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11593851000,
+      "name": "Kohn Paul",
+      "tags": {
+        "amenity": "doctors"
+      },
+      "lat": 49.5427483,
+      "lon": 6.3663406,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11594031181,
+      "name": "Zhong Hua",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5444933,
+      "lon": 6.3637269,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11601344461,
+      "name": "Knick Kevin",
+      "tags": {
+        "amenity": "dentist"
+      },
+      "lat": 49.5459427,
+      "lon": 6.3706555,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11640882277,
+      "name": "Hôtel de l'Esplanade",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5442109,
+      "lon": 6.3692089,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11725663921,
+      "name": "G-art",
+      "tags": {
+        "shop": "clothes"
+      },
+      "lat": 49.5170238,
+      "lon": 6.1879179,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11818466241,
+      "name": "Gehaanshaff",
+      "tags": {
+        "shop": "farm"
+      },
+      "lat": 49.5133056,
+      "lon": 6.0919741,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11893694826,
+      "name": "Cabinet Médical de Bettembourg",
+      "tags": {
+        "amenity": "doctors"
+      },
+      "lat": 49.5152309,
+      "lon": 6.1115278,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12012209642,
+      "name": null,
+      "tags": {
+        "shop": "gas"
+      },
+      "lat": 49.5046859,
+      "lon": 6.2693699,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12618832201,
+      "name": "Golf de Preisch",
+      "tags": {
+        "leisure": "sports_centre"
+      },
+      "lat": 49.5055913,
+      "lon": 6.2181096,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12618841901,
+      "name": "Ristorante Premio",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5056542,
+      "lon": 6.2184806,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12771644495,
+      "name": "Circle K",
+      "tags": {
+        "shop": "convenience"
+      },
+      "lat": 49.5081429,
+      "lon": 6.1917917,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12917148024,
+      "name": "Beau Séjour",
+      "tags": {
+        "tourism": "hotel"
+      },
+      "lat": 49.5041137,
+      "lon": 6.2798883,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12917148025,
+      "name": "Le Nid Gourmand",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.504122,
+      "lon": 6.2799134,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12963916884,
+      "name": "As Minhotas",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5180192,
+      "lon": 6.1039218,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12964373362,
+      "name": "Manuela",
+      "tags": {
+        "shop": "hairdresser"
+      },
+      "lat": 49.5178256,
+      "lon": 6.1022887,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12964404242,
+      "name": "Yvone Mota",
+      "tags": {
+        "shop": "hairdresser"
+      },
+      "lat": 49.5179563,
+      "lon": 6.1027581,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12964866448,
+      "name": "Presto Lux",
+      "tags": {
+        "shop": "dry_cleaning"
+      },
+      "lat": 49.5177926,
+      "lon": 6.1021942,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13039814254,
+      "name": "Quai 14",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5435944,
+      "lon": 6.3680242,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13131701096,
+      "name": "Syel détente",
+      "tags": {
+        "shop": "massage"
+      },
+      "lat": 49.5051776,
+      "lon": 6.1932054,
+      "walkable": false
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13197236912,
+      "name": "Parc Merveilleux",
+      "tags": {
+        "tourism": "hotel"
+      },
+      "lat": 49.509571,
+      "lon": 6.1187949,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13288682376,
+      "name": "Lux Snacks",
+      "tags": {
+        "amenity": "fast_food"
+      },
+      "lat": 49.5094342,
+      "lon": 6.1182558,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13351953774,
+      "name": "SIPEL",
+      "tags": {
+        "office": "company"
+      },
+      "lat": 49.5144735,
+      "lon": 6.3026829,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13449157181,
+      "name": "Axyscom",
+      "tags": {
+        "shop": "telecommunication"
+      },
+      "lat": 49.5447691,
+      "lon": 6.3691749,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 14020057002,
+      "name": "Yashiki Sushi",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5056669,
+      "lon": 6.2712158,
+      "walkable": true
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 14020057702,
+      "name": "Yashiki Sushi",
+      "tags": {
+        "amenity": "restaurant"
+      },
+      "lat": 49.5056669,
+      "lon": 6.2712158,
+      "walkable": true
+    },
+    {
+      "osm_type": "relation",
+      "osm_id": 2575570,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5020192,
+      "lon": 6.282886730658436,
+      "walkable": false
+    },
+    {
+      "osm_type": "relation",
+      "osm_id": 6936881,
+      "name": "Laboratoire National de Santé",
+      "tags": {
+        "building": "yes",
+        "office": "research"
+      },
+      "lat": 49.49889965,
+      "lon": 6.086568937102761,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 5017510,
+      "name": "Op der Millen",
+      "tags": {
+        "leisure": "stadium"
+      },
+      "lat": 49.54132425,
+      "lon": 6.362255623172645,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 27549894,
+      "name": "Globus Baumarkt",
+      "tags": {
+        "building": "retail",
+        "shop": "doityourself"
+      },
+      "lat": 49.50463965,
+      "lon": 6.093304748611036,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 29388250,
+      "name": "Kauffmann",
+      "tags": {
+        "building": "retail",
+        "shop": "car"
+      },
+      "lat": 49.49614445,
+      "lon": 6.087525872771292,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 37825776,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.499658600000004,
+      "lon": 6.281204528649956,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 37885293,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.515363050000005,
+      "lon": 6.307102343265632,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 41569653,
+      "name": null,
+      "tags": {
+        "amenity": "school",
+        "building": "yes"
+      },
+      "lat": 49.50595345,
+      "lon": 6.273750329818387,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 44786332,
+      "name": "Muffenrohr",
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5013283,
+      "lon": 6.0917212377467065,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 80932992,
+      "name": "Parc Jaquinot",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.5148109,
+      "lon": 6.103044507017736,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 81244746,
+      "name": "Winandy",
+      "tags": {
+        "building": "commercial",
+        "shop": "car"
+      },
+      "lat": 49.50588415,
+      "lon": 6.125712372435837,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 84099469,
+      "name": "Husky",
+      "tags": {
+        "building": "yes",
+        "office": "company"
+      },
+      "lat": 49.4860784,
+      "lon": 6.112249314069661,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 85283801,
+      "name": "DEG",
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.50583295,
+      "lon": 6.091928428216616,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 85283803,
+      "name": "Mako SA",
+      "tags": {
+        "building": "industrial",
+        "office": "logistics",
+        "shop": "rental"
+      },
+      "lat": 49.5066232,
+      "lon": 6.0929667968358,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 88440857,
+      "name": "Carrosserie Tricar",
+      "tags": {
+        "building": "yes",
+        "shop": "car_repair"
+      },
+      "lat": 49.512737349999995,
+      "lon": 6.304356148418993,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 88441707,
+      "name": "Caves Gales SA",
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5163888,
+      "lon": 6.306288519481219,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 88732703,
+      "name": "Citroën",
+      "tags": {
+        "building": "yes",
+        "shop": "car"
+      },
+      "lat": 49.5170484,
+      "lon": 6.199110211089108,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 109101086,
+      "name": "Post, Centre de distribution",
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.547574350000005,
+      "lon": 6.355103135690727,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 109101088,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.54781535,
+      "lon": 6.356482655111213,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 112454659,
+      "name": "Parc A Leischemer",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.5130909,
+      "lon": 6.113918875524934,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 112455182,
+      "name": "École fondamentale",
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.5175756,
+      "lon": 6.1090669184158894,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 112503619,
+      "name": null,
+      "tags": {
+        "leisure": "stadium"
+      },
+      "lat": 49.50928415,
+      "lon": 6.28957515,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 128045266,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.5014539,
+      "lon": 6.2814764503825735,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 131667629,
+      "name": "Parc du Château",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.51725665,
+      "lon": 6.09774513792841,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 131667910,
+      "name": "Centre Sportif et Culturel",
+      "tags": {
+        "leisure": "sports_centre"
+      },
+      "lat": 49.51519375,
+      "lon": 6.098424246628455,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 131668895,
+      "name": null,
+      "tags": {
+        "building": "train_station"
+      },
+      "lat": 49.51563365,
+      "lon": 6.101511570687812,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 131669275,
+      "name": null,
+      "tags": {
+        "building": "train_station"
+      },
+      "lat": 49.5165741,
+      "lon": 6.10169645076511,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 132702842,
+      "name": "an de Wisen",
+      "tags": {
+        "amenity": "social_facility",
+        "building": "yes"
+      },
+      "lat": 49.5116183,
+      "lon": 6.10174398919192,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 133500124,
+      "name": "Lea Linster",
+      "tags": {
+        "amenity": "restaurant",
+        "building": "yes"
+      },
+      "lat": 49.51813,
+      "lon": 6.187064357875366,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 133500131,
+      "name": null,
+      "tags": {
+        "amenity": "social_facility",
+        "building": "yes"
+      },
+      "lat": 49.5161337,
+      "lon": 6.1845787006208734,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 135183475,
+      "name": null,
+      "tags": {
+        "building": "shed",
+        "office": "yes"
+      },
+      "lat": 49.501644049999996,
+      "lon": 6.087851228470652,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 139159718,
+      "name": "Cactus",
+      "tags": {
+        "building": "supermarket",
+        "shop": "supermarket"
+      },
+      "lat": 49.5481772,
+      "lon": 6.360759003135422,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 139159790,
+      "name": "Cactus",
+      "tags": {
+        "building": "yes",
+        "shop": "beverages"
+      },
+      "lat": 49.54818605,
+      "lon": 6.361431322093406,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 146811861,
+      "name": "Château de Bettembourg",
+      "tags": {
+        "amenity": "townhall",
+        "building": "yes"
+      },
+      "lat": 49.51731235,
+      "lon": 6.096420144741199,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 151089019,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.50221445,
+      "lon": 6.090460299999995,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 151089023,
+      "name": "Stoll Hydraulics",
+      "tags": {
+        "building": "commercial",
+        "shop": "hardware"
+      },
+      "lat": 49.501198900000006,
+      "lon": 6.0921166364356,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 151089485,
+      "name": "Munhowen Drinx",
+      "tags": {
+        "building": "commercial",
+        "shop": "beverages"
+      },
+      "lat": 49.5067229,
+      "lon": 6.092536141919612,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 153342310,
+      "name": "Zentralschoul Fréiseng",
+      "tags": {
+        "amenity": "school",
+        "building": "yes"
+      },
+      "lat": 49.5150215,
+      "lon": 6.190431600875817,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 153342311,
+      "name": null,
+      "tags": {
+        "amenity": "school",
+        "building": "yes"
+      },
+      "lat": 49.51523995,
+      "lon": 6.189857383678136,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 153534259,
+      "name": null,
+      "tags": {
+        "building": "hotel"
+      },
+      "lat": 49.54801525,
+      "lon": 6.35813703031301,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 153535392,
+      "name": "Administration communale Remich",
+      "tags": {
+        "amenity": "townhall",
+        "building": "public"
+      },
+      "lat": 49.545022,
+      "lon": 6.3691969056957,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 153539104,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.54047085,
+      "lon": 6.3641251854839265,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 153553832,
+      "name": "Maison de retraite Saint-Jospeh",
+      "tags": {
+        "amenity": "social_facility",
+        "building": "yes"
+      },
+      "lat": 49.54332985,
+      "lon": 6.3622136433725345,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 153557992,
+      "name": "Centre Culturel",
+      "tags": {
+        "building": "public",
+        "leisure": "sports_centre"
+      },
+      "lat": 49.55542,
+      "lon": 6.334282427826911,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 155466342,
+      "name": "Mairie d'Évrange",
+      "tags": {
+        "amenity": "townhall",
+        "building": "civic"
+      },
+      "lat": 49.50513195,
+      "lon": 6.194463942195274,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 158428151,
+      "name": "Raiffeisen",
+      "tags": {
+        "amenity": "bank",
+        "building": "commercial"
+      },
+      "lat": 49.54797865,
+      "lon": 6.357220904036865,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 162872119,
+      "name": "DPD",
+      "tags": {
+        "building": "yes",
+        "office": "logistics"
+      },
+      "lat": 49.508169699999996,
+      "lon": 6.108109171701571,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 164327650,
+      "name": "A Possen",
+      "tags": {
+        "building": "yes",
+        "tourism": "museum"
+      },
+      "lat": 49.5288073,
+      "lon": 6.354228035736748,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 164331075,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.53154670000001,
+      "lon": 6.3538799715068,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 169347728,
+      "name": "Römisches Mosaik",
+      "tags": {
+        "building": "yes",
+        "tourism": "museum"
+      },
+      "lat": 49.529066,
+      "lon": 6.384695379465116,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 169853983,
+      "name": "Grill Buud",
+      "tags": {
+        "amenity": "fast_food",
+        "building": "yes"
+      },
+      "lat": 49.5114582,
+      "lon": 6.1204521955413265,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 175191188,
+      "name": "CIGL",
+      "tags": {
+        "amenity": "social_facility",
+        "building": "yes"
+      },
+      "lat": 49.51344695,
+      "lon": 6.1021731760855165,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 175191198,
+      "name": "Centre d'Initiave et de Gestion Local",
+      "tags": {
+        "amenity": "social_facility"
+      },
+      "lat": 49.513269750000006,
+      "lon": 6.102544378108961,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 175195220,
+      "name": null,
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.5198183,
+      "lon": 6.104309738085833,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 175224044,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.52265605,
+      "lon": 6.099227344203857,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 175253872,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5146291,
+      "lon": 6.094275697181049,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 175380413,
+      "name": "Office social commun",
+      "tags": {
+        "amenity": "social_facility",
+        "building": "yes"
+      },
+      "lat": 49.5163533,
+      "lon": 6.099375208923009,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 176721877,
+      "name": "Centre Sportif Roll Delles",
+      "tags": {
+        "building": "yes",
+        "leisure": "sports_centre"
+      },
+      "lat": 49.50677755,
+      "lon": 6.274786348128446,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 178003434,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.50897205,
+      "lon": 6.15213805103385,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 179480742,
+      "name": "Centre Culturel Hellange",
+      "tags": {
+        "amenity": "community_centre",
+        "building": "civic"
+      },
+      "lat": 49.5096231,
+      "lon": 6.149429449456864,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 185134761,
+      "name": "Administration communale de Frisange",
+      "tags": {
+        "amenity": "townhall",
+        "building": "public"
+      },
+      "lat": 49.5158577,
+      "lon": 6.190673406418615,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 185141163,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.511426799999995,
+      "lon": 6.190066918397266,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 185141166,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.51115645,
+      "lon": 6.190904842269912,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 185207530,
+      "name": null,
+      "tags": {
+        "amenity": "school",
+        "building": "school"
+      },
+      "lat": 49.515027450000005,
+      "lon": 6.1901987539713526,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 190887937,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5016811,
+      "lon": 6.282454435999849,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 191050268,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.5084958,
+      "lon": 6.192262859499824,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 192434013,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.542902749999996,
+      "lon": 6.362895394933715,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 192434016,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5403857,
+      "lon": 6.363243776330947,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195121195,
+      "name": null,
+      "tags": {
+        "amenity": "school",
+        "building": "school"
+      },
+      "lat": 49.524563400000005,
+      "lon": 6.225562950618565,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195201100,
+      "name": "Stëftung Hëllef Doheem",
+      "tags": {
+        "building": "office"
+      },
+      "lat": 49.50637655,
+      "lon": 6.192655661853928,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195203313,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51597495,
+      "lon": 6.192435950530638,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195664606,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5240774,
+      "lon": 6.187419981470588,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195664607,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.522439,
+      "lon": 6.184925219440012,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195664613,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52301695,
+      "lon": 6.185941300326364,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195664614,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52048485,
+      "lon": 6.185804163437499,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195664616,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5228745,
+      "lon": 6.18602715400329,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 195664617,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5181567,
+      "lon": 6.189582714452635,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 196201522,
+      "name": null,
+      "tags": {
+        "amenity": "post_office",
+        "building": "office"
+      },
+      "lat": 49.5207345,
+      "lon": 6.222781382094905,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 196903060,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51694355,
+      "lon": 6.196197729114713,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 197032172,
+      "name": null,
+      "tags": {
+        "building": "yes",
+        "shop": "alcohol"
+      },
+      "lat": 49.50633735,
+      "lon": 6.141549763007994,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 197032345,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.506408,
+      "lon": 6.14108959538489,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 197294182,
+      "name": null,
+      "tags": {
+        "building": "house",
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51224945,
+      "lon": 6.186160610355905,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 199139209,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.522754750000004,
+      "lon": 6.221302508566712,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 209196929,
+      "name": "Hotel am Klouschter",
+      "tags": {
+        "building": "monastery",
+        "tourism": "hotel"
+      },
+      "lat": 49.5051865,
+      "lon": 6.285292549215825,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 209197586,
+      "name": null,
+      "tags": {
+        "amenity": "townhall",
+        "building": "yes"
+      },
+      "lat": 49.5062517,
+      "lon": 6.27489359764361,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 215294668,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.51501155,
+      "lon": 6.106928209876672,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 215488430,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.511812649999996,
+      "lon": 6.155589800000001,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 215488431,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51183575,
+      "lon": 6.155279349999999,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 215488432,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5110642,
+      "lon": 6.151133922946009,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 215488433,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5117025,
+      "lon": 6.15512181671008,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 219408899,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.50873970000001,
+      "lon": 6.094040244381979,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 237353872,
+      "name": "Parc Grande-Duchesse Charlotte",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.51904605,
+      "lon": 6.099204906143102,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 237957954,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.54664745,
+      "lon": 6.353657901351353,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 238035107,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.54706935,
+      "lon": 6.363962399776186,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 238289200,
+      "name": "Autocenter Goedert",
+      "tags": {
+        "building": "retail",
+        "shop": "car_parts"
+      },
+      "lat": 49.5474472,
+      "lon": 6.359909474448687,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 239180491,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5212524,
+      "lon": 6.084520302321715,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 246596848,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.50626405,
+      "lon": 6.283556579821433,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 254169600,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.5384753,
+      "lon": 6.338541789496971,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 256924734,
+      "name": "Caisse",
+      "tags": {
+        "building": "retail",
+        "shop": "ticket"
+      },
+      "lat": 49.5102058,
+      "lon": 6.119415438834952,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 256977951,
+      "name": "Parc Cité du Soleil",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.51097925,
+      "lon": 6.112394815089976,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 277526033,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.508751950000004,
+      "lon": 6.277696375051724,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 288097920,
+      "name": "Cactus Shoppi Mondorf",
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.50480615,
+      "lon": 6.269557838671059,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 288097922,
+      "name": "Algarve",
+      "tags": {
+        "amenity": "restaurant",
+        "building": "yes"
+      },
+      "lat": 49.504343649999996,
+      "lon": 6.266031592017427,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 289226024,
+      "name": null,
+      "tags": {
+        "building": "yes",
+        "shop": "car"
+      },
+      "lat": 49.510254200000006,
+      "lon": 6.25606310068341,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 294866321,
+      "name": "Nopson sàrl",
+      "tags": {
+        "building": "office"
+      },
+      "lat": 49.55368154999999,
+      "lon": 6.323139550000001,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 307633490,
+      "name": "Bâtiment vente",
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.49161365,
+      "lon": 6.1140830210868184,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 312927297,
+      "name": "Administration Communale de Bous",
+      "tags": {
+        "amenity": "townhall",
+        "building": "yes"
+      },
+      "lat": 49.55530005,
+      "lon": 6.328595328247623,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 327698464,
+      "name": "E.Leclerc",
+      "tags": {
+        "building": "commercial",
+        "shop": "supermarket"
+      },
+      "lat": 49.5155326,
+      "lon": 6.307776142062318,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 331802505,
+      "name": "Hotel Restaurant Zur Traube",
+      "tags": {
+        "amenity": "restaurant",
+        "building": "yes",
+        "tourism": "hotel"
+      },
+      "lat": 49.5399553,
+      "lon": 6.377434499935452,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 331804397,
+      "name": "Zum Mosaik",
+      "tags": {
+        "amenity": "restaurant",
+        "building": "yes"
+      },
+      "lat": 49.5339553,
+      "lon": 6.385053864529314,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 331823566,
+      "name": "Wässa & Schuster Farben",
+      "tags": {
+        "building": "yes",
+        "shop": "doityourself"
+      },
+      "lat": 49.516568649999996,
+      "lon": 6.369959946218938,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 331823579,
+      "name": "Happy Fit",
+      "tags": {
+        "building": "yes",
+        "leisure": "sports_centre"
+      },
+      "lat": 49.51591705,
+      "lon": 6.372673489876709,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 331823586,
+      "name": "Boesner",
+      "tags": {
+        "building": "yes",
+        "shop": "craft"
+      },
+      "lat": 49.5157569,
+      "lon": 6.374241421428572,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 331823587,
+      "name": "Steinblume Perl",
+      "tags": {
+        "building": "yes",
+        "shop": "florist"
+      },
+      "lat": 49.51735515,
+      "lon": 6.375680915921379,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 331885054,
+      "name": "Victor's Residenz-Hotel Schloss Berg",
+      "tags": {
+        "building": "yes",
+        "tourism": "hotel"
+      },
+      "lat": 49.535788249999996,
+      "lon": 6.386665460289102,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 336519179,
+      "name": "Millerad",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.54205695,
+      "lon": 6.366690480691922,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 341433552,
+      "name": "WeinGut Edgar Gales",
+      "tags": {
+        "amenity": "bar",
+        "building": "yes"
+      },
+      "lat": 49.52979139999999,
+      "lon": 6.382900125906826,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 345735935,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.51120075,
+      "lon": 6.1196074,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 350341767,
+      "name": "Gradel Sàrl",
+      "tags": {
+        "building": "yes",
+        "office": "company"
+      },
+      "lat": 49.51144205,
+      "lon": 6.299150677307168,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 396030777,
+      "name": null,
+      "tags": {
+        "amenity": "school",
+        "building": "school"
+      },
+      "lat": 49.551650550000005,
+      "lon": 6.312775358512274,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 406467245,
+      "name": "MAKO",
+      "tags": {
+        "building": "yes",
+        "shop": "hardware"
+      },
+      "lat": 49.50623065,
+      "lon": 6.094832428189116,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 409840777,
+      "name": null,
+      "tags": {
+        "building": "office"
+      },
+      "lat": 49.4989261,
+      "lon": 6.097475406794999,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 409840778,
+      "name": "CFL Multimodal",
+      "tags": {
+        "building": "office"
+      },
+      "lat": 49.49888985,
+      "lon": 6.097921914611588,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 409840779,
+      "name": "CFL Logistics - Customs Agency / Agence en douane",
+      "tags": {
+        "building": "office"
+      },
+      "lat": 49.49871925,
+      "lon": 6.0982443632582655,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 410097054,
+      "name": "CFL Logistics S.A.",
+      "tags": {
+        "building": "warehouse",
+        "office": "logistics"
+      },
+      "lat": 49.49899995,
+      "lon": 6.1080555256991556,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 410613768,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.50695825,
+      "lon": 6.102238053713368,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 410613771,
+      "name": "Transaliance",
+      "tags": {
+        "building": "office"
+      },
+      "lat": 49.49988995,
+      "lon": 6.114999695639554,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 443025049,
+      "name": "Autocars Emille Frisch",
+      "tags": {
+        "building": "yes",
+        "office": "company"
+      },
+      "lat": 49.5027172,
+      "lon": 6.091444394145993,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 443025050,
+      "name": "Autocars Pletschette",
+      "tags": {
+        "building": "yes",
+        "office": "company"
+      },
+      "lat": 49.50214685,
+      "lon": 6.092327131404055,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 484334894,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.5054246,
+      "lon": 6.283036474613627,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 490086415,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.51237935,
+      "lon": 6.094109536549286,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 504516344,
+      "name": "GN Logistics",
+      "tags": {
+        "building": "yes",
+        "office": "logistics"
+      },
+      "lat": 49.508776749999996,
+      "lon": 6.1057247132624735,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 511747656,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5156198,
+      "lon": 6.308142248846099,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 512980511,
+      "name": "Centre Sportif \"Romain Schroeder\"",
+      "tags": {
+        "building": "public",
+        "leisure": "sports_centre"
+      },
+      "lat": 49.5152131,
+      "lon": 6.191556885818153,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 514766690,
+      "name": "Losch Bech-Kleinmacher",
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5210534,
+      "lon": 6.356856980521759,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 550466111,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.50856315,
+      "lon": 6.09393958699185,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 556764477,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5470521,
+      "lon": 6.323646136317356,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 556766174,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.54657125,
+      "lon": 6.325084479235704,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 558267435,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.5224246,
+      "lon": 6.1014544294205155,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 569069282,
+      "name": "Krakelshaff Park",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.511123100000006,
+      "lon": 6.105608141790123,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 579154547,
+      "name": "Parc bei der Schwemm",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.51616195,
+      "lon": 6.098157679920248,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 579154549,
+      "name": "Parc du Château",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.514405249999996,
+      "lon": 6.0969795415438135,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 579157407,
+      "name": "Parc Michel Hack",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.514404299999995,
+      "lon": 6.094807693869427,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 579161193,
+      "name": "Parc Fernand Mertens",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.518445299999996,
+      "lon": 6.110772033459777,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 582498228,
+      "name": "An der Schwämm",
+      "tags": {
+        "building": "yes",
+        "leisure": "sports_centre"
+      },
+      "lat": 49.51546185,
+      "lon": 6.097742833353218,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 626954648,
+      "name": "Ancienne Gare de Scheuerberg",
+      "tags": {
+        "building": "train_station"
+      },
+      "lat": 49.53752235,
+      "lon": 6.332922865056499,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 635227510,
+      "name": "Tradition Immobilière Sarl",
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.5205287,
+      "lon": 6.296814089679465,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 647062697,
+      "name": "Hendle KFZ-Technik",
+      "tags": {
+        "building": "yes",
+        "shop": "car_repair"
+      },
+      "lat": 49.515169400000005,
+      "lon": 6.373638150000001,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 647062701,
+      "name": "Schräglage",
+      "tags": {
+        "building": "yes",
+        "shop": "motorcycle"
+      },
+      "lat": 49.5146232,
+      "lon": 6.372728200000001,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 663781177,
+      "name": "École internationale de Mondorf",
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.500204350000004,
+      "lon": 6.285029543717593,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 703331295,
+      "name": null,
+      "tags": {
+        "amenity": "fast_food",
+        "building": "yes"
+      },
+      "lat": 49.515456150000006,
+      "lon": 6.18231244669014,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 725452815,
+      "name": "Club Nautique du Luxembourg",
+      "tags": {
+        "leisure": "sports_centre"
+      },
+      "lat": 49.521253200000004,
+      "lon": 6.358797393599211,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 768521150,
+      "name": "Centre Medical Remich",
+      "tags": {
+        "amenity": "doctors",
+        "building": "yes"
+      },
+      "lat": 49.54833445,
+      "lon": 6.35901390746252,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 786601041,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.543630199999996,
+      "lon": 6.367987076362961,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 786601046,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.5433019,
+      "lon": 6.367252478700685,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 786601047,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.54335815,
+      "lon": 6.367390909879536,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 786601109,
+      "name": null,
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.545181150000005,
+      "lon": 6.368537566701088,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 786601122,
+      "name": "École Gewännchen",
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.54709175,
+      "lon": 6.366085936409861,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 836157681,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5015264,
+      "lon": 6.091636556818187,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 838568251,
+      "name": "Parc Merveilleux",
+      "tags": {
+        "tourism": "zoo"
+      },
+      "lat": 49.51131585,
+      "lon": 6.12074128693799,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 902232912,
+      "name": null,
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.5549976,
+      "lon": 6.3301765053840535,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 916584605,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.54370625,
+      "lon": 6.3559085500000005,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 916584700,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5453557,
+      "lon": 6.370327134558823,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 916702128,
+      "name": "McDonald's",
+      "tags": {
+        "amenity": "fast_food",
+        "building": "retail"
+      },
+      "lat": 49.54667565,
+      "lon": 6.36356215570921,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 916702198,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.54429675,
+      "lon": 6.363828011994411,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 928884518,
+      "name": "Foyer Sainte Elisabeth",
+      "tags": {
+        "amenity": "social_facility"
+      },
+      "lat": 49.521339499999996,
+      "lon": 6.097233478395985,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 928910188,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.51701955,
+      "lon": 6.094451617223468,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 928910217,
+      "name": null,
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.51959995,
+      "lon": 6.097559283316409,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 928910238,
+      "name": null,
+      "tags": {
+        "amenity": "kindergarten"
+      },
+      "lat": 49.5194771,
+      "lon": 6.098718500238852,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 929799250,
+      "name": null,
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.52797235,
+      "lon": 6.34991918113566,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 930422388,
+      "name": "Black Stone",
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5079462,
+      "lon": 6.093477855840607,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 930762618,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.51103865,
+      "lon": 6.1019849180511185,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 932200816,
+      "name": null,
+      "tags": {
+        "tourism": "zoo"
+      },
+      "lat": 49.509997,
+      "lon": 6.1204566513117875,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 932200818,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.513875350000006,
+      "lon": 6.119398075327291,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 932200820,
+      "name": "Minizoo Streichelzoo",
+      "tags": {
+        "tourism": "zoo"
+      },
+      "lat": 49.5132924,
+      "lon": 6.1185133983744695,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 932200826,
+      "name": null,
+      "tags": {
+        "building": "yes",
+        "tourism": "zoo"
+      },
+      "lat": 49.5099675,
+      "lon": 6.12075000325133,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 932200828,
+      "name": null,
+      "tags": {
+        "building": "yes",
+        "tourism": "zoo"
+      },
+      "lat": 49.510586399999994,
+      "lon": 6.120622288141252,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 932200831,
+      "name": null,
+      "tags": {
+        "tourism": "zoo"
+      },
+      "lat": 49.51351955,
+      "lon": 6.12092800557458,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 932620522,
+      "name": null,
+      "tags": {
+        "building": "yes",
+        "tourism": "zoo"
+      },
+      "lat": 49.5128479,
+      "lon": 6.1190373598080825,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 937075603,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.520420400000006,
+      "lon": 6.2206053569008475,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 937075606,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52035925,
+      "lon": 6.219849748707405,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 937267715,
+      "name": "Monplaisir",
+      "tags": {
+        "amenity": "social_facility"
+      },
+      "lat": 49.50555575,
+      "lon": 6.289835307020022,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 937267728,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.508669600000005,
+      "lon": 6.287994436567159,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 937276854,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.51742645,
+      "lon": 6.187855130043103,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 944628344,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5067025,
+      "lon": 6.140798908697409,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 944628345,
+      "name": null,
+      "tags": {
+        "building": "commercial"
+      },
+      "lat": 49.5064282,
+      "lon": 6.139761283388015,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 944660091,
+      "name": "dm",
+      "tags": {
+        "building": "yes",
+        "shop": "chemist"
+      },
+      "lat": 49.5184541,
+      "lon": 6.37620984007021,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 944660092,
+      "name": "Aldi Süd",
+      "tags": {
+        "building": "yes",
+        "shop": "supermarket"
+      },
+      "lat": 49.51914805,
+      "lon": 6.376537287731745,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 961628670,
+      "name": "Kessler",
+      "tags": {
+        "building": "yes",
+        "shop": "beverages"
+      },
+      "lat": 49.51662185,
+      "lon": 6.3753626,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 961628672,
+      "name": "Café Louis Besch",
+      "tags": {
+        "amenity": "cafe",
+        "building": "yes"
+      },
+      "lat": 49.51602215,
+      "lon": 6.37512165,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 962550805,
+      "name": "Kita St.Martin",
+      "tags": {
+        "amenity": "kindergarten"
+      },
+      "lat": 49.53182305,
+      "lon": 6.383888739348362,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 982309924,
+      "name": "Jardin Clara Reinert",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.5044233,
+      "lon": 6.264046084612801,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 996447863,
+      "name": "Lidl",
+      "tags": {
+        "building": "yes",
+        "shop": "supermarket"
+      },
+      "lat": 49.496787850000004,
+      "lon": 6.085951345635671,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1013541542,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.5197139,
+      "lon": 6.0946864989564435,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1018717468,
+      "name": null,
+      "tags": {
+        "leisure": "sports_centre"
+      },
+      "lat": 49.540163899999996,
+      "lon": 6.374688521019454,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1041522791,
+      "name": null,
+      "tags": {
+        "leisure": "sports_centre"
+      },
+      "lat": 49.5119667,
+      "lon": 6.116469579885267,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1055841659,
+      "name": "Waistuff",
+      "tags": {
+        "amenity": "pub",
+        "building": "yes"
+      },
+      "lat": 49.5287953,
+      "lon": 6.354045828032357,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1106639071,
+      "name": null,
+      "tags": {
+        "building": "retail"
+      },
+      "lat": 49.54706935,
+      "lon": 6.364174391476033,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1107192241,
+      "name": "Domaine la Forêt",
+      "tags": {
+        "tourism": "hotel"
+      },
+      "lat": 49.5479599,
+      "lon": 6.358030010786747,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1188316523,
+      "name": "Tiny Bar",
+      "tags": {
+        "amenity": "bar",
+        "building": "yes"
+      },
+      "lat": 49.540538100000006,
+      "lon": 6.3660645999999925,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1188316532,
+      "name": "Domaine Claude Bentz",
+      "tags": {
+        "amenity": "bar",
+        "building": "yes"
+      },
+      "lat": 49.54325085,
+      "lon": 6.35605228383256,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1204183331,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.54725405,
+      "lon": 6.358473685705742,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1204721548,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49930555,
+      "lon": 6.1770636097188305,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1204721549,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49916685,
+      "lon": 6.176729497073577,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1204721552,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49992745,
+      "lon": 6.171247536581241,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1204721981,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.500934400000006,
+      "lon": 6.173181277589111,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887449,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50499135,
+      "lon": 6.265867172305654,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887482,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50986795,
+      "lon": 6.277677297738196,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887485,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.507360500000004,
+      "lon": 6.288920899999997,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887490,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50743625,
+      "lon": 6.283619732958476,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887500,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5111231,
+      "lon": 6.2843958,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887515,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.508994099999995,
+      "lon": 6.276794620589699,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887516,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.509305499999996,
+      "lon": 6.27728873642519,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887517,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51020665,
+      "lon": 6.279678454481132,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887518,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50986895,
+      "lon": 6.2791962189351835,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887522,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51071115,
+      "lon": 6.2814309999999995,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887523,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.509882000000005,
+      "lon": 6.28098965,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887524,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5091491,
+      "lon": 6.2814259743052725,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887530,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50683155,
+      "lon": 6.284795002363184,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887533,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5069422,
+      "lon": 6.28511944999999,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1223887568,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5045608,
+      "lon": 6.2800473,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1242449057,
+      "name": null,
+      "tags": {
+        "building": "castle",
+        "tourism": "hotel"
+      },
+      "lat": 49.5349364,
+      "lon": 6.386776852025857,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1246039400,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.54641005,
+      "lon": 6.361637782236841,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1259732997,
+      "name": "Marché de Bettembourg",
+      "tags": {
+        "amenity": "marketplace"
+      },
+      "lat": 49.51913915,
+      "lon": 6.0984131958403776,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1290091670,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5399321,
+      "lon": 6.330210199999998,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1290091671,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.54003695,
+      "lon": 6.329917369897962,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1290091700,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.544433850000004,
+      "lon": 6.325176318361804,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1290091703,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.54781335,
+      "lon": 6.323651700000008,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1290091848,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5561521,
+      "lon": 6.3344602000000005,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1290091849,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.556243499999994,
+      "lon": 6.335292622902795,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1290091955,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5554864,
+      "lon": 6.3143596430985,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1292195623,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51835,
+      "lon": 6.301368348557775,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1292195673,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5233206,
+      "lon": 6.342372403901516,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1292195701,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.522441799999996,
+      "lon": 6.3422413785074605,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1292195702,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5228929,
+      "lon": 6.34224862469296,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1292195873,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.525416,
+      "lon": 6.35553685,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1292195892,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.53415575,
+      "lon": 6.355865349999997,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647513,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5172984,
+      "lon": 6.189056670276873,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647539,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5169535,
+      "lon": 6.19385175,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647541,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.517147,
+      "lon": 6.1935497999999995,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647549,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.508251900000005,
+      "lon": 6.147119919026775,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647552,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.510421449999996,
+      "lon": 6.147576150000003,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647553,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.510054600000004,
+      "lon": 6.147875519556449,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647554,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.509630349999995,
+      "lon": 6.148155650000002,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647555,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5093706,
+      "lon": 6.148402990983607,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647556,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5095156,
+      "lon": 6.1482422,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647565,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5062073,
+      "lon": 6.143457700000001,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647568,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50512845,
+      "lon": 6.13824005,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647598,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51769685,
+      "lon": 6.19397645,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647599,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.517511549999995,
+      "lon": 6.19455417818936,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647602,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51787985,
+      "lon": 6.188415,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647608,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51331035,
+      "lon": 6.188606162009058,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647617,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.513404300000005,
+      "lon": 6.186609249999997,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647623,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51301625,
+      "lon": 6.18423795,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647624,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.513785150000004,
+      "lon": 6.183617849999999,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647631,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5222112,
+      "lon": 6.2229035653543,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647634,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52303845,
+      "lon": 6.2295501,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647642,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51676875,
+      "lon": 6.234043098930806,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647665,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5201357,
+      "lon": 6.223074650000002,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647666,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.520082200000004,
+      "lon": 6.22337225503597,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647676,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5239797,
+      "lon": 6.230835200000003,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647686,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5216158,
+      "lon": 6.21917438399303,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647687,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52145505,
+      "lon": 6.22022248399583,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647690,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.523101049999994,
+      "lon": 6.230942403779456,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647691,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52318775,
+      "lon": 6.23083403354602,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647692,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52336015,
+      "lon": 6.230640378634586,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1297647694,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.522478199999995,
+      "lon": 6.229434883921019,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1298175114,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.520136050000005,
+      "lon": 6.185939993793561,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1298175115,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52092505,
+      "lon": 6.187562141474357,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1298175116,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52153815,
+      "lon": 6.18800015,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300754983,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.516228999999996,
+      "lon": 6.115051510135142,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300754989,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51444525,
+      "lon": 6.11386025,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300754990,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51852375,
+      "lon": 6.106030040425853,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300754991,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51876455,
+      "lon": 6.1060587,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300755014,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5127292,
+      "lon": 6.1132984,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300755028,
+      "name": null,
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.51686145,
+      "lon": 6.113506660764521,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300755060,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51411615,
+      "lon": 6.1068371500000005,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300755188,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5132498,
+      "lon": 6.110775502702221,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1300755194,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.514185749999996,
+      "lon": 6.108677033300578,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1301360709,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50492175,
+      "lon": 6.0615308,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1305798257,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.4912137,
+      "lon": 6.100427599999996,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1305798275,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49289975,
+      "lon": 6.0968205,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1305798417,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49685315,
+      "lon": 6.083539406176815,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1305798418,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49685755,
+      "lon": 6.08261665,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1305798419,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49686655,
+      "lon": 6.082307524239865,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1305798420,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49686725,
+      "lon": 6.082830529792805,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1305798501,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.49629885,
+      "lon": 6.082476049421746,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1305798502,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.496491,
+      "lon": 6.084609272838181,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1346420669,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52333255,
+      "lon": 6.21797175,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1346420671,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52243315,
+      "lon": 6.220068799999999,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1346420672,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.520508199999995,
+      "lon": 6.221057939967583,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1416362474,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.506229950000005,
+      "lon": 6.062984849999994,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1425847667,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.542697000000004,
+      "lon": 6.357452150000005,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1434481121,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5039347,
+      "lon": 6.1992739499999985,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1434481122,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.504103549999996,
+      "lon": 6.199654803045329,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1434481123,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5046189,
+      "lon": 6.198937950000004,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1435137992,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5237987,
+      "lon": 6.186810599999999,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1435137997,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51601425,
+      "lon": 6.192833735136988,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1450003108,
+      "name": "Cactus Shoppi",
+      "tags": {
+        "building": "shop",
+        "shop": "convenience"
+      },
+      "lat": 49.515204100000005,
+      "lon": 6.101419030615019,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1455840287,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50650365,
+      "lon": 6.2888693009353736,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1469172148,
+      "name": "Em de Bechel",
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.5121512,
+      "lon": 6.104565564641332,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1473979828,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5090744,
+      "lon": 6.149844857190246,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1473979831,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50929855,
+      "lon": 6.148276750000001,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1473979955,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.520146100000005,
+      "lon": 6.108960522797926,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1476554136,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5554077,
+      "lon": 6.324334649999998,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1480370983,
+      "name": null,
+      "tags": {
+        "office": "hedge"
+      },
+      "lat": 49.53785675,
+      "lon": 6.338495954392048,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1480371204,
+      "name": "Jeannot Belling",
+      "tags": {
+        "leisure": "park"
+      },
+      "lat": 49.54261285,
+      "lon": 6.364338857857883,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1485781862,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5116745,
+      "lon": 6.155529150000001,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1485781997,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.51183615,
+      "lon": 6.15104637732258,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1493858911,
+      "name": "École primaire",
+      "tags": {
+        "amenity": "school"
+      },
+      "lat": 49.502838499999996,
+      "lon": 6.2708977842416935,
+      "walkable": true
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1534656768,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5093763,
+      "lon": 6.2743325500000005,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1534656879,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.52314895,
+      "lon": 6.189356269472789,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1534656883,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5237712,
+      "lon": 6.18659435,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1534656993,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.50213705,
+      "lon": 6.195442441917293,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1534656996,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5031363,
+      "lon": 6.196800469612103,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1534656998,
+      "name": null,
+      "tags": {
+        "leisure": "swimming_pool"
+      },
+      "lat": 49.5034618,
+      "lon": 6.192612995425562,
+      "walkable": false
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1554258210,
+      "name": "Happy Burger",
+      "tags": {
+        "amenity": "fast_food",
+        "building": "yes"
+      },
+      "lat": 49.5043935,
+      "lon": 6.092440180876069,
+      "walkable": false
+    }
+  ]
+}
