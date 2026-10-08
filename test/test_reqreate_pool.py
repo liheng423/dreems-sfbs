@@ -2,11 +2,13 @@
 
 import hashlib
 import json
+import tomllib
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CFG_PATH = ROOT / "src/reqreate/config_550.json"
+CFG_PATH = ROOT / "src/reqreate/config_550.toml"
+STOPS_PATH = ROOT / "data/busline/stops_550.json"
 POOL_PATH = ROOT / "data/reqreate/550_raw_requests.json"
 META_PATH = ROOT / "data/reqreate/550_raw_requests_metadata.json"
 DIST_PATH = ROOT / "data/distance_matrix_550.json"
@@ -21,11 +23,12 @@ def sha256(path):
 
 
 def main():
-    cfg = read_json(CFG_PATH)
+    cfg = tomllib.loads(CFG_PATH.read_text())
     pool = read_json(POOL_PATH)
     meta = read_json(META_PATH)
     dist_mat = read_json(DIST_PATH)
-    places = {int(place["name"].removeprefix("Stop_")): place for place in cfg["places"]}
+    places = {int(place["name"].removeprefix("Stop_")): place
+              for place in read_json(STOPS_PATH)}
     dist_idx = {int(stop_id): idx for idx, stop_id in enumerate(dist_mat["stop_ids"])}
     params = {param["name"]: param["value"] for param in cfg["parameters"] if "value" in param}
     reqs = pool["requests"]

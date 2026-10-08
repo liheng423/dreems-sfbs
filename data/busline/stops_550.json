@@ -1,0 +1,205 @@
+[
+  {
+    "name": "Stop_000210103001",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.327284,
+    "lat": 49.546038
+  },
+  {
+    "name": "Stop_000210103003",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.324773,
+    "lat": 49.542507
+  },
+  {
+    "name": "Stop_000210105001",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.323211,
+    "lat": 49.539419
+  },
+  {
+    "name": "Stop_000210501001",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.257602,
+    "lat": 49.509007
+  },
+  {
+    "name": "Stop_000210501002",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.250079,
+    "lat": 49.50933
+  },
+  {
+    "name": "Stop_000210501003",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.255343,
+    "lat": 49.510054
+  },
+  {
+    "name": "Stop_000210501004",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.26071,
+    "lat": 49.507723
+  },
+  {
+    "name": "Stop_000210502001",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.304688,
+    "lat": 49.515382
+  },
+  {
+    "name": "Stop_000210502002",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.297506,
+    "lat": 49.520264
+  },
+  {
+    "name": "Stop_000210503001",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.270312,
+    "lat": 49.504588
+  },
+  {
+    "name": "Stop_000210503002",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.281589,
+    "lat": 49.506248
+  },
+  {
+    "name": "Stop_000210503003",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.274508,
+    "lat": 49.504642
+  },
+  {
+    "name": "Stop_000210503005",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.266162,
+    "lat": 49.504184
+  },
+  {
+    "name": "Stop_000210503006",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.284231,
+    "lat": 49.508251
+  },
+  {
+    "name": "Stop_000210503007",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.287453,
+    "lat": 49.510042
+  },
+  {
+    "name": "Stop_000210701006",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.368293,
+    "lat": 49.542737
+  },
+  {
+    "name": "Stop_000210701017",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.355633,
+    "lat": 49.547279
+  },
+  {
+    "name": "Stop_000210701024",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.365122,
+    "lat": 49.546434
+  },
+  {
+    "name": "Stop_000220102004",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.110184,
+    "lat": 49.513187
+  },
+  {
+    "name": "Stop_000220102005",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.101996,
+    "lat": 49.516606
+  },
+  {
+    "name": "Stop_000220102007",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.126026,
+    "lat": 49.50614
+  },
+  {
+    "name": "Stop_000220102008",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.118727,
+    "lat": 49.509351
+  },
+  {
+    "name": "Stop_000220501001",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.233064,
+    "lat": 49.517894
+  },
+  {
+    "name": "Stop_000220501002",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.225998,
+    "lat": 49.520283
+  },
+  {
+    "name": "Stop_000220502002",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.198109,
+    "lat": 49.516656
+  },
+  {
+    "name": "Stop_000220502004",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.18877,
+    "lat": 49.515892
+  },
+  {
+    "name": "Stop_000220503001",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.142069,
+    "lat": 49.506158
+  },
+  {
+    "name": "Stop_000220503002",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.158291,
+    "lat": 49.510494
+  },
+  {
+    "name": "Stop_000220503003",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.148425,
+    "lat": 49.507551
+  }
+]

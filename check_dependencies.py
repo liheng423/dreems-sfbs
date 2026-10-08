@@ -16,8 +16,10 @@ def missing_dependencies(requirements_path=REQUIREMENTS_PATH):
         requirement = line.split("#", 1)[0].strip()
         if not requirement:
             continue
-        # The editable local checkout installs a distribution named REQreate.
-        package = "REQreate" if requirement.startswith("-e ") else re.split(r"[<>=!~;\[]", requirement, 1)[0]
+        # The local checkout installs a distribution named reqreate with a REQreate package.
+        package = "REQreate" if requirement == "./.instance-generator" else re.split(r"[<>=!~;\[]", requirement, 1)[0]
+        if package == "scikit-learn":
+            package = "sklearn"
         try:
             import_module(package)
         except ImportError:
