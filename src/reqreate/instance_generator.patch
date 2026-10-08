@@ -1,0 +1,82 @@
+diff --git a/REQreate/input_json.py b/REQreate/input_json.py
+index 56c73868..758b5ef6 100644
+--- a/REQreate/input_json.py
++++ b/REQreate/input_json.py
+@@ -256,7 +256,7 @@ def input_json(inst_directory, instance_filename, base_save_folder_name):
+ 
+                 
+                 if 'class' in j: 
+-                    classlocs = ['school', 'coordinate', 'bus_stop']
++                    classlocs = ['school', 'coordinate', 'bus_stop', 'mandatory', 'optional']
+ 
+                     if j['class'] not in classlocs:
+                         raise ValueError('location '+str(j['type'])+' is not supported')
+@@ -264,7 +264,7 @@ def input_json(inst_directory, instance_filename, base_save_folder_name):
+                     if j['class'] == 'school':
+                         inst.network.add_new_school(name=namelocation, x=lon, y=lat)
+ 
+-                    if j['class'] == 'bus_stop':
++                    if j['class'] in ('bus_stop', 'mandatory', 'optional'):
+                         inst.network.add_new_stop(types=0, x=lon, y=lat)
+                 
+ 
+@@ -1001,7 +1001,7 @@ def input_json(inst_directory, instance_filename, base_save_folder_name):
+                 else:    
+                     GA.nodes[name]['static_probability'] = 0
+ 
+-        for node in GA.nodes():
++        for node in list(GA.nodes()):
+ 
+             if 'expression' in GA.nodes[node]:
+                 expression = re.split(r"[(,) ]", GA.nodes[node]['expression'])
+diff --git a/REQreate/passenger_requests.py b/REQreate/passenger_requests.py
+index f3914389..59d34cf1 100644
+--- a/REQreate/passenger_requests.py
++++ b/REQreate/passenger_requests.py
+@@ -426,7 +426,7 @@ def _generate_single_data_impl(GA, network, sorted_attributes, parameters, reqid
+                                     point = (network.schools.loc[idxs, 'lat'], network.schools.loc[idxs, 'lon'])
+                                 elif parameters[loc]['locs'] == 'random':
+                                     idxs = random.choice(parameters[loc]['list'+str(replicate_num)])
+-                                    point = (parameters[loc]['list_lat'+str(replicate_num)][idxs[0]], parameters[loc]['list_lon'+str(replicate_num)][idxs[0]])
++                                    point = (parameters[loc]['list_lat'+str(replicate_num)][idxs], parameters[loc]['list_lon'+str(replicate_num)][idxs])
+                                     #print("heere ", point)
+                                     #point = (network.schools.loc[idxs, 'lat'], network.schools.loc[idxs, 'lon'])
+                     
+@@ -495,7 +495,7 @@ def _generate_single_data_impl(GA, network, sorted_attributes, parameters, reqid
+                                 attributes[att] = norm.rvs(loc=GA.nodes[att]['pdf'][0]['loc'], scale=GA.nodes[att]['pdf'][0]['scale'], size=1)
+                                 
+                                 if (GA.nodes[att]['type'] == 'time') or (GA.nodes[att]['type'] == 'integer'):
+-                                    attributes[att] = int(attributes[att])
++                                    attributes[att] = int(attributes[att][0])
+ 
+                         
+                         if GA.nodes[att]['pdf'][0]['type'] == 'uniform':
+@@ -514,7 +514,7 @@ def _generate_single_data_impl(GA, network, sorted_attributes, parameters, reqid
+ 
+                                 else:
+                                     if (GA.nodes[att]['type'] == 'time') or (GA.nodes[att]['type'] == 'integer'):
+-                                        attributes[att] = np.random.randint(GA.nodes[att]['pdf'][0]['loc'], GA.nodes[att]['pdf'][0]['scale'] + GA.nodes[att]['pdf'][0]['loc'] + 1)
++                                        attributes[att] = int(np.random.randint(GA.nodes[att]['pdf'][0]['loc'], GA.nodes[att]['pdf'][0]['scale'] + GA.nodes[att]['pdf'][0]['loc'] + 1))
+ 
+                                     else:
+                                         uniform.random_state = np.random.RandomState(seed=rseed)
+@@ -1288,4 +1288,4 @@ if RAY_AVAILABLE:
+     _generate_single_data = ray.remote(_generate_single_data_impl)
+ else:
+     # Non-ray version for sequential execution
+-    _generate_single_data = _generate_single_data_impl
+\ No newline at end of file
++    _generate_single_data = _generate_single_data_impl
+diff --git a/REQreate/schema/config.schema.json b/REQreate/schema/config.schema.json
+index 0581ea33..af8af06b 100644
+--- a/REQreate/schema/config.schema.json
++++ b/REQreate/schema/config.schema.json
+@@ -175,7 +175,7 @@
+           "type": "boolean"
+         },
+         "class": {
+-          "enum": ["school", "coordinate", "bus_stop"]
++        "enum": ["school", "coordinate", "bus_stop", "mandatory", "optional"]
+         },
+         "length_lon": {
+           "type": "number",

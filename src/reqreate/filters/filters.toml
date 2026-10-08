@@ -1,0 +1,9 @@
+# Thresholds used by the Route 550 request filters.
+max_walking_distance_m = 1500
+
+# REQreate also uses this parameter to retry short trips during sampling.
+[[parameters]]
+name = "min_distance"
+type = "integer"
+value = 100
+length_unit = "m"
