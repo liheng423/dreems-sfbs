@@ -9,7 +9,7 @@ from shapely.geometry import Point
 
 if TYPE_CHECKING:
     import pandas as pd
-    from area_network import AreaNetwork
+    from reqreate.maps.area_network import AreaNetwork
 
 
 class CandidateFilter[Candidate](Protocol):

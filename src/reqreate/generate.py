@@ -15,10 +15,10 @@ import pandas as pd
 from scipy.stats import uniform
 from REQreate.passenger_requests import _generate_single_data_impl
 
-from area_network import build_area_net
+from reqreate.maps.area_network import build_area_net
 from filters.filters import REQUEST_FILTERS, passes_filters
-from pois import load_pois, set_poi_zones
-from pool_output import write_pool
+from reqreate.maps.pois import load_pois, set_poi_zones
+from reqreate.adapters.pool_output import write_pool
 
 
 ROOT = Path(__file__).resolve().parents[2]
