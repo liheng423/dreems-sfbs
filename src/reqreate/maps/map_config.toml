@@ -1,0 +1,22 @@
+# Route 550 map and POI sampling settings. Paths are relative to the repository root.
+service_area_path = "data/reqreate/service_area_550/service_area.geojson"
+stops_path = "data/busline/stops_550.json"
+poi_cache_file = "550_pois.json"
+
+[poi_tags]
+amenity = ["arts_centre", "bar", "cafe", "cinema", "clinic", "college", "community_centre", "dentist", "doctors", "fast_food", "hospital", "kindergarten", "library", "marketplace", "nursing_home", "pub", "restaurant", "school", "social_facility", "theatre", "townhall", "university"]
+building = ["commercial", "hotel", "office", "retail", "stadium", "supermarket", "train_station"]
+leisure = ["fitness_centre", "park", "sports_centre", "stadium", "swimming_pool"]
+office = true
+shop = true
+tourism = ["attraction", "gallery", "hotel", "museum", "zoo"]
+
+[method_pois]
+locations = ["origin", "destination"]
+rows = 50
+columns = 50
+
+[method_pois.pdf]
+type = "uniform"
+loc = 500
+scale = 14500

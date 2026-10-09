@@ -12,12 +12,12 @@ from filters.filters import POI_FILTERS, passes_filters
 
 
 def sha256(path):
-    """Fingerprint a source file used by the POI cache."""
+    """Return the SHA-256 hex digest of a POI cache input file."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def load_pois(cfg, net, area_path, poi_path):
-    """Cache OSM POIs that fall inside the service area."""
+    """Return POI coordinates from a matching cache or a fresh OSM query."""
     source = {
         "schema": 3,
         "area_sha256": sha256(area_path),
@@ -60,7 +60,7 @@ def load_pois(cfg, net, area_path, poi_path):
 
 
 def set_poi_zones(net, pois, rows, columns):
-    """Count eligible POIs in a grid for REQreate's zone-density sampler."""
+    """Build sampling grid zones weighted by their eligible POI counts."""
     min_lon, min_lat, max_lon, max_lat = net.polygon.bounds
     cell_width = (max_lon - min_lon) / columns
     cell_height = (max_lat - min_lat) / rows

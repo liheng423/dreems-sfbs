@@ -1,5 +1,7 @@
 # Thresholds used by the Route 550 request filters.
 max_walking_distance_m = 1500
+walking_speed_mps = 1.4
+schedule_path = "data/crawled_550.json"
 
 # REQreate also uses this parameter to retry short trips during sampling.
 [[parameters]]
