@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CFG_PATH = ROOT / "src/reqreate/config_550.toml"
+CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
 
 

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <script src="route_550.js" defer></script>
   <script src="reqreate.js" defer></script>
 </head>
 <body>
@@ -16,8 +17,14 @@
         <span class="eyebrow">Luxembourg · REQreate</span>
         <h1>Requests,<br><em>on the map.</em></h1>
         <p>Explore area_550 requests and points of interest by booking type, departure time, and origin–destination pair.</p>
-        <p class="hint"><a href="scenario.html">Open the scenario viewer</a></p>
       </header>
+
+      <section class="selected-energy" aria-labelledby="selected-energy-heading">
+        <div class="section-heading"><h2 id="selected-energy-heading">Selected request energy</h2><span id="energy-request">No request selected</span></div>
+        <div class="energy-value"><strong id="selected-energy">—</strong><span>kWh · bus trip estimate</span></div>
+        <p id="selected-energy-note" class="hint">Select a request to see its bus trip energy.</p>
+        <div id="req-details" class="req-details" hidden></div>
+      </section>
 
       <section aria-labelledby="file-heading">
         <div class="section-heading"><h2 id="file-heading">REQreate output</h2><span>01</span></div>
@@ -29,6 +36,20 @@
         <input id="poi-file" type="file" accept=".json,application/json">
         <p id="poi-file-name" class="file-name">Loading area_550 POIs…</p>
         <p id="poi-file-error" class="error" role="alert" hidden></p>
+      </section>
+
+      <section aria-labelledby="busline-heading">
+        <div class="section-heading"><h2 id="busline-heading">Busline stops</h2><span id="busline-count">—</span></div>
+        <label class="file-button secondary-file" for="busline-file">Add stop / route JSONs <span aria-hidden="true">↗</span></label>
+        <input id="busline-file" type="file" accept=".json,application/json" multiple>
+        <p class="hint">For Route 550, choose stops_550.json and energy_550.json; the route order is included in this viewer. Mandatory stops have a larger marker. Selecting a request shows estimated straight-line walks to a forward-route boarding and alighting stop pair.</p>
+        <p id="busline-error" class="error" role="alert" hidden></p>
+        <div id="busline-list" class="busline-list"></div>
+        <label class="file-button secondary-file" for="energy-file">Choose bus energy JSON <span aria-hidden="true">↗</span></label>
+        <input id="energy-file" type="file" accept=".json,application/json">
+        <p id="energy-name" class="file-name">Loading data/busline/energy_550.json…</p>
+        <p id="energy-status" class="hint"></p>
+        <p id="energy-error" class="error" role="alert" hidden></p>
       </section>
 
       <section aria-labelledby="poi-heading">
@@ -49,6 +70,7 @@
         <input id="time-range" type="range" min="0" max="86400" step="3600" value="86400" disabled>
         <div class="range-ends"><span>Service day start</span><span>Last departure</span></div>
         <label class="flow-toggle"><input id="flows-check" type="checkbox"> Show aggregated origin–destination flows</label>
+        <label class="flow-toggle"><input id="walks-check" type="checkbox"> Show all estimated walking links</label>
       </section>
 
       <section aria-labelledby="demand-heading">
@@ -59,7 +81,6 @@
           <div><strong id="pair-count">—</strong><span>OD pairs</span></div>
         </div>
         <p class="hint">Circle size shows visible request endpoints. Select a location or request for details.</p>
-        <div id="req-details" class="req-details" hidden></div>
       </section>
 
       <section class="requests-section" aria-labelledby="requests-heading">
@@ -74,9 +95,10 @@
     <div class="map-shell">
       <div id="map" aria-label="Interactive map of area_550 requests and points of interest"></div>
       <div class="map-title"><span id="map-kicker">LUXEMBOURG / REQUEST VIEW</span><strong id="map-title">Choose a requests JSON</strong></div>
-      <div class="map-legend"><span><i class="circle-key"></i> Request endpoints</span><span><i class="line-key"></i> OD flows</span><span><i class="poi-key"></i> POIs (colors by type)</span></div>
+      <div class="map-legend"><span><i class="circle-key"></i> Request endpoints</span><span><i class="line-key"></i> OD flows</span><span><i class="poi-key"></i> POIs (colors by type)</span><span><i class="busline-key"></i> Busline route and stops</span><span><i class="walk-key"></i> Estimated walk</span></div>
       <button id="fit-button" class="fit-button" type="button" disabled>Fit demand ↗</button>
     </div>
   </main>
+  <script src="busline.js" defer></script>
 </body>
 </html>

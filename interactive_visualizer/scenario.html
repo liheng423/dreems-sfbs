@@ -38,6 +38,15 @@
         <p id="dist-error" class="error" role="alert" hidden></p>
       </section>
 
+      <section aria-labelledby="busline-heading">
+        <div class="section-heading"><h2 id="busline-heading">Busline stops</h2><span id="busline-count">—</span></div>
+        <label class="file-button secondary-file" for="busline-file">Add stop / route JSONs <span aria-hidden="true">↗</span></label>
+        <input id="busline-file" type="file" accept=".json,application/json" multiple>
+        <p class="hint">Choose stops_*.json from data/busline/ and matching crawled_*.json from data/. Mandatory stops have a larger marker.</p>
+        <p id="busline-error" class="error" role="alert" hidden></p>
+        <div id="busline-list" class="busline-list"></div>
+      </section>
+
       <section aria-labelledby="view-heading">
         <div class="section-heading"><h2 id="view-heading">Map view</h2><span>02</span></div>
         <label class="field-label" for="pattern-select">Bus route and direction</label>
@@ -95,9 +104,10 @@
     <div class="map-shell">
       <div id="map" aria-label="Interactive map of Luxembourg bus routes"></div>
       <div class="map-title"><span id="map-kicker">LUXEMBOURG / NETWORK VIEW</span><strong id="map-title">Choose an instance JSON</strong></div>
-      <div class="map-legend"><span><i class="line-key"></i> Bus pattern</span><span><i class="circle-key"></i> Stop demand</span><span id="debug-legend" hidden><i class="debug-key"></i> Rejected draw</span></div>
+      <div class="map-legend"><span><i class="line-key"></i> Bus pattern</span><span><i class="circle-key"></i> Stop demand</span><span><i class="busline-key"></i> Busline route and stops</span><span id="debug-legend" hidden><i class="debug-key"></i> Rejected draw</span></div>
       <button id="fit-button" class="fit-button" type="button" disabled>Fit route ↗</button>
     </div>
   </main>
+  <script src="busline.js" defer></script>
 </body>
 </html>

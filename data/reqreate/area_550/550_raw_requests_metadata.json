@@ -13,19 +13,23 @@
     "networkx": "3.7"
   },
   "seed": 42,
-  "candidate_count": 8000,
-  "request_count": 272,
+  "candidate_count": 20000,
+  "request_count": 1772,
   "network_input": "GeoJSON service area and saved OSM drive/walk graphs",
   "travel_time_method": "REQreate 20 km/h distance fallback",
-  "spatial_sampling": "REQreate method_pois: POI-density zones and radial trip distances, followed by a walking-distance filter on both endpoints",
+  "spatial_sampling": "REQreate method_pois: POI-density zones and radial trip distances, followed by walking-access, walking-dominance, and scheduled Route 550 feasibility filters",
   "poi_count": 540,
   "distance_method": "Directed OSM shortest path weighted by length in metres",
   "inputs_sha256": {
-    "src/demand_busline/config_550.json": "8a36ff837c4e86db1c6233bf8816897f61c063eee5897d571282e07b0244a737",
+    "src/reqreate/config_550.toml": "bd06e785fba07d7777863300c1ec054efa6d8aa5f35bd6fe1768e3ea1ae43b51",
+    "src/reqreate/maps/config.toml": "c2ee8c3d72c0d2dc2be8ea91eed6ad008de2ebbe3d016dbea6810ba473bd5af4",
+    "src/reqreate/filters/filters.toml": "912537a0c47831c389baaac9b1a37f36038924de6114dab53434e582d3601ccd",
+    "data/busline/stops_550.json": "474837f19ded72e0a0a1fae53af0b5d861ae39632311f29fb3d071a64ea856cc",
+    "data/crawled_550.json": "365fd30af66105e6b3a3d4a3a0fcc1b7587f5c8584e00dc7838f6457d3a46b30",
     "data/reqreate/service_area_550/service_area.geojson": "fc4376386b4c46a4d1b8de4ebe0844a2a228bd31f2007935c6c04226b0444b59",
     "data/reqreate/service_area_550/drive.graphml": "e932e9040bb52d594285da104a1a7db7fc69e1b345a7748069066d83d49e7272",
     "data/reqreate/service_area_550/walk.graphml": "fab70ba246c56754c949950b4009906192f9af595ff56e61573daa20d2f5149d",
-    "data/reqreate/area_550/550_pois.json": "5e1710315afedf53dbc7519d5df70b124e290a76b258e625dfd546b22bb7c14a"
+    "data/reqreate/area_550/550_pois.json": "667e50c0db7c09818929a496af0bd8adecc6332c78a13d19619434983c1506db"
   },
-  "pool_sha256": "6ecebb1b56692266fcbb9970d195700e85d8685da315e2806200469b312f03ac"
+  "pool_sha256": "8c6eed856cf13f7ddcfa78dea3c154999cbec15a03bf84c89687a7e637068314"
 }

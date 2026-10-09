@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CFG_PATH = ROOT / "src/reqreate/config_550.toml"
+CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
 STOPS_PATH = ROOT / "data/busline/stops_550.json"
 POOL_PATH = ROOT / "data/reqreate/550_raw_requests.json"
 META_PATH = ROOT / "data/reqreate/550_raw_requests_metadata.json"

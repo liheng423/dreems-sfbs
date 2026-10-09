@@ -22,7 +22,7 @@ from pool_output import write_pool
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CFG_PATH = ROOT / "src/reqreate/config_550.toml"
+CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
 
 
@@ -45,8 +45,8 @@ def generate(cfg, area_path, poi_path):
     method = cfg["method_pois"]
     pdf = method["pdf"]
     graph = nx.DiGraph()
-    for attr in cfg["attributes"]:
-        graph.add_node(attr["name"], **attr)
+    for name, attr in cfg["attributes"].items():
+        graph.add_node(name, **attr)
     # REQreate enables polygon sampling through subset_zones=False.
     graph.nodes["origin"]["subset_zones"] = False
     graph.nodes["destination"]["subset_zones"] = False
@@ -54,7 +54,7 @@ def generate(cfg, area_path, poi_path):
 
     np.random.seed(cfg["seed"])
     random.seed(cfg["seed"])
-    names = [attr["name"] for attr in cfg["attributes"]]
+    names = list(cfg["attributes"])
     reqs = {}
     for req_idx in range(cfg["requests"]):
         distance = uniform.rvs(loc=pdf["loc"], scale=pdf["scale"])

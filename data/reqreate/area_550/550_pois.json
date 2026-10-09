@@ -1,6 +1,6 @@
 {
   "source": {
-    "schema": 2,
+    "schema": 3,
     "area_sha256": "fc4376386b4c46a4d1b8de4ebe0844a2a228bd31f2007935c6c04226b0444b59",
     "walk_graph_sha256": "fab70ba246c56754c949950b4009906192f9af595ff56e61573daa20d2f5149d",
     "tags": {
@@ -259,7 +259,10 @@
         "lat": 49.507551
       }
     ],
-    "max_walking_distance_m": 500
+    "max_walking_distance_m": 1500,
+    "poi_filters": [
+      "poi_within_area"
+    ]
   },
   "features": [
     {
@@ -270,8 +273,7 @@
         "shop": "supermarket"
       },
       "lat": 49.5148699,
-      "lon": 6.1069286,
-      "walkable": true
+      "lon": 6.1069286
     },
     {
       "osm_type": "node",
@@ -281,8 +283,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5109345,
-      "lon": 6.1202643,
-      "walkable": true
+      "lon": 6.1202643
     },
     {
       "osm_type": "node",
@@ -292,8 +293,7 @@
         "tourism": "attraction"
       },
       "lat": 49.4938676,
-      "lon": 6.1282735,
-      "walkable": false
+      "lon": 6.1282735
     },
     {
       "osm_type": "node",
@@ -303,8 +303,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5079315,
-      "lon": 6.2791118,
-      "walkable": true
+      "lon": 6.2791118
     },
     {
       "osm_type": "node",
@@ -314,8 +313,7 @@
         "shop": "supermarket"
       },
       "lat": 49.505561,
-      "lon": 6.2760163,
-      "walkable": true
+      "lon": 6.2760163
     },
     {
       "osm_type": "node",
@@ -325,8 +323,7 @@
         "amenity": "cafe"
       },
       "lat": 49.4973757,
-      "lon": 6.2814312,
-      "walkable": false
+      "lon": 6.2814312
     },
     {
       "osm_type": "node",
@@ -336,8 +333,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5162263,
-      "lon": 6.3047121,
-      "walkable": true
+      "lon": 6.3047121
     },
     {
       "osm_type": "node",
@@ -347,8 +343,7 @@
         "amenity": "pub"
       },
       "lat": 49.5178467,
-      "lon": 6.1023876,
-      "walkable": true
+      "lon": 6.1023876
     },
     {
       "osm_type": "node",
@@ -358,8 +353,7 @@
         "amenity": "cinema"
       },
       "lat": 49.5186896,
-      "lon": 6.1010574,
-      "walkable": true
+      "lon": 6.1010574
     },
     {
       "osm_type": "node",
@@ -369,8 +363,7 @@
         "amenity": "cafe"
       },
       "lat": 49.5061956,
-      "lon": 6.2835799,
-      "walkable": true
+      "lon": 6.2835799
     },
     {
       "osm_type": "node",
@@ -380,8 +373,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5246501,
-      "lon": 6.2237296,
-      "walkable": false
+      "lon": 6.2237296
     },
     {
       "osm_type": "node",
@@ -391,8 +383,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5207825,
-      "lon": 6.2255431,
-      "walkable": true
+      "lon": 6.2255431
     },
     {
       "osm_type": "node",
@@ -402,8 +393,7 @@
         "amenity": "pub"
       },
       "lat": 49.5551604,
-      "lon": 6.3290531,
-      "walkable": false
+      "lon": 6.3290531
     },
     {
       "osm_type": "node",
@@ -413,8 +403,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5031162,
-      "lon": 6.2836277,
-      "walkable": false
+      "lon": 6.2836277
     },
     {
       "osm_type": "node",
@@ -424,8 +413,7 @@
         "amenity": "pub"
       },
       "lat": 49.5051223,
-      "lon": 6.2769285,
-      "walkable": true
+      "lon": 6.2769285
     },
     {
       "osm_type": "node",
@@ -435,8 +423,7 @@
         "amenity": "pub"
       },
       "lat": 49.5017143,
-      "lon": 6.2818377,
-      "walkable": false
+      "lon": 6.2818377
     },
     {
       "osm_type": "node",
@@ -446,8 +433,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5184177,
-      "lon": 6.0982503,
-      "walkable": false
+      "lon": 6.0982503
     },
     {
       "osm_type": "node",
@@ -457,8 +443,7 @@
         "shop": "vacant"
       },
       "lat": 49.5181847,
-      "lon": 6.1010153,
-      "walkable": true
+      "lon": 6.1010153
     },
     {
       "osm_type": "node",
@@ -468,8 +453,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.5195232,
-      "lon": 6.1006161,
-      "walkable": true
+      "lon": 6.1006161
     },
     {
       "osm_type": "node",
@@ -479,8 +463,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5178718,
-      "lon": 6.0990603,
-      "walkable": true
+      "lon": 6.0990603
     },
     {
       "osm_type": "node",
@@ -490,8 +473,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5213149,
-      "lon": 6.2248695,
-      "walkable": true
+      "lon": 6.2248695
     },
     {
       "osm_type": "node",
@@ -501,8 +483,7 @@
         "shop": "bakery"
       },
       "lat": 49.517963,
-      "lon": 6.1077893,
-      "walkable": false
+      "lon": 6.1077893
     },
     {
       "osm_type": "node",
@@ -512,8 +493,7 @@
         "shop": "bakery"
       },
       "lat": 49.5177353,
-      "lon": 6.1877188,
-      "walkable": true
+      "lon": 6.1877188
     },
     {
       "osm_type": "node",
@@ -523,8 +503,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5146746,
-      "lon": 6.0941897,
-      "walkable": false
+      "lon": 6.0941897
     },
     {
       "osm_type": "node",
@@ -534,8 +513,7 @@
         "shop": "tobacco"
       },
       "lat": 49.5042243,
-      "lon": 6.2755795,
-      "walkable": true
+      "lon": 6.2755795
     },
     {
       "osm_type": "node",
@@ -545,8 +523,7 @@
         "amenity": "pub"
       },
       "lat": 49.5047178,
-      "lon": 6.275429,
-      "walkable": true
+      "lon": 6.275429
     },
     {
       "osm_type": "node",
@@ -556,8 +533,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.5047567,
-      "lon": 6.2734058,
-      "walkable": true
+      "lon": 6.2734058
     },
     {
       "osm_type": "node",
@@ -567,8 +543,7 @@
         "shop": "hairdresser"
       },
       "lat": 49.5049085,
-      "lon": 6.2716632,
-      "walkable": true
+      "lon": 6.2716632
     },
     {
       "osm_type": "node",
@@ -578,8 +553,7 @@
         "amenity": "bar"
       },
       "lat": 49.5047743,
-      "lon": 6.2709421,
-      "walkable": true
+      "lon": 6.2709421
     },
     {
       "osm_type": "node",
@@ -589,8 +563,7 @@
         "amenity": "cafe"
       },
       "lat": 49.5036308,
-      "lon": 6.2715372,
-      "walkable": true
+      "lon": 6.2715372
     },
     {
       "osm_type": "node",
@@ -600,8 +573,7 @@
         "amenity": "bar"
       },
       "lat": 49.5045644,
-      "lon": 6.2706306,
-      "walkable": true
+      "lon": 6.2706306
     },
     {
       "osm_type": "node",
@@ -611,8 +583,7 @@
         "shop": "bakery"
       },
       "lat": 49.5040104,
-      "lon": 6.2774457,
-      "walkable": true
+      "lon": 6.2774457
     },
     {
       "osm_type": "node",
@@ -622,8 +593,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5043144,
-      "lon": 6.2791852,
-      "walkable": true
+      "lon": 6.2791852
     },
     {
       "osm_type": "node",
@@ -633,8 +603,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.503892,
-      "lon": 6.2790823,
-      "walkable": true
+      "lon": 6.2790823
     },
     {
       "osm_type": "node",
@@ -644,8 +613,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.544698,
-      "lon": 6.3700205,
-      "walkable": true
+      "lon": 6.3700205
     },
     {
       "osm_type": "node",
@@ -655,8 +623,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5441892,
-      "lon": 6.36917,
-      "walkable": true
+      "lon": 6.36917
     },
     {
       "osm_type": "node",
@@ -666,8 +633,7 @@
         "amenity": "bar"
       },
       "lat": 49.5473231,
-      "lon": 6.3629124,
-      "walkable": true
+      "lon": 6.3629124
     },
     {
       "osm_type": "node",
@@ -677,8 +643,7 @@
         "amenity": "cafe"
       },
       "lat": 49.5428721,
-      "lon": 6.3665803,
-      "walkable": true
+      "lon": 6.3665803
     },
     {
       "osm_type": "node",
@@ -688,8 +653,7 @@
         "amenity": "pub"
       },
       "lat": 49.518821,
-      "lon": 6.099441,
-      "walkable": true
+      "lon": 6.099441
     },
     {
       "osm_type": "node",
@@ -699,8 +663,7 @@
         "amenity": "pub"
       },
       "lat": 49.5190606,
-      "lon": 6.0999048,
-      "walkable": true
+      "lon": 6.0999048
     },
     {
       "osm_type": "node",
@@ -710,8 +673,7 @@
         "office": "engineer"
       },
       "lat": 49.5191424,
-      "lon": 6.1003284,
-      "walkable": true
+      "lon": 6.1003284
     },
     {
       "osm_type": "node",
@@ -721,8 +683,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.5187745,
-      "lon": 6.1009867,
-      "walkable": true
+      "lon": 6.1009867
     },
     {
       "osm_type": "node",
@@ -732,8 +693,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5184691,
-      "lon": 6.1007935,
-      "walkable": true
+      "lon": 6.1007935
     },
     {
       "osm_type": "node",
@@ -743,8 +703,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5183969,
-      "lon": 6.1013475,
-      "walkable": true
+      "lon": 6.1013475
     },
     {
       "osm_type": "node",
@@ -754,8 +713,7 @@
         "amenity": "pub"
       },
       "lat": 49.5183646,
-      "lon": 6.1008713,
-      "walkable": true
+      "lon": 6.1008713
     },
     {
       "osm_type": "node",
@@ -765,8 +723,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5183124,
-      "lon": 6.1008981,
-      "walkable": true
+      "lon": 6.1008981
     },
     {
       "osm_type": "node",
@@ -776,8 +733,7 @@
         "amenity": "pub"
       },
       "lat": 49.5184714,
-      "lon": 6.1011608,
-      "walkable": true
+      "lon": 6.1011608
     },
     {
       "osm_type": "node",
@@ -787,8 +743,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.510028,
-      "lon": 6.2571983,
-      "walkable": true
+      "lon": 6.2571983
     },
     {
       "osm_type": "node",
@@ -798,8 +753,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5117593,
-      "lon": 6.2569105,
-      "walkable": true
+      "lon": 6.2569105
     },
     {
       "osm_type": "node",
@@ -809,8 +763,7 @@
         "shop": "hairdresser"
       },
       "lat": 49.5101655,
-      "lon": 6.2571443,
-      "walkable": true
+      "lon": 6.2571443
     },
     {
       "osm_type": "node",
@@ -820,8 +773,7 @@
         "amenity": "pub"
       },
       "lat": 49.5097115,
-      "lon": 6.2573622,
-      "walkable": true
+      "lon": 6.2573622
     },
     {
       "osm_type": "node",
@@ -831,8 +783,7 @@
         "shop": "bicycle"
       },
       "lat": 49.5478808,
-      "lon": 6.356806,
-      "walkable": true
+      "lon": 6.356806
     },
     {
       "osm_type": "node",
@@ -842,8 +793,7 @@
         "shop": "bakery"
       },
       "lat": 49.5478111,
-      "lon": 6.3566236,
-      "walkable": true
+      "lon": 6.3566236
     },
     {
       "osm_type": "node",
@@ -853,8 +803,7 @@
         "shop": "clothes"
       },
       "lat": 49.547832,
-      "lon": 6.3563983,
-      "walkable": true
+      "lon": 6.3563983
     },
     {
       "osm_type": "node",
@@ -864,8 +813,7 @@
         "shop": "doityourself"
       },
       "lat": 49.5477067,
-      "lon": 6.3562481,
-      "walkable": true
+      "lon": 6.3562481
     },
     {
       "osm_type": "node",
@@ -875,8 +823,7 @@
         "shop": "garden_centre"
       },
       "lat": 49.5478441,
-      "lon": 6.3562107,
-      "walkable": true
+      "lon": 6.3562107
     },
     {
       "osm_type": "node",
@@ -886,8 +833,7 @@
         "shop": "gift"
       },
       "lat": 49.5479086,
-      "lon": 6.3566478,
-      "walkable": true
+      "lon": 6.3566478
     },
     {
       "osm_type": "node",
@@ -897,8 +843,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5174394,
-      "lon": 6.094589,
-      "walkable": false
+      "lon": 6.094589
     },
     {
       "osm_type": "node",
@@ -908,8 +853,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5053833,
-      "lon": 6.2715996,
-      "walkable": true
+      "lon": 6.2715996
     },
     {
       "osm_type": "node",
@@ -919,8 +863,7 @@
         "shop": "butcher"
       },
       "lat": 49.5056698,
-      "lon": 6.2712646,
-      "walkable": true
+      "lon": 6.2712646
     },
     {
       "osm_type": "node",
@@ -930,8 +873,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5202448,
-      "lon": 6.295718,
-      "walkable": true
+      "lon": 6.295718
     },
     {
       "osm_type": "node",
@@ -941,8 +883,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5163823,
-      "lon": 6.1879856,
-      "walkable": true
+      "lon": 6.1879856
     },
     {
       "osm_type": "node",
@@ -952,8 +893,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.541361,
-      "lon": 6.3622173,
-      "walkable": false
+      "lon": 6.3622173
     },
     {
       "osm_type": "node",
@@ -963,8 +903,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.5469963,
-      "lon": 6.366246,
-      "walkable": true
+      "lon": 6.366246
     },
     {
       "osm_type": "node",
@@ -974,8 +913,7 @@
         "shop": "car"
       },
       "lat": 49.5468303,
-      "lon": 6.3544312,
-      "walkable": true
+      "lon": 6.3544312
     },
     {
       "osm_type": "node",
@@ -985,8 +923,7 @@
         "shop": "butcher"
       },
       "lat": 49.5442519,
-      "lon": 6.3680647,
-      "walkable": true
+      "lon": 6.3680647
     },
     {
       "osm_type": "node",
@@ -996,8 +933,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.5424614,
-      "lon": 6.3662267,
-      "walkable": true
+      "lon": 6.3662267
     },
     {
       "osm_type": "node",
@@ -1007,8 +943,7 @@
         "amenity": "pub"
       },
       "lat": 49.5425446,
-      "lon": 6.3659833,
-      "walkable": true
+      "lon": 6.3659833
     },
     {
       "osm_type": "node",
@@ -1018,8 +953,7 @@
         "amenity": "pub"
       },
       "lat": 49.5425049,
-      "lon": 6.365524,
-      "walkable": true
+      "lon": 6.365524
     },
     {
       "osm_type": "node",
@@ -1029,8 +963,7 @@
         "amenity": "pub"
       },
       "lat": 49.5434164,
-      "lon": 6.3675866,
-      "walkable": true
+      "lon": 6.3675866
     },
     {
       "osm_type": "node",
@@ -1040,8 +973,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.5438047,
-      "lon": 6.3673981,
-      "walkable": true
+      "lon": 6.3673981
     },
     {
       "osm_type": "node",
@@ -1051,8 +983,7 @@
         "amenity": "cafe"
       },
       "lat": 49.5427816,
-      "lon": 6.3664225,
-      "walkable": true
+      "lon": 6.3664225
     },
     {
       "osm_type": "node",
@@ -1062,8 +993,7 @@
         "shop": "convenience"
       },
       "lat": 49.5426894,
-      "lon": 6.3662026,
-      "walkable": true
+      "lon": 6.3662026
     },
     {
       "osm_type": "node",
@@ -1073,8 +1003,7 @@
         "amenity": "pub"
       },
       "lat": 49.5450487,
-      "lon": 6.364454,
-      "walkable": true
+      "lon": 6.364454
     },
     {
       "osm_type": "node",
@@ -1084,8 +1013,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.542251,
-      "lon": 6.3727139,
-      "walkable": false
+      "lon": 6.3727139
     },
     {
       "osm_type": "node",
@@ -1095,8 +1023,7 @@
         "office": "company"
       },
       "lat": 49.5134118,
-      "lon": 6.3030276,
-      "walkable": true
+      "lon": 6.3030276
     },
     {
       "osm_type": "node",
@@ -1106,8 +1033,7 @@
         "office": "company"
       },
       "lat": 49.5135129,
-      "lon": 6.30321,
-      "walkable": true
+      "lon": 6.30321
     },
     {
       "osm_type": "node",
@@ -1117,8 +1043,7 @@
         "office": "company"
       },
       "lat": 49.5131646,
-      "lon": 6.3034836,
-      "walkable": true
+      "lon": 6.3034836
     },
     {
       "osm_type": "node",
@@ -1128,8 +1053,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5316887,
-      "lon": 6.3546147,
-      "walkable": false
+      "lon": 6.3546147
     },
     {
       "osm_type": "node",
@@ -1139,8 +1063,7 @@
         "shop": "hairdresser"
       },
       "lat": 49.5450924,
-      "lon": 6.3672136,
-      "walkable": true
+      "lon": 6.3672136
     },
     {
       "osm_type": "node",
@@ -1150,8 +1073,7 @@
         "amenity": "cafe"
       },
       "lat": 49.5110703,
-      "lon": 6.1202061,
-      "walkable": true
+      "lon": 6.1202061
     },
     {
       "osm_type": "node",
@@ -1161,8 +1083,7 @@
         "amenity": "cafe"
       },
       "lat": 49.5115422,
-      "lon": 6.1212228,
-      "walkable": true
+      "lon": 6.1212228
     },
     {
       "osm_type": "node",
@@ -1172,8 +1093,7 @@
         "shop": "gift"
       },
       "lat": 49.5114411,
-      "lon": 6.121035,
-      "walkable": true
+      "lon": 6.121035
     },
     {
       "osm_type": "node",
@@ -1184,8 +1104,7 @@
         "shop": "rental"
       },
       "lat": 49.5430193,
-      "lon": 6.3683265,
-      "walkable": true
+      "lon": 6.3683265
     },
     {
       "osm_type": "node",
@@ -1195,8 +1114,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5046704,
-      "lon": 6.2786651,
-      "walkable": true
+      "lon": 6.2786651
     },
     {
       "osm_type": "node",
@@ -1206,8 +1124,7 @@
         "tourism": "museum"
       },
       "lat": 49.5011617,
-      "lon": 6.2824438,
-      "walkable": false
+      "lon": 6.2824438
     },
     {
       "osm_type": "node",
@@ -1217,8 +1134,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5029924,
-      "lon": 6.2838573,
-      "walkable": false
+      "lon": 6.2838573
     },
     {
       "osm_type": "node",
@@ -1228,8 +1144,7 @@
         "shop": "bakery"
       },
       "lat": 49.5027573,
-      "lon": 6.2806092,
-      "walkable": false
+      "lon": 6.2806092
     },
     {
       "osm_type": "node",
@@ -1239,8 +1154,7 @@
         "amenity": "bar"
       },
       "lat": 49.5186389,
-      "lon": 6.1010368,
-      "walkable": true
+      "lon": 6.1010368
     },
     {
       "osm_type": "node",
@@ -1250,8 +1164,7 @@
         "amenity": "school"
       },
       "lat": 49.519776,
-      "lon": 6.1041673,
-      "walkable": false
+      "lon": 6.1041673
     },
     {
       "osm_type": "node",
@@ -1261,8 +1174,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5183798,
-      "lon": 6.187532,
-      "walkable": true
+      "lon": 6.187532
     },
     {
       "osm_type": "node",
@@ -1272,8 +1184,7 @@
         "shop": "car_repair"
       },
       "lat": 49.5187757,
-      "lon": 6.1868864,
-      "walkable": true
+      "lon": 6.1868864
     },
     {
       "osm_type": "node",
@@ -1283,8 +1194,7 @@
         "shop": "butcher"
       },
       "lat": 49.5170139,
-      "lon": 6.1874198,
-      "walkable": true
+      "lon": 6.1874198
     },
     {
       "osm_type": "node",
@@ -1294,8 +1204,7 @@
         "shop": "hairdresser"
       },
       "lat": 49.517282,
-      "lon": 6.187849,
-      "walkable": true
+      "lon": 6.187849
     },
     {
       "osm_type": "node",
@@ -1305,8 +1214,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5163648,
-      "lon": 6.1032563,
-      "walkable": true
+      "lon": 6.1032563
     },
     {
       "osm_type": "node",
@@ -1316,8 +1224,7 @@
         "amenity": "school"
       },
       "lat": 49.5248369,
-      "lon": 6.2255729,
-      "walkable": false
+      "lon": 6.2255729
     },
     {
       "osm_type": "node",
@@ -1327,8 +1234,7 @@
         "amenity": "pub"
       },
       "lat": 49.5086028,
-      "lon": 6.1484223,
-      "walkable": true
+      "lon": 6.1484223
     },
     {
       "osm_type": "node",
@@ -1338,8 +1244,7 @@
         "amenity": "cafe"
       },
       "lat": 49.5178678,
-      "lon": 6.1024491,
-      "walkable": true
+      "lon": 6.1024491
     },
     {
       "osm_type": "node",
@@ -1350,8 +1255,7 @@
         "shop": "convenience"
       },
       "lat": 49.5105625,
-      "lon": 6.1906074,
-      "walkable": false
+      "lon": 6.1906074
     },
     {
       "osm_type": "node",
@@ -1361,8 +1265,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.503135,
-      "lon": 6.2802555,
-      "walkable": true
+      "lon": 6.2802555
     },
     {
       "osm_type": "node",
@@ -1372,8 +1275,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.505429,
-      "lon": 6.2769617,
-      "walkable": true
+      "lon": 6.2769617
     },
     {
       "osm_type": "node",
@@ -1383,8 +1285,7 @@
         "shop": "convenience"
       },
       "lat": 49.541936,
-      "lon": 6.3735039,
-      "walkable": false
+      "lon": 6.3735039
     },
     {
       "osm_type": "node",
@@ -1394,8 +1295,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5349815,
-      "lon": 6.3867325,
-      "walkable": false
+      "lon": 6.3867325
     },
     {
       "osm_type": "node",
@@ -1405,8 +1305,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.5420622,
-      "lon": 6.3724927,
-      "walkable": false
+      "lon": 6.3724927
     },
     {
       "osm_type": "node",
@@ -1416,8 +1315,7 @@
         "amenity": "pub"
       },
       "lat": 49.5131158,
-      "lon": 6.1099261,
-      "walkable": true
+      "lon": 6.1099261
     },
     {
       "osm_type": "node",
@@ -1427,8 +1325,7 @@
         "shop": "clothes"
       },
       "lat": 49.5384004,
-      "lon": 6.3770161,
-      "walkable": false
+      "lon": 6.3770161
     },
     {
       "osm_type": "node",
@@ -1438,8 +1335,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5156984,
-      "lon": 6.0980197,
-      "walkable": false
+      "lon": 6.0980197
     },
     {
       "osm_type": "node",
@@ -1449,8 +1345,7 @@
         "shop": "car_repair"
       },
       "lat": 49.5202656,
-      "lon": 6.0907781,
-      "walkable": false
+      "lon": 6.0907781
     },
     {
       "osm_type": "node",
@@ -1460,8 +1355,7 @@
         "amenity": "school"
       },
       "lat": 49.5099202,
-      "lon": 6.1494423,
-      "walkable": true
+      "lon": 6.1494423
     },
     {
       "osm_type": "node",
@@ -1471,8 +1365,7 @@
         "shop": "car"
       },
       "lat": 49.5209354,
-      "lon": 6.3569202,
-      "walkable": false
+      "lon": 6.3569202
     },
     {
       "osm_type": "node",
@@ -1482,8 +1375,7 @@
         "amenity": "kindergarten"
       },
       "lat": 49.5072257,
-      "lon": 6.1452953,
-      "walkable": true
+      "lon": 6.1452953
     },
     {
       "osm_type": "node",
@@ -1493,8 +1385,7 @@
         "amenity": "doctors"
       },
       "lat": 49.5192663,
-      "lon": 6.1006467,
-      "walkable": true
+      "lon": 6.1006467
     },
     {
       "osm_type": "node",
@@ -1504,8 +1395,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5162799,
-      "lon": 6.1034512,
-      "walkable": true
+      "lon": 6.1034512
     },
     {
       "osm_type": "node",
@@ -1515,8 +1405,7 @@
         "amenity": "dentist"
       },
       "lat": 49.5192695,
-      "lon": 6.1006949,
-      "walkable": true
+      "lon": 6.1006949
     },
     {
       "osm_type": "node",
@@ -1526,8 +1415,7 @@
         "office": "architect"
       },
       "lat": 49.5452134,
-      "lon": 6.3641013,
-      "walkable": true
+      "lon": 6.3641013
     },
     {
       "osm_type": "node",
@@ -1537,8 +1425,7 @@
         "amenity": "doctors"
       },
       "lat": 49.5127046,
-      "lon": 6.1892735,
-      "walkable": true
+      "lon": 6.1892735
     },
     {
       "osm_type": "node",
@@ -1548,8 +1435,7 @@
         "shop": "chocolate"
       },
       "lat": 49.5482728,
-      "lon": 6.360707,
-      "walkable": true
+      "lon": 6.360707
     },
     {
       "osm_type": "node",
@@ -1559,8 +1445,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5172171,
-      "lon": 6.1178428,
-      "walkable": false
+      "lon": 6.1178428
     },
     {
       "osm_type": "node",
@@ -1570,8 +1455,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5135665,
-      "lon": 6.1189532,
-      "walkable": false
+      "lon": 6.1189532
     },
     {
       "osm_type": "node",
@@ -1581,8 +1465,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5136827,
-      "lon": 6.1182631,
-      "walkable": false
+      "lon": 6.1182631
     },
     {
       "osm_type": "node",
@@ -1592,8 +1475,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5137255,
-      "lon": 6.1187048,
-      "walkable": false
+      "lon": 6.1187048
     },
     {
       "osm_type": "node",
@@ -1603,8 +1485,7 @@
         "tourism": "attraction"
       },
       "lat": 49.513888,
-      "lon": 6.1190946,
-      "walkable": false
+      "lon": 6.1190946
     },
     {
       "osm_type": "node",
@@ -1614,8 +1495,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5135103,
-      "lon": 6.1180702,
-      "walkable": false
+      "lon": 6.1180702
     },
     {
       "osm_type": "node",
@@ -1625,8 +1505,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5136042,
-      "lon": 6.118845,
-      "walkable": false
+      "lon": 6.118845
     },
     {
       "osm_type": "node",
@@ -1636,8 +1515,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5130101,
-      "lon": 6.1217037,
-      "walkable": false
+      "lon": 6.1217037
     },
     {
       "osm_type": "node",
@@ -1647,8 +1525,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5135953,
-      "lon": 6.1185323,
-      "walkable": false
+      "lon": 6.1185323
     },
     {
       "osm_type": "node",
@@ -1658,8 +1535,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.511143,
-      "lon": 6.1199369,
-      "walkable": true
+      "lon": 6.1199369
     },
     {
       "osm_type": "node",
@@ -1669,8 +1545,7 @@
         "shop": "florist"
       },
       "lat": 49.5196126,
-      "lon": 6.1006434,
-      "walkable": true
+      "lon": 6.1006434
     },
     {
       "osm_type": "node",
@@ -1680,8 +1555,7 @@
         "shop": "butcher"
       },
       "lat": 49.5390492,
-      "lon": 6.3765024,
-      "walkable": false
+      "lon": 6.3765024
     },
     {
       "osm_type": "node",
@@ -1691,8 +1565,7 @@
         "amenity": "townhall"
       },
       "lat": 49.5029082,
-      "lon": 6.2718109,
-      "walkable": true
+      "lon": 6.2718109
     },
     {
       "osm_type": "node",
@@ -1702,8 +1575,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5463673,
-      "lon": 6.3273191,
-      "walkable": true
+      "lon": 6.3273191
     },
     {
       "osm_type": "node",
@@ -1713,8 +1585,7 @@
         "shop": "alcohol"
       },
       "lat": 49.5161833,
-      "lon": 6.3037305,
-      "walkable": true
+      "lon": 6.3037305
     },
     {
       "osm_type": "node",
@@ -1724,8 +1595,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5046963,
-      "lon": 6.2734957,
-      "walkable": true
+      "lon": 6.2734957
     },
     {
       "osm_type": "node",
@@ -1735,8 +1605,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5420125,
-      "lon": 6.3652397,
-      "walkable": true
+      "lon": 6.3652397
     },
     {
       "osm_type": "node",
@@ -1746,8 +1615,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5440459,
-      "lon": 6.3683542,
-      "walkable": true
+      "lon": 6.3683542
     },
     {
       "osm_type": "node",
@@ -1757,8 +1625,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5431439,
-      "lon": 6.3670881,
-      "walkable": true
+      "lon": 6.3670881
     },
     {
       "osm_type": "node",
@@ -1768,8 +1635,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5427814,
-      "lon": 6.3658507,
-      "walkable": true
+      "lon": 6.3658507
     },
     {
       "osm_type": "node",
@@ -1779,8 +1645,7 @@
         "amenity": "cafe"
       },
       "lat": 49.5442951,
-      "lon": 6.36936,
-      "walkable": true
+      "lon": 6.36936
     },
     {
       "osm_type": "node",
@@ -1790,8 +1655,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.546997,
-      "lon": 6.363908,
-      "walkable": true
+      "lon": 6.363908
     },
     {
       "osm_type": "node",
@@ -1801,8 +1665,7 @@
         "shop": "wine"
       },
       "lat": 49.5277308,
-      "lon": 6.3481398,
-      "walkable": false
+      "lon": 6.3481398
     },
     {
       "osm_type": "node",
@@ -1812,8 +1675,7 @@
         "shop": "garden_centre"
       },
       "lat": 49.508938,
-      "lon": 6.1521892,
-      "walkable": true
+      "lon": 6.1521892
     },
     {
       "osm_type": "node",
@@ -1823,8 +1685,7 @@
         "amenity": "pub"
       },
       "lat": 49.5438408,
-      "lon": 6.3674697,
-      "walkable": true
+      "lon": 6.3674697
     },
     {
       "osm_type": "node",
@@ -1834,8 +1695,7 @@
         "amenity": "pub"
       },
       "lat": 49.5412191,
-      "lon": 6.3641015,
-      "walkable": true
+      "lon": 6.3641015
     },
     {
       "osm_type": "node",
@@ -1845,8 +1705,7 @@
         "shop": "hairdresser"
       },
       "lat": 49.5428237,
-      "lon": 6.3660453,
-      "walkable": true
+      "lon": 6.3660453
     },
     {
       "osm_type": "node",
@@ -1856,8 +1715,7 @@
         "shop": "jewelry"
       },
       "lat": 49.5129038,
-      "lon": 6.0944514,
-      "walkable": false
+      "lon": 6.0944514
     },
     {
       "osm_type": "node",
@@ -1867,8 +1725,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5126585,
-      "lon": 6.0934823,
-      "walkable": false
+      "lon": 6.0934823
     },
     {
       "osm_type": "node",
@@ -1878,8 +1735,7 @@
         "shop": "newsagent"
       },
       "lat": 49.512866,
-      "lon": 6.0940841,
-      "walkable": false
+      "lon": 6.0940841
     },
     {
       "osm_type": "node",
@@ -1889,8 +1745,7 @@
         "shop": "travel_agency"
       },
       "lat": 49.5128577,
-      "lon": 6.0939442,
-      "walkable": false
+      "lon": 6.0939442
     },
     {
       "osm_type": "node",
@@ -1900,8 +1755,7 @@
         "shop": "perfumery"
       },
       "lat": 49.5128431,
-      "lon": 6.0938063,
-      "walkable": false
+      "lon": 6.0938063
     },
     {
       "osm_type": "node",
@@ -1911,8 +1765,7 @@
         "shop": "supermarket"
       },
       "lat": 49.5124184,
-      "lon": 6.0940762,
-      "walkable": false
+      "lon": 6.0940762
     },
     {
       "osm_type": "node",
@@ -1922,8 +1775,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.521907,
-      "lon": 6.1009698,
-      "walkable": false
+      "lon": 6.1009698
     },
     {
       "osm_type": "node",
@@ -1933,8 +1785,7 @@
         "shop": "car_repair"
       },
       "lat": 49.5403802,
-      "lon": 6.3815425,
-      "walkable": false
+      "lon": 6.3815425
     },
     {
       "osm_type": "node",
@@ -1944,8 +1795,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5402462,
-      "lon": 6.3817169,
-      "walkable": false
+      "lon": 6.3817169
     },
     {
       "osm_type": "node",
@@ -1955,8 +1805,7 @@
         "amenity": "pub"
       },
       "lat": 49.538671,
-      "lon": 6.3763042,
-      "walkable": false
+      "lon": 6.3763042
     },
     {
       "osm_type": "node",
@@ -1966,8 +1815,7 @@
         "office": "estate_agent"
       },
       "lat": 49.5414506,
-      "lon": 6.3739599,
-      "walkable": false
+      "lon": 6.3739599
     },
     {
       "osm_type": "node",
@@ -1977,8 +1825,7 @@
         "shop": "optician"
       },
       "lat": 49.5441616,
-      "lon": 6.368061,
-      "walkable": true
+      "lon": 6.368061
     },
     {
       "osm_type": "node",
@@ -1988,8 +1835,7 @@
         "shop": "bakery"
       },
       "lat": 49.5437094,
-      "lon": 6.3676474,
-      "walkable": true
+      "lon": 6.3676474
     },
     {
       "osm_type": "node",
@@ -1999,8 +1845,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5171807,
-      "lon": 6.0950718,
-      "walkable": false
+      "lon": 6.0950718
     },
     {
       "osm_type": "node",
@@ -2010,8 +1855,7 @@
         "amenity": "library"
       },
       "lat": 49.5178308,
-      "lon": 6.0969855,
-      "walkable": false
+      "lon": 6.0969855
     },
     {
       "osm_type": "node",
@@ -2021,8 +1865,7 @@
         "shop": "supermarket"
       },
       "lat": 49.5180301,
-      "lon": 6.2552781,
-      "walkable": false
+      "lon": 6.2552781
     },
     {
       "osm_type": "node",
@@ -2032,8 +1875,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5181043,
-      "lon": 6.1010855,
-      "walkable": true
+      "lon": 6.1010855
     },
     {
       "osm_type": "node",
@@ -2043,8 +1885,7 @@
         "tourism": "attraction"
       },
       "lat": 49.5342396,
-      "lon": 6.3874268,
-      "walkable": false
+      "lon": 6.3874268
     },
     {
       "osm_type": "node",
@@ -2054,8 +1895,7 @@
         "shop": "kiosk"
       },
       "lat": 49.5056182,
-      "lon": 6.2758894,
-      "walkable": true
+      "lon": 6.2758894
     },
     {
       "osm_type": "node",
@@ -2065,8 +1905,7 @@
         "amenity": "pub"
       },
       "lat": 49.5464742,
-      "lon": 6.3599152,
-      "walkable": true
+      "lon": 6.3599152
     },
     {
       "osm_type": "node",
@@ -2076,8 +1915,7 @@
         "shop": "bakery"
       },
       "lat": 49.5186122,
-      "lon": 6.0987547,
-      "walkable": false
+      "lon": 6.0987547
     },
     {
       "osm_type": "node",
@@ -2087,8 +1925,7 @@
         "office": "accountant"
       },
       "lat": 49.5049461,
-      "lon": 6.2717611,
-      "walkable": true
+      "lon": 6.2717611
     },
     {
       "osm_type": "node",
@@ -2099,8 +1936,7 @@
         "shop": "bakery"
       },
       "lat": 49.5042692,
-      "lon": 6.2756067,
-      "walkable": true
+      "lon": 6.2756067
     },
     {
       "osm_type": "node",
@@ -2110,8 +1946,7 @@
         "shop": "estate_agent"
       },
       "lat": 49.5435602,
-      "lon": 6.3669603,
-      "walkable": true
+      "lon": 6.3669603
     },
     {
       "osm_type": "node",
@@ -2121,8 +1956,7 @@
         "amenity": "pub"
       },
       "lat": 49.518786,
-      "lon": 6.0992534,
-      "walkable": false
+      "lon": 6.0992534
     },
     {
       "osm_type": "node",
@@ -2132,8 +1966,7 @@
         "amenity": "doctors"
       },
       "lat": 49.518547,
-      "lon": 6.0985822,
-      "walkable": false
+      "lon": 6.0985822
     },
     {
       "osm_type": "node",
@@ -2143,8 +1976,7 @@
         "office": "estate_agent"
       },
       "lat": 49.5183699,
-      "lon": 6.0981068,
-      "walkable": false
+      "lon": 6.0981068
     },
     {
       "osm_type": "node",
@@ -2154,8 +1986,7 @@
         "shop": "hairdresser"
       },
       "lat": 49.5186615,
-      "lon": 6.0989182,
-      "walkable": false
+      "lon": 6.0989182
     },
     {
       "osm_type": "node",
@@ -2165,8 +1996,7 @@
         "amenity": "arts_centre"
       },
       "lat": 49.5211647,
-      "lon": 6.2983459,
-      "walkable": true
+      "lon": 6.2983459
     },
     {
       "osm_type": "node",
@@ -2176,8 +2006,7 @@
         "amenity": "cinema"
       },
       "lat": 49.5011123,
-      "lon": 6.2829423,
-      "walkable": false
+      "lon": 6.2829423
     },
     {
       "osm_type": "node",
@@ -2187,8 +2016,7 @@
         "amenity": "library"
       },
       "lat": 49.5164832,
-      "lon": 6.1876263,
-      "walkable": true
+      "lon": 6.1876263
     },
     {
       "osm_type": "node",
@@ -2198,8 +2026,7 @@
         "office": "tax_advisor"
       },
       "lat": 49.5079823,
-      "lon": 6.1918483,
-      "walkable": false
+      "lon": 6.1918483
     },
     {
       "osm_type": "node",
@@ -2209,8 +2036,7 @@
         "shop": "car_repair"
       },
       "lat": 49.5151583,
-      "lon": 6.3072393,
-      "walkable": true
+      "lon": 6.3072393
     },
     {
       "osm_type": "node",
@@ -2220,8 +2046,7 @@
         "shop": "bicycle"
       },
       "lat": 49.5123277,
-      "lon": 6.0940216,
-      "walkable": false
+      "lon": 6.0940216
     },
     {
       "osm_type": "node",
@@ -2231,8 +2056,7 @@
         "shop": "yes"
       },
       "lat": 49.5155188,
-      "lon": 6.1045689,
-      "walkable": true
+      "lon": 6.1045689
     },
     {
       "osm_type": "node",
@@ -2242,8 +2066,7 @@
         "office": "insurance"
       },
       "lat": 49.5163695,
-      "lon": 6.1026733,
-      "walkable": true
+      "lon": 6.1026733
     },
     {
       "osm_type": "node",
@@ -2253,8 +2076,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5163247,
-      "lon": 6.1033619,
-      "walkable": true
+      "lon": 6.1033619
     },
     {
       "osm_type": "node",
@@ -2264,8 +2086,7 @@
         "amenity": "social_facility"
       },
       "lat": 49.5215925,
-      "lon": 6.098202,
-      "walkable": false
+      "lon": 6.098202
     },
     {
       "osm_type": "node",
@@ -2275,8 +2096,7 @@
         "amenity": "social_facility"
       },
       "lat": 49.5207136,
-      "lon": 6.0998268,
-      "walkable": false
+      "lon": 6.0998268
     },
     {
       "osm_type": "node",
@@ -2286,8 +2106,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.5138727,
-      "lon": 6.1193946,
-      "walkable": false
+      "lon": 6.1193946
     },
     {
       "osm_type": "node",
@@ -2297,8 +2116,7 @@
         "office": "company"
       },
       "lat": 49.5080646,
-      "lon": 6.0934183,
-      "walkable": false
+      "lon": 6.0934183
     },
     {
       "osm_type": "node",
@@ -2308,8 +2126,7 @@
         "office": "company"
       },
       "lat": 49.5085532,
-      "lon": 6.0938501,
-      "walkable": false
+      "lon": 6.0938501
     },
     {
       "osm_type": "node",
@@ -2320,8 +2137,7 @@
         "tourism": "hostel"
       },
       "lat": 49.5293293,
-      "lon": 6.3834509,
-      "walkable": false
+      "lon": 6.3834509
     },
     {
       "osm_type": "node",
@@ -2331,8 +2147,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5344716,
-      "lon": 6.386742,
-      "walkable": false
+      "lon": 6.386742
     },
     {
       "osm_type": "node",
@@ -2342,8 +2157,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.504414,
-      "lon": 6.2771267,
-      "walkable": true
+      "lon": 6.2771267
     },
     {
       "osm_type": "node",
@@ -2353,8 +2167,7 @@
         "shop": "optician"
       },
       "lat": 49.5048899,
-      "lon": 6.2769592,
-      "walkable": true
+      "lon": 6.2769592
     },
     {
       "osm_type": "node",
@@ -2364,8 +2177,7 @@
         "tourism": "attraction"
       },
       "lat": 49.4924128,
-      "lon": 6.1267042,
-      "walkable": false
+      "lon": 6.1267042
     },
     {
       "osm_type": "node",
@@ -2375,8 +2187,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5478779,
-      "lon": 6.3578422,
-      "walkable": true
+      "lon": 6.3578422
     },
     {
       "osm_type": "node",
@@ -2386,8 +2197,7 @@
         "shop": "bakery"
       },
       "lat": 49.5042027,
-      "lon": 6.0932253,
-      "walkable": false
+      "lon": 6.0932253
     },
     {
       "osm_type": "node",
@@ -2397,8 +2207,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5039397,
-      "lon": 6.2800525,
-      "walkable": true
+      "lon": 6.2800525
     },
     {
       "osm_type": "node",
@@ -2408,8 +2217,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5039339,
-      "lon": 6.2800369,
-      "walkable": true
+      "lon": 6.2800369
     },
     {
       "osm_type": "node",
@@ -2419,8 +2227,7 @@
         "amenity": "dentist"
       },
       "lat": 49.5455599,
-      "lon": 6.3670542,
-      "walkable": true
+      "lon": 6.3670542
     },
     {
       "osm_type": "node",
@@ -2430,8 +2237,7 @@
         "amenity": "dentist"
       },
       "lat": 49.5453061,
-      "lon": 6.367863,
-      "walkable": true
+      "lon": 6.367863
     },
     {
       "osm_type": "node",
@@ -2441,8 +2247,7 @@
         "amenity": "doctors"
       },
       "lat": 49.5453466,
-      "lon": 6.3679168,
-      "walkable": true
+      "lon": 6.3679168
     },
     {
       "osm_type": "node",
@@ -2452,8 +2257,7 @@
         "amenity": "doctors"
       },
       "lat": 49.5427483,
-      "lon": 6.3663406,
-      "walkable": true
+      "lon": 6.3663406
     },
     {
       "osm_type": "node",
@@ -2463,8 +2267,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5444933,
-      "lon": 6.3637269,
-      "walkable": true
+      "lon": 6.3637269
     },
     {
       "osm_type": "node",
@@ -2474,8 +2277,7 @@
         "amenity": "dentist"
       },
       "lat": 49.5459427,
-      "lon": 6.3706555,
-      "walkable": true
+      "lon": 6.3706555
     },
     {
       "osm_type": "node",
@@ -2485,8 +2287,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5442109,
-      "lon": 6.3692089,
-      "walkable": true
+      "lon": 6.3692089
     },
     {
       "osm_type": "node",
@@ -2496,8 +2297,7 @@
         "shop": "clothes"
       },
       "lat": 49.5170238,
-      "lon": 6.1879179,
-      "walkable": true
+      "lon": 6.1879179
     },
     {
       "osm_type": "node",
@@ -2507,8 +2307,7 @@
         "shop": "farm"
       },
       "lat": 49.5133056,
-      "lon": 6.0919741,
-      "walkable": false
+      "lon": 6.0919741
     },
     {
       "osm_type": "node",
@@ -2518,8 +2317,7 @@
         "amenity": "doctors"
       },
       "lat": 49.5152309,
-      "lon": 6.1115278,
-      "walkable": true
+      "lon": 6.1115278
     },
     {
       "osm_type": "node",
@@ -2529,8 +2327,7 @@
         "shop": "gas"
       },
       "lat": 49.5046859,
-      "lon": 6.2693699,
-      "walkable": true
+      "lon": 6.2693699
     },
     {
       "osm_type": "node",
@@ -2540,8 +2337,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.5055913,
-      "lon": 6.2181096,
-      "walkable": false
+      "lon": 6.2181096
     },
     {
       "osm_type": "node",
@@ -2551,8 +2347,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5056542,
-      "lon": 6.2184806,
-      "walkable": false
+      "lon": 6.2184806
     },
     {
       "osm_type": "node",
@@ -2562,8 +2357,7 @@
         "shop": "convenience"
       },
       "lat": 49.5081429,
-      "lon": 6.1917917,
-      "walkable": false
+      "lon": 6.1917917
     },
     {
       "osm_type": "node",
@@ -2573,8 +2367,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5041137,
-      "lon": 6.2798883,
-      "walkable": true
+      "lon": 6.2798883
     },
     {
       "osm_type": "node",
@@ -2584,8 +2377,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.504122,
-      "lon": 6.2799134,
-      "walkable": true
+      "lon": 6.2799134
     },
     {
       "osm_type": "node",
@@ -2595,8 +2387,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5180192,
-      "lon": 6.1039218,
-      "walkable": true
+      "lon": 6.1039218
     },
     {
       "osm_type": "node",
@@ -2606,8 +2397,7 @@
         "shop": "hairdresser"
       },
       "lat": 49.5178256,
-      "lon": 6.1022887,
-      "walkable": true
+      "lon": 6.1022887
     },
     {
       "osm_type": "node",
@@ -2617,8 +2407,7 @@
         "shop": "hairdresser"
       },
       "lat": 49.5179563,
-      "lon": 6.1027581,
-      "walkable": true
+      "lon": 6.1027581
     },
     {
       "osm_type": "node",
@@ -2628,8 +2417,7 @@
         "shop": "dry_cleaning"
       },
       "lat": 49.5177926,
-      "lon": 6.1021942,
-      "walkable": true
+      "lon": 6.1021942
     },
     {
       "osm_type": "node",
@@ -2639,8 +2427,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5435944,
-      "lon": 6.3680242,
-      "walkable": true
+      "lon": 6.3680242
     },
     {
       "osm_type": "node",
@@ -2650,8 +2437,7 @@
         "shop": "massage"
       },
       "lat": 49.5051776,
-      "lon": 6.1932054,
-      "walkable": false
+      "lon": 6.1932054
     },
     {
       "osm_type": "node",
@@ -2661,8 +2447,7 @@
         "tourism": "hotel"
       },
       "lat": 49.509571,
-      "lon": 6.1187949,
-      "walkable": true
+      "lon": 6.1187949
     },
     {
       "osm_type": "node",
@@ -2672,8 +2457,7 @@
         "amenity": "fast_food"
       },
       "lat": 49.5094342,
-      "lon": 6.1182558,
-      "walkable": true
+      "lon": 6.1182558
     },
     {
       "osm_type": "node",
@@ -2683,8 +2467,7 @@
         "office": "company"
       },
       "lat": 49.5144735,
-      "lon": 6.3026829,
-      "walkable": true
+      "lon": 6.3026829
     },
     {
       "osm_type": "node",
@@ -2694,8 +2477,7 @@
         "shop": "telecommunication"
       },
       "lat": 49.5447691,
-      "lon": 6.3691749,
-      "walkable": true
+      "lon": 6.3691749
     },
     {
       "osm_type": "node",
@@ -2705,8 +2487,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5056669,
-      "lon": 6.2712158,
-      "walkable": true
+      "lon": 6.2712158
     },
     {
       "osm_type": "node",
@@ -2716,8 +2497,7 @@
         "amenity": "restaurant"
       },
       "lat": 49.5056669,
-      "lon": 6.2712158,
-      "walkable": true
+      "lon": 6.2712158
     },
     {
       "osm_type": "relation",
@@ -2727,8 +2507,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5020192,
-      "lon": 6.282886730658436,
-      "walkable": false
+      "lon": 6.282886730658436
     },
     {
       "osm_type": "relation",
@@ -2739,8 +2518,7 @@
         "office": "research"
       },
       "lat": 49.49889965,
-      "lon": 6.086568937102761,
-      "walkable": false
+      "lon": 6.086568937102761
     },
     {
       "osm_type": "way",
@@ -2750,8 +2528,7 @@
         "leisure": "stadium"
       },
       "lat": 49.54132425,
-      "lon": 6.362255623172645,
-      "walkable": false
+      "lon": 6.362255623172645
     },
     {
       "osm_type": "way",
@@ -2762,8 +2539,7 @@
         "shop": "doityourself"
       },
       "lat": 49.50463965,
-      "lon": 6.093304748611036,
-      "walkable": false
+      "lon": 6.093304748611036
     },
     {
       "osm_type": "way",
@@ -2774,8 +2550,7 @@
         "shop": "car"
       },
       "lat": 49.49614445,
-      "lon": 6.087525872771292,
-      "walkable": false
+      "lon": 6.087525872771292
     },
     {
       "osm_type": "way",
@@ -2785,8 +2560,7 @@
         "leisure": "park"
       },
       "lat": 49.499658600000004,
-      "lon": 6.281204528649956,
-      "walkable": false
+      "lon": 6.281204528649956
     },
     {
       "osm_type": "way",
@@ -2796,8 +2570,7 @@
         "building": "commercial"
       },
       "lat": 49.515363050000005,
-      "lon": 6.307102343265632,
-      "walkable": true
+      "lon": 6.307102343265632
     },
     {
       "osm_type": "way",
@@ -2808,8 +2581,7 @@
         "building": "yes"
       },
       "lat": 49.50595345,
-      "lon": 6.273750329818387,
-      "walkable": true
+      "lon": 6.273750329818387
     },
     {
       "osm_type": "way",
@@ -2819,8 +2591,7 @@
         "building": "commercial"
       },
       "lat": 49.5013283,
-      "lon": 6.0917212377467065,
-      "walkable": false
+      "lon": 6.0917212377467065
     },
     {
       "osm_type": "way",
@@ -2830,8 +2601,7 @@
         "leisure": "park"
       },
       "lat": 49.5148109,
-      "lon": 6.103044507017736,
-      "walkable": true
+      "lon": 6.103044507017736
     },
     {
       "osm_type": "way",
@@ -2842,8 +2612,7 @@
         "shop": "car"
       },
       "lat": 49.50588415,
-      "lon": 6.125712372435837,
-      "walkable": true
+      "lon": 6.125712372435837
     },
     {
       "osm_type": "way",
@@ -2854,8 +2623,7 @@
         "office": "company"
       },
       "lat": 49.4860784,
-      "lon": 6.112249314069661,
-      "walkable": false
+      "lon": 6.112249314069661
     },
     {
       "osm_type": "way",
@@ -2865,8 +2633,7 @@
         "building": "commercial"
       },
       "lat": 49.50583295,
-      "lon": 6.091928428216616,
-      "walkable": false
+      "lon": 6.091928428216616
     },
     {
       "osm_type": "way",
@@ -2878,8 +2645,7 @@
         "shop": "rental"
       },
       "lat": 49.5066232,
-      "lon": 6.0929667968358,
-      "walkable": false
+      "lon": 6.0929667968358
     },
     {
       "osm_type": "way",
@@ -2890,8 +2656,7 @@
         "shop": "car_repair"
       },
       "lat": 49.512737349999995,
-      "lon": 6.304356148418993,
-      "walkable": false
+      "lon": 6.304356148418993
     },
     {
       "osm_type": "way",
@@ -2901,8 +2666,7 @@
         "building": "commercial"
       },
       "lat": 49.5163888,
-      "lon": 6.306288519481219,
-      "walkable": true
+      "lon": 6.306288519481219
     },
     {
       "osm_type": "way",
@@ -2913,8 +2677,7 @@
         "shop": "car"
       },
       "lat": 49.5170484,
-      "lon": 6.199110211089108,
-      "walkable": true
+      "lon": 6.199110211089108
     },
     {
       "osm_type": "way",
@@ -2924,8 +2687,7 @@
         "building": "commercial"
       },
       "lat": 49.547574350000005,
-      "lon": 6.355103135690727,
-      "walkable": true
+      "lon": 6.355103135690727
     },
     {
       "osm_type": "way",
@@ -2935,8 +2697,7 @@
         "building": "retail"
       },
       "lat": 49.54781535,
-      "lon": 6.356482655111213,
-      "walkable": true
+      "lon": 6.356482655111213
     },
     {
       "osm_type": "way",
@@ -2946,8 +2707,7 @@
         "leisure": "park"
       },
       "lat": 49.5130909,
-      "lon": 6.113918875524934,
-      "walkable": true
+      "lon": 6.113918875524934
     },
     {
       "osm_type": "way",
@@ -2957,8 +2717,7 @@
         "amenity": "school"
       },
       "lat": 49.5175756,
-      "lon": 6.1090669184158894,
-      "walkable": false
+      "lon": 6.1090669184158894
     },
     {
       "osm_type": "way",
@@ -2968,8 +2727,7 @@
         "leisure": "stadium"
       },
       "lat": 49.50928415,
-      "lon": 6.28957515,
-      "walkable": true
+      "lon": 6.28957515
     },
     {
       "osm_type": "way",
@@ -2979,8 +2737,7 @@
         "building": "retail"
       },
       "lat": 49.5014539,
-      "lon": 6.2814764503825735,
-      "walkable": false
+      "lon": 6.2814764503825735
     },
     {
       "osm_type": "way",
@@ -2990,8 +2747,7 @@
         "leisure": "park"
       },
       "lat": 49.51725665,
-      "lon": 6.09774513792841,
-      "walkable": false
+      "lon": 6.09774513792841
     },
     {
       "osm_type": "way",
@@ -3001,8 +2757,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.51519375,
-      "lon": 6.098424246628455,
-      "walkable": false
+      "lon": 6.098424246628455
     },
     {
       "osm_type": "way",
@@ -3012,8 +2767,7 @@
         "building": "train_station"
       },
       "lat": 49.51563365,
-      "lon": 6.101511570687812,
-      "walkable": true
+      "lon": 6.101511570687812
     },
     {
       "osm_type": "way",
@@ -3023,8 +2777,7 @@
         "building": "train_station"
       },
       "lat": 49.5165741,
-      "lon": 6.10169645076511,
-      "walkable": true
+      "lon": 6.10169645076511
     },
     {
       "osm_type": "way",
@@ -3035,8 +2788,7 @@
         "building": "yes"
       },
       "lat": 49.5116183,
-      "lon": 6.10174398919192,
-      "walkable": false
+      "lon": 6.10174398919192
     },
     {
       "osm_type": "way",
@@ -3047,8 +2799,7 @@
         "building": "yes"
       },
       "lat": 49.51813,
-      "lon": 6.187064357875366,
-      "walkable": true
+      "lon": 6.187064357875366
     },
     {
       "osm_type": "way",
@@ -3059,8 +2810,7 @@
         "building": "yes"
       },
       "lat": 49.5161337,
-      "lon": 6.1845787006208734,
-      "walkable": true
+      "lon": 6.1845787006208734
     },
     {
       "osm_type": "way",
@@ -3071,8 +2821,7 @@
         "office": "yes"
       },
       "lat": 49.501644049999996,
-      "lon": 6.087851228470652,
-      "walkable": false
+      "lon": 6.087851228470652
     },
     {
       "osm_type": "way",
@@ -3083,8 +2832,7 @@
         "shop": "supermarket"
       },
       "lat": 49.5481772,
-      "lon": 6.360759003135422,
-      "walkable": true
+      "lon": 6.360759003135422
     },
     {
       "osm_type": "way",
@@ -3095,8 +2843,7 @@
         "shop": "beverages"
       },
       "lat": 49.54818605,
-      "lon": 6.361431322093406,
-      "walkable": true
+      "lon": 6.361431322093406
     },
     {
       "osm_type": "way",
@@ -3107,8 +2854,7 @@
         "building": "yes"
       },
       "lat": 49.51731235,
-      "lon": 6.096420144741199,
-      "walkable": false
+      "lon": 6.096420144741199
     },
     {
       "osm_type": "way",
@@ -3118,8 +2864,7 @@
         "building": "commercial"
       },
       "lat": 49.50221445,
-      "lon": 6.090460299999995,
-      "walkable": false
+      "lon": 6.090460299999995
     },
     {
       "osm_type": "way",
@@ -3130,8 +2875,7 @@
         "shop": "hardware"
       },
       "lat": 49.501198900000006,
-      "lon": 6.0921166364356,
-      "walkable": false
+      "lon": 6.0921166364356
     },
     {
       "osm_type": "way",
@@ -3142,8 +2886,7 @@
         "shop": "beverages"
       },
       "lat": 49.5067229,
-      "lon": 6.092536141919612,
-      "walkable": false
+      "lon": 6.092536141919612
     },
     {
       "osm_type": "way",
@@ -3154,8 +2897,7 @@
         "building": "yes"
       },
       "lat": 49.5150215,
-      "lon": 6.190431600875817,
-      "walkable": true
+      "lon": 6.190431600875817
     },
     {
       "osm_type": "way",
@@ -3166,8 +2908,7 @@
         "building": "yes"
       },
       "lat": 49.51523995,
-      "lon": 6.189857383678136,
-      "walkable": true
+      "lon": 6.189857383678136
     },
     {
       "osm_type": "way",
@@ -3177,8 +2918,7 @@
         "building": "hotel"
       },
       "lat": 49.54801525,
-      "lon": 6.35813703031301,
-      "walkable": true
+      "lon": 6.35813703031301
     },
     {
       "osm_type": "way",
@@ -3189,8 +2929,7 @@
         "building": "public"
       },
       "lat": 49.545022,
-      "lon": 6.3691969056957,
-      "walkable": true
+      "lon": 6.3691969056957
     },
     {
       "osm_type": "way",
@@ -3200,8 +2939,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.54047085,
-      "lon": 6.3641251854839265,
-      "walkable": false
+      "lon": 6.3641251854839265
     },
     {
       "osm_type": "way",
@@ -3212,8 +2950,7 @@
         "building": "yes"
       },
       "lat": 49.54332985,
-      "lon": 6.3622136433725345,
-      "walkable": false
+      "lon": 6.3622136433725345
     },
     {
       "osm_type": "way",
@@ -3224,8 +2961,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.55542,
-      "lon": 6.334282427826911,
-      "walkable": false
+      "lon": 6.334282427826911
     },
     {
       "osm_type": "way",
@@ -3236,8 +2972,7 @@
         "building": "civic"
       },
       "lat": 49.50513195,
-      "lon": 6.194463942195274,
-      "walkable": false
+      "lon": 6.194463942195274
     },
     {
       "osm_type": "way",
@@ -3248,8 +2983,7 @@
         "building": "commercial"
       },
       "lat": 49.54797865,
-      "lon": 6.357220904036865,
-      "walkable": true
+      "lon": 6.357220904036865
     },
     {
       "osm_type": "way",
@@ -3260,8 +2994,7 @@
         "office": "logistics"
       },
       "lat": 49.508169699999996,
-      "lon": 6.108109171701571,
-      "walkable": false
+      "lon": 6.108109171701571
     },
     {
       "osm_type": "way",
@@ -3272,8 +3005,7 @@
         "tourism": "museum"
       },
       "lat": 49.5288073,
-      "lon": 6.354228035736748,
-      "walkable": false
+      "lon": 6.354228035736748
     },
     {
       "osm_type": "way",
@@ -3283,8 +3015,7 @@
         "leisure": "park"
       },
       "lat": 49.53154670000001,
-      "lon": 6.3538799715068,
-      "walkable": false
+      "lon": 6.3538799715068
     },
     {
       "osm_type": "way",
@@ -3295,8 +3026,7 @@
         "tourism": "museum"
       },
       "lat": 49.529066,
-      "lon": 6.384695379465116,
-      "walkable": false
+      "lon": 6.384695379465116
     },
     {
       "osm_type": "way",
@@ -3307,8 +3037,7 @@
         "building": "yes"
       },
       "lat": 49.5114582,
-      "lon": 6.1204521955413265,
-      "walkable": true
+      "lon": 6.1204521955413265
     },
     {
       "osm_type": "way",
@@ -3319,8 +3048,7 @@
         "building": "yes"
       },
       "lat": 49.51344695,
-      "lon": 6.1021731760855165,
-      "walkable": true
+      "lon": 6.1021731760855165
     },
     {
       "osm_type": "way",
@@ -3330,8 +3058,7 @@
         "amenity": "social_facility"
       },
       "lat": 49.513269750000006,
-      "lon": 6.102544378108961,
-      "walkable": true
+      "lon": 6.102544378108961
     },
     {
       "osm_type": "way",
@@ -3341,8 +3068,7 @@
         "amenity": "school"
       },
       "lat": 49.5198183,
-      "lon": 6.104309738085833,
-      "walkable": false
+      "lon": 6.104309738085833
     },
     {
       "osm_type": "way",
@@ -3352,8 +3078,7 @@
         "building": "retail"
       },
       "lat": 49.52265605,
-      "lon": 6.099227344203857,
-      "walkable": false
+      "lon": 6.099227344203857
     },
     {
       "osm_type": "way",
@@ -3363,8 +3088,7 @@
         "building": "commercial"
       },
       "lat": 49.5146291,
-      "lon": 6.094275697181049,
-      "walkable": false
+      "lon": 6.094275697181049
     },
     {
       "osm_type": "way",
@@ -3375,8 +3099,7 @@
         "building": "yes"
       },
       "lat": 49.5163533,
-      "lon": 6.099375208923009,
-      "walkable": true
+      "lon": 6.099375208923009
     },
     {
       "osm_type": "way",
@@ -3387,8 +3110,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.50677755,
-      "lon": 6.274786348128446,
-      "walkable": true
+      "lon": 6.274786348128446
     },
     {
       "osm_type": "way",
@@ -3398,8 +3120,7 @@
         "building": "commercial"
       },
       "lat": 49.50897205,
-      "lon": 6.15213805103385,
-      "walkable": true
+      "lon": 6.15213805103385
     },
     {
       "osm_type": "way",
@@ -3410,8 +3131,7 @@
         "building": "civic"
       },
       "lat": 49.5096231,
-      "lon": 6.149429449456864,
-      "walkable": true
+      "lon": 6.149429449456864
     },
     {
       "osm_type": "way",
@@ -3422,8 +3142,7 @@
         "building": "public"
       },
       "lat": 49.5158577,
-      "lon": 6.190673406418615,
-      "walkable": true
+      "lon": 6.190673406418615
     },
     {
       "osm_type": "way",
@@ -3433,8 +3152,7 @@
         "building": "retail"
       },
       "lat": 49.511426799999995,
-      "lon": 6.190066918397266,
-      "walkable": false
+      "lon": 6.190066918397266
     },
     {
       "osm_type": "way",
@@ -3444,8 +3162,7 @@
         "building": "retail"
       },
       "lat": 49.51115645,
-      "lon": 6.190904842269912,
-      "walkable": false
+      "lon": 6.190904842269912
     },
     {
       "osm_type": "way",
@@ -3456,8 +3173,7 @@
         "building": "school"
       },
       "lat": 49.515027450000005,
-      "lon": 6.1901987539713526,
-      "walkable": true
+      "lon": 6.1901987539713526
     },
     {
       "osm_type": "way",
@@ -3467,8 +3183,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5016811,
-      "lon": 6.282454435999849,
-      "walkable": false
+      "lon": 6.282454435999849
     },
     {
       "osm_type": "way",
@@ -3478,8 +3193,7 @@
         "building": "retail"
       },
       "lat": 49.5084958,
-      "lon": 6.192262859499824,
-      "walkable": false
+      "lon": 6.192262859499824
     },
     {
       "osm_type": "way",
@@ -3489,8 +3203,7 @@
         "building": "retail"
       },
       "lat": 49.542902749999996,
-      "lon": 6.362895394933715,
-      "walkable": false
+      "lon": 6.362895394933715
     },
     {
       "osm_type": "way",
@@ -3500,8 +3213,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5403857,
-      "lon": 6.363243776330947,
-      "walkable": false
+      "lon": 6.363243776330947
     },
     {
       "osm_type": "way",
@@ -3512,8 +3224,7 @@
         "building": "school"
       },
       "lat": 49.524563400000005,
-      "lon": 6.225562950618565,
-      "walkable": false
+      "lon": 6.225562950618565
     },
     {
       "osm_type": "way",
@@ -3523,8 +3234,7 @@
         "building": "office"
       },
       "lat": 49.50637655,
-      "lon": 6.192655661853928,
-      "walkable": false
+      "lon": 6.192655661853928
     },
     {
       "osm_type": "way",
@@ -3534,8 +3244,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51597495,
-      "lon": 6.192435950530638,
-      "walkable": false
+      "lon": 6.192435950530638
     },
     {
       "osm_type": "way",
@@ -3545,8 +3254,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5240774,
-      "lon": 6.187419981470588,
-      "walkable": false
+      "lon": 6.187419981470588
     },
     {
       "osm_type": "way",
@@ -3556,8 +3264,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.522439,
-      "lon": 6.184925219440012,
-      "walkable": false
+      "lon": 6.184925219440012
     },
     {
       "osm_type": "way",
@@ -3567,8 +3274,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52301695,
-      "lon": 6.185941300326364,
-      "walkable": false
+      "lon": 6.185941300326364
     },
     {
       "osm_type": "way",
@@ -3578,8 +3284,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52048485,
-      "lon": 6.185804163437499,
-      "walkable": false
+      "lon": 6.185804163437499
     },
     {
       "osm_type": "way",
@@ -3589,8 +3294,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5228745,
-      "lon": 6.18602715400329,
-      "walkable": false
+      "lon": 6.18602715400329
     },
     {
       "osm_type": "way",
@@ -3600,8 +3304,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5181567,
-      "lon": 6.189582714452635,
-      "walkable": true
+      "lon": 6.189582714452635
     },
     {
       "osm_type": "way",
@@ -3612,8 +3315,7 @@
         "building": "office"
       },
       "lat": 49.5207345,
-      "lon": 6.222781382094905,
-      "walkable": true
+      "lon": 6.222781382094905
     },
     {
       "osm_type": "way",
@@ -3623,8 +3325,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51694355,
-      "lon": 6.196197729114713,
-      "walkable": false
+      "lon": 6.196197729114713
     },
     {
       "osm_type": "way",
@@ -3635,8 +3336,7 @@
         "shop": "alcohol"
       },
       "lat": 49.50633735,
-      "lon": 6.141549763007994,
-      "walkable": true
+      "lon": 6.141549763007994
     },
     {
       "osm_type": "way",
@@ -3646,8 +3346,7 @@
         "building": "commercial"
       },
       "lat": 49.506408,
-      "lon": 6.14108959538489,
-      "walkable": true
+      "lon": 6.14108959538489
     },
     {
       "osm_type": "way",
@@ -3658,8 +3357,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51224945,
-      "lon": 6.186160610355905,
-      "walkable": false
+      "lon": 6.186160610355905
     },
     {
       "osm_type": "way",
@@ -3669,8 +3367,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.522754750000004,
-      "lon": 6.221302508566712,
-      "walkable": false
+      "lon": 6.221302508566712
     },
     {
       "osm_type": "way",
@@ -3681,8 +3378,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5051865,
-      "lon": 6.285292549215825,
-      "walkable": true
+      "lon": 6.285292549215825
     },
     {
       "osm_type": "way",
@@ -3693,8 +3389,7 @@
         "building": "yes"
       },
       "lat": 49.5062517,
-      "lon": 6.27489359764361,
-      "walkable": true
+      "lon": 6.27489359764361
     },
     {
       "osm_type": "way",
@@ -3704,8 +3399,7 @@
         "building": "retail"
       },
       "lat": 49.51501155,
-      "lon": 6.106928209876672,
-      "walkable": true
+      "lon": 6.106928209876672
     },
     {
       "osm_type": "way",
@@ -3715,8 +3409,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.511812649999996,
-      "lon": 6.155589800000001,
-      "walkable": true
+      "lon": 6.155589800000001
     },
     {
       "osm_type": "way",
@@ -3726,8 +3419,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51183575,
-      "lon": 6.155279349999999,
-      "walkable": true
+      "lon": 6.155279349999999
     },
     {
       "osm_type": "way",
@@ -3737,8 +3429,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5110642,
-      "lon": 6.151133922946009,
-      "walkable": false
+      "lon": 6.151133922946009
     },
     {
       "osm_type": "way",
@@ -3748,8 +3439,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5117025,
-      "lon": 6.15512181671008,
-      "walkable": true
+      "lon": 6.15512181671008
     },
     {
       "osm_type": "way",
@@ -3759,8 +3449,7 @@
         "building": "commercial"
       },
       "lat": 49.50873970000001,
-      "lon": 6.094040244381979,
-      "walkable": false
+      "lon": 6.094040244381979
     },
     {
       "osm_type": "way",
@@ -3770,8 +3459,7 @@
         "leisure": "park"
       },
       "lat": 49.51904605,
-      "lon": 6.099204906143102,
-      "walkable": true
+      "lon": 6.099204906143102
     },
     {
       "osm_type": "way",
@@ -3781,8 +3469,7 @@
         "building": "commercial"
       },
       "lat": 49.54664745,
-      "lon": 6.353657901351353,
-      "walkable": true
+      "lon": 6.353657901351353
     },
     {
       "osm_type": "way",
@@ -3792,8 +3479,7 @@
         "building": "commercial"
       },
       "lat": 49.54706935,
-      "lon": 6.363962399776186,
-      "walkable": true
+      "lon": 6.363962399776186
     },
     {
       "osm_type": "way",
@@ -3804,8 +3490,7 @@
         "shop": "car_parts"
       },
       "lat": 49.5474472,
-      "lon": 6.359909474448687,
-      "walkable": true
+      "lon": 6.359909474448687
     },
     {
       "osm_type": "way",
@@ -3815,8 +3500,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5212524,
-      "lon": 6.084520302321715,
-      "walkable": false
+      "lon": 6.084520302321715
     },
     {
       "osm_type": "way",
@@ -3826,8 +3510,7 @@
         "building": "retail"
       },
       "lat": 49.50626405,
-      "lon": 6.283556579821433,
-      "walkable": true
+      "lon": 6.283556579821433
     },
     {
       "osm_type": "way",
@@ -3837,8 +3520,7 @@
         "leisure": "park"
       },
       "lat": 49.5384753,
-      "lon": 6.338541789496971,
-      "walkable": false
+      "lon": 6.338541789496971
     },
     {
       "osm_type": "way",
@@ -3849,8 +3531,7 @@
         "shop": "ticket"
       },
       "lat": 49.5102058,
-      "lon": 6.119415438834952,
-      "walkable": true
+      "lon": 6.119415438834952
     },
     {
       "osm_type": "way",
@@ -3860,8 +3541,7 @@
         "leisure": "park"
       },
       "lat": 49.51097925,
-      "lon": 6.112394815089976,
-      "walkable": true
+      "lon": 6.112394815089976
     },
     {
       "osm_type": "way",
@@ -3871,8 +3551,7 @@
         "leisure": "park"
       },
       "lat": 49.508751950000004,
-      "lon": 6.277696375051724,
-      "walkable": true
+      "lon": 6.277696375051724
     },
     {
       "osm_type": "way",
@@ -3882,8 +3561,7 @@
         "building": "retail"
       },
       "lat": 49.50480615,
-      "lon": 6.269557838671059,
-      "walkable": true
+      "lon": 6.269557838671059
     },
     {
       "osm_type": "way",
@@ -3894,8 +3572,7 @@
         "building": "yes"
       },
       "lat": 49.504343649999996,
-      "lon": 6.266031592017427,
-      "walkable": true
+      "lon": 6.266031592017427
     },
     {
       "osm_type": "way",
@@ -3906,8 +3583,7 @@
         "shop": "car"
       },
       "lat": 49.510254200000006,
-      "lon": 6.25606310068341,
-      "walkable": true
+      "lon": 6.25606310068341
     },
     {
       "osm_type": "way",
@@ -3917,8 +3593,7 @@
         "building": "office"
       },
       "lat": 49.55368154999999,
-      "lon": 6.323139550000001,
-      "walkable": false
+      "lon": 6.323139550000001
     },
     {
       "osm_type": "way",
@@ -3928,8 +3603,7 @@
         "building": "commercial"
       },
       "lat": 49.49161365,
-      "lon": 6.1140830210868184,
-      "walkable": false
+      "lon": 6.1140830210868184
     },
     {
       "osm_type": "way",
@@ -3940,8 +3614,7 @@
         "building": "yes"
       },
       "lat": 49.55530005,
-      "lon": 6.328595328247623,
-      "walkable": false
+      "lon": 6.328595328247623
     },
     {
       "osm_type": "way",
@@ -3952,8 +3625,7 @@
         "shop": "supermarket"
       },
       "lat": 49.5155326,
-      "lon": 6.307776142062318,
-      "walkable": true
+      "lon": 6.307776142062318
     },
     {
       "osm_type": "way",
@@ -3965,8 +3637,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5399553,
-      "lon": 6.377434499935452,
-      "walkable": false
+      "lon": 6.377434499935452
     },
     {
       "osm_type": "way",
@@ -3977,8 +3648,7 @@
         "building": "yes"
       },
       "lat": 49.5339553,
-      "lon": 6.385053864529314,
-      "walkable": false
+      "lon": 6.385053864529314
     },
     {
       "osm_type": "way",
@@ -3989,8 +3659,7 @@
         "shop": "doityourself"
       },
       "lat": 49.516568649999996,
-      "lon": 6.369959946218938,
-      "walkable": false
+      "lon": 6.369959946218938
     },
     {
       "osm_type": "way",
@@ -4001,8 +3670,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.51591705,
-      "lon": 6.372673489876709,
-      "walkable": false
+      "lon": 6.372673489876709
     },
     {
       "osm_type": "way",
@@ -4013,8 +3681,7 @@
         "shop": "craft"
       },
       "lat": 49.5157569,
-      "lon": 6.374241421428572,
-      "walkable": false
+      "lon": 6.374241421428572
     },
     {
       "osm_type": "way",
@@ -4025,8 +3692,7 @@
         "shop": "florist"
       },
       "lat": 49.51735515,
-      "lon": 6.375680915921379,
-      "walkable": false
+      "lon": 6.375680915921379
     },
     {
       "osm_type": "way",
@@ -4037,8 +3703,7 @@
         "tourism": "hotel"
       },
       "lat": 49.535788249999996,
-      "lon": 6.386665460289102,
-      "walkable": false
+      "lon": 6.386665460289102
     },
     {
       "osm_type": "way",
@@ -4048,8 +3713,7 @@
         "leisure": "park"
       },
       "lat": 49.54205695,
-      "lon": 6.366690480691922,
-      "walkable": true
+      "lon": 6.366690480691922
     },
     {
       "osm_type": "way",
@@ -4060,8 +3724,7 @@
         "building": "yes"
       },
       "lat": 49.52979139999999,
-      "lon": 6.382900125906826,
-      "walkable": false
+      "lon": 6.382900125906826
     },
     {
       "osm_type": "way",
@@ -4071,8 +3734,7 @@
         "building": "retail"
       },
       "lat": 49.51120075,
-      "lon": 6.1196074,
-      "walkable": true
+      "lon": 6.1196074
     },
     {
       "osm_type": "way",
@@ -4083,8 +3745,7 @@
         "office": "company"
       },
       "lat": 49.51144205,
-      "lon": 6.299150677307168,
-      "walkable": false
+      "lon": 6.299150677307168
     },
     {
       "osm_type": "way",
@@ -4095,8 +3756,7 @@
         "building": "school"
       },
       "lat": 49.551650550000005,
-      "lon": 6.312775358512274,
-      "walkable": false
+      "lon": 6.312775358512274
     },
     {
       "osm_type": "way",
@@ -4107,8 +3767,7 @@
         "shop": "hardware"
       },
       "lat": 49.50623065,
-      "lon": 6.094832428189116,
-      "walkable": false
+      "lon": 6.094832428189116
     },
     {
       "osm_type": "way",
@@ -4118,8 +3777,7 @@
         "building": "office"
       },
       "lat": 49.4989261,
-      "lon": 6.097475406794999,
-      "walkable": false
+      "lon": 6.097475406794999
     },
     {
       "osm_type": "way",
@@ -4129,8 +3787,7 @@
         "building": "office"
       },
       "lat": 49.49888985,
-      "lon": 6.097921914611588,
-      "walkable": false
+      "lon": 6.097921914611588
     },
     {
       "osm_type": "way",
@@ -4140,8 +3797,7 @@
         "building": "office"
       },
       "lat": 49.49871925,
-      "lon": 6.0982443632582655,
-      "walkable": false
+      "lon": 6.0982443632582655
     },
     {
       "osm_type": "way",
@@ -4152,8 +3808,7 @@
         "office": "logistics"
       },
       "lat": 49.49899995,
-      "lon": 6.1080555256991556,
-      "walkable": false
+      "lon": 6.1080555256991556
     },
     {
       "osm_type": "way",
@@ -4163,8 +3818,7 @@
         "building": "commercial"
       },
       "lat": 49.50695825,
-      "lon": 6.102238053713368,
-      "walkable": false
+      "lon": 6.102238053713368
     },
     {
       "osm_type": "way",
@@ -4174,8 +3828,7 @@
         "building": "office"
       },
       "lat": 49.49988995,
-      "lon": 6.114999695639554,
-      "walkable": false
+      "lon": 6.114999695639554
     },
     {
       "osm_type": "way",
@@ -4186,8 +3839,7 @@
         "office": "company"
       },
       "lat": 49.5027172,
-      "lon": 6.091444394145993,
-      "walkable": false
+      "lon": 6.091444394145993
     },
     {
       "osm_type": "way",
@@ -4198,8 +3850,7 @@
         "office": "company"
       },
       "lat": 49.50214685,
-      "lon": 6.092327131404055,
-      "walkable": false
+      "lon": 6.092327131404055
     },
     {
       "osm_type": "way",
@@ -4209,8 +3860,7 @@
         "leisure": "park"
       },
       "lat": 49.5054246,
-      "lon": 6.283036474613627,
-      "walkable": true
+      "lon": 6.283036474613627
     },
     {
       "osm_type": "way",
@@ -4220,8 +3870,7 @@
         "building": "commercial"
       },
       "lat": 49.51237935,
-      "lon": 6.094109536549286,
-      "walkable": false
+      "lon": 6.094109536549286
     },
     {
       "osm_type": "way",
@@ -4232,8 +3881,7 @@
         "office": "logistics"
       },
       "lat": 49.508776749999996,
-      "lon": 6.1057247132624735,
-      "walkable": false
+      "lon": 6.1057247132624735
     },
     {
       "osm_type": "way",
@@ -4243,8 +3891,7 @@
         "building": "commercial"
       },
       "lat": 49.5156198,
-      "lon": 6.308142248846099,
-      "walkable": false
+      "lon": 6.308142248846099
     },
     {
       "osm_type": "way",
@@ -4255,8 +3902,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.5152131,
-      "lon": 6.191556885818153,
-      "walkable": true
+      "lon": 6.191556885818153
     },
     {
       "osm_type": "way",
@@ -4266,8 +3912,7 @@
         "building": "commercial"
       },
       "lat": 49.5210534,
-      "lon": 6.356856980521759,
-      "walkable": false
+      "lon": 6.356856980521759
     },
     {
       "osm_type": "way",
@@ -4277,8 +3922,7 @@
         "building": "commercial"
       },
       "lat": 49.50856315,
-      "lon": 6.09393958699185,
-      "walkable": false
+      "lon": 6.09393958699185
     },
     {
       "osm_type": "way",
@@ -4288,8 +3932,7 @@
         "building": "commercial"
       },
       "lat": 49.5470521,
-      "lon": 6.323646136317356,
-      "walkable": true
+      "lon": 6.323646136317356
     },
     {
       "osm_type": "way",
@@ -4299,8 +3942,7 @@
         "building": "commercial"
       },
       "lat": 49.54657125,
-      "lon": 6.325084479235704,
-      "walkable": true
+      "lon": 6.325084479235704
     },
     {
       "osm_type": "way",
@@ -4310,8 +3952,7 @@
         "leisure": "park"
       },
       "lat": 49.5224246,
-      "lon": 6.1014544294205155,
-      "walkable": false
+      "lon": 6.1014544294205155
     },
     {
       "osm_type": "way",
@@ -4321,8 +3962,7 @@
         "leisure": "park"
       },
       "lat": 49.511123100000006,
-      "lon": 6.105608141790123,
-      "walkable": false
+      "lon": 6.105608141790123
     },
     {
       "osm_type": "way",
@@ -4332,8 +3972,7 @@
         "leisure": "park"
       },
       "lat": 49.51616195,
-      "lon": 6.098157679920248,
-      "walkable": true
+      "lon": 6.098157679920248
     },
     {
       "osm_type": "way",
@@ -4343,8 +3982,7 @@
         "leisure": "park"
       },
       "lat": 49.514405249999996,
-      "lon": 6.0969795415438135,
-      "walkable": false
+      "lon": 6.0969795415438135
     },
     {
       "osm_type": "way",
@@ -4354,8 +3992,7 @@
         "leisure": "park"
       },
       "lat": 49.514404299999995,
-      "lon": 6.094807693869427,
-      "walkable": false
+      "lon": 6.094807693869427
     },
     {
       "osm_type": "way",
@@ -4365,8 +4002,7 @@
         "leisure": "park"
       },
       "lat": 49.518445299999996,
-      "lon": 6.110772033459777,
-      "walkable": false
+      "lon": 6.110772033459777
     },
     {
       "osm_type": "way",
@@ -4377,8 +4013,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.51546185,
-      "lon": 6.097742833353218,
-      "walkable": false
+      "lon": 6.097742833353218
     },
     {
       "osm_type": "way",
@@ -4388,8 +4023,7 @@
         "building": "train_station"
       },
       "lat": 49.53752235,
-      "lon": 6.332922865056499,
-      "walkable": false
+      "lon": 6.332922865056499
     },
     {
       "osm_type": "way",
@@ -4399,8 +4033,7 @@
         "building": "retail"
       },
       "lat": 49.5205287,
-      "lon": 6.296814089679465,
-      "walkable": true
+      "lon": 6.296814089679465
     },
     {
       "osm_type": "way",
@@ -4411,8 +4044,7 @@
         "shop": "car_repair"
       },
       "lat": 49.515169400000005,
-      "lon": 6.373638150000001,
-      "walkable": false
+      "lon": 6.373638150000001
     },
     {
       "osm_type": "way",
@@ -4423,8 +4055,7 @@
         "shop": "motorcycle"
       },
       "lat": 49.5146232,
-      "lon": 6.372728200000001,
-      "walkable": false
+      "lon": 6.372728200000001
     },
     {
       "osm_type": "way",
@@ -4434,8 +4065,7 @@
         "amenity": "school"
       },
       "lat": 49.500204350000004,
-      "lon": 6.285029543717593,
-      "walkable": false
+      "lon": 6.285029543717593
     },
     {
       "osm_type": "way",
@@ -4446,8 +4076,7 @@
         "building": "yes"
       },
       "lat": 49.515456150000006,
-      "lon": 6.18231244669014,
-      "walkable": false
+      "lon": 6.18231244669014
     },
     {
       "osm_type": "way",
@@ -4457,8 +4086,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.521253200000004,
-      "lon": 6.358797393599211,
-      "walkable": false
+      "lon": 6.358797393599211
     },
     {
       "osm_type": "way",
@@ -4469,8 +4097,7 @@
         "building": "yes"
       },
       "lat": 49.54833445,
-      "lon": 6.35901390746252,
-      "walkable": true
+      "lon": 6.35901390746252
     },
     {
       "osm_type": "way",
@@ -4480,8 +4107,7 @@
         "building": "retail"
       },
       "lat": 49.543630199999996,
-      "lon": 6.367987076362961,
-      "walkable": true
+      "lon": 6.367987076362961
     },
     {
       "osm_type": "way",
@@ -4491,8 +4117,7 @@
         "building": "retail"
       },
       "lat": 49.5433019,
-      "lon": 6.367252478700685,
-      "walkable": true
+      "lon": 6.367252478700685
     },
     {
       "osm_type": "way",
@@ -4502,8 +4127,7 @@
         "building": "retail"
       },
       "lat": 49.54335815,
-      "lon": 6.367390909879536,
-      "walkable": true
+      "lon": 6.367390909879536
     },
     {
       "osm_type": "way",
@@ -4513,8 +4137,7 @@
         "amenity": "school"
       },
       "lat": 49.545181150000005,
-      "lon": 6.368537566701088,
-      "walkable": true
+      "lon": 6.368537566701088
     },
     {
       "osm_type": "way",
@@ -4524,8 +4147,7 @@
         "amenity": "school"
       },
       "lat": 49.54709175,
-      "lon": 6.366085936409861,
-      "walkable": true
+      "lon": 6.366085936409861
     },
     {
       "osm_type": "way",
@@ -4535,8 +4157,7 @@
         "building": "commercial"
       },
       "lat": 49.5015264,
-      "lon": 6.091636556818187,
-      "walkable": false
+      "lon": 6.091636556818187
     },
     {
       "osm_type": "way",
@@ -4546,8 +4167,7 @@
         "tourism": "zoo"
       },
       "lat": 49.51131585,
-      "lon": 6.12074128693799,
-      "walkable": true
+      "lon": 6.12074128693799
     },
     {
       "osm_type": "way",
@@ -4557,8 +4177,7 @@
         "amenity": "school"
       },
       "lat": 49.5549976,
-      "lon": 6.3301765053840535,
-      "walkable": false
+      "lon": 6.3301765053840535
     },
     {
       "osm_type": "way",
@@ -4568,8 +4187,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.54370625,
-      "lon": 6.3559085500000005,
-      "walkable": false
+      "lon": 6.3559085500000005
     },
     {
       "osm_type": "way",
@@ -4579,8 +4197,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5453557,
-      "lon": 6.370327134558823,
-      "walkable": true
+      "lon": 6.370327134558823
     },
     {
       "osm_type": "way",
@@ -4591,8 +4208,7 @@
         "building": "retail"
       },
       "lat": 49.54667565,
-      "lon": 6.36356215570921,
-      "walkable": true
+      "lon": 6.36356215570921
     },
     {
       "osm_type": "way",
@@ -4602,8 +4218,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.54429675,
-      "lon": 6.363828011994411,
-      "walkable": true
+      "lon": 6.363828011994411
     },
     {
       "osm_type": "way",
@@ -4613,8 +4228,7 @@
         "amenity": "social_facility"
       },
       "lat": 49.521339499999996,
-      "lon": 6.097233478395985,
-      "walkable": false
+      "lon": 6.097233478395985
     },
     {
       "osm_type": "way",
@@ -4624,8 +4238,7 @@
         "building": "commercial"
       },
       "lat": 49.51701955,
-      "lon": 6.094451617223468,
-      "walkable": false
+      "lon": 6.094451617223468
     },
     {
       "osm_type": "way",
@@ -4635,8 +4248,7 @@
         "amenity": "school"
       },
       "lat": 49.51959995,
-      "lon": 6.097559283316409,
-      "walkable": false
+      "lon": 6.097559283316409
     },
     {
       "osm_type": "way",
@@ -4646,8 +4258,7 @@
         "amenity": "kindergarten"
       },
       "lat": 49.5194771,
-      "lon": 6.098718500238852,
-      "walkable": false
+      "lon": 6.098718500238852
     },
     {
       "osm_type": "way",
@@ -4657,8 +4268,7 @@
         "amenity": "school"
       },
       "lat": 49.52797235,
-      "lon": 6.34991918113566,
-      "walkable": false
+      "lon": 6.34991918113566
     },
     {
       "osm_type": "way",
@@ -4668,8 +4278,7 @@
         "building": "commercial"
       },
       "lat": 49.5079462,
-      "lon": 6.093477855840607,
-      "walkable": false
+      "lon": 6.093477855840607
     },
     {
       "osm_type": "way",
@@ -4679,8 +4288,7 @@
         "leisure": "park"
       },
       "lat": 49.51103865,
-      "lon": 6.1019849180511185,
-      "walkable": false
+      "lon": 6.1019849180511185
     },
     {
       "osm_type": "way",
@@ -4690,8 +4298,7 @@
         "tourism": "zoo"
       },
       "lat": 49.509997,
-      "lon": 6.1204566513117875,
-      "walkable": true
+      "lon": 6.1204566513117875
     },
     {
       "osm_type": "way",
@@ -4701,8 +4308,7 @@
         "building": "retail"
       },
       "lat": 49.513875350000006,
-      "lon": 6.119398075327291,
-      "walkable": false
+      "lon": 6.119398075327291
     },
     {
       "osm_type": "way",
@@ -4712,8 +4318,7 @@
         "tourism": "zoo"
       },
       "lat": 49.5132924,
-      "lon": 6.1185133983744695,
-      "walkable": false
+      "lon": 6.1185133983744695
     },
     {
       "osm_type": "way",
@@ -4724,8 +4329,7 @@
         "tourism": "zoo"
       },
       "lat": 49.5099675,
-      "lon": 6.12075000325133,
-      "walkable": true
+      "lon": 6.12075000325133
     },
     {
       "osm_type": "way",
@@ -4736,8 +4340,7 @@
         "tourism": "zoo"
       },
       "lat": 49.510586399999994,
-      "lon": 6.120622288141252,
-      "walkable": true
+      "lon": 6.120622288141252
     },
     {
       "osm_type": "way",
@@ -4747,8 +4350,7 @@
         "tourism": "zoo"
       },
       "lat": 49.51351955,
-      "lon": 6.12092800557458,
-      "walkable": false
+      "lon": 6.12092800557458
     },
     {
       "osm_type": "way",
@@ -4759,8 +4361,7 @@
         "tourism": "zoo"
       },
       "lat": 49.5128479,
-      "lon": 6.1190373598080825,
-      "walkable": true
+      "lon": 6.1190373598080825
     },
     {
       "osm_type": "way",
@@ -4770,8 +4371,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.520420400000006,
-      "lon": 6.2206053569008475,
-      "walkable": false
+      "lon": 6.2206053569008475
     },
     {
       "osm_type": "way",
@@ -4781,8 +4381,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52035925,
-      "lon": 6.219849748707405,
-      "walkable": false
+      "lon": 6.219849748707405
     },
     {
       "osm_type": "way",
@@ -4792,8 +4391,7 @@
         "amenity": "social_facility"
       },
       "lat": 49.50555575,
-      "lon": 6.289835307020022,
-      "walkable": false
+      "lon": 6.289835307020022
     },
     {
       "osm_type": "way",
@@ -4803,8 +4401,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.508669600000005,
-      "lon": 6.287994436567159,
-      "walkable": true
+      "lon": 6.287994436567159
     },
     {
       "osm_type": "way",
@@ -4814,8 +4411,7 @@
         "building": "commercial"
       },
       "lat": 49.51742645,
-      "lon": 6.187855130043103,
-      "walkable": true
+      "lon": 6.187855130043103
     },
     {
       "osm_type": "way",
@@ -4825,8 +4421,7 @@
         "building": "commercial"
       },
       "lat": 49.5067025,
-      "lon": 6.140798908697409,
-      "walkable": true
+      "lon": 6.140798908697409
     },
     {
       "osm_type": "way",
@@ -4836,8 +4431,7 @@
         "building": "commercial"
       },
       "lat": 49.5064282,
-      "lon": 6.139761283388015,
-      "walkable": true
+      "lon": 6.139761283388015
     },
     {
       "osm_type": "way",
@@ -4848,8 +4442,7 @@
         "shop": "chemist"
       },
       "lat": 49.5184541,
-      "lon": 6.37620984007021,
-      "walkable": false
+      "lon": 6.37620984007021
     },
     {
       "osm_type": "way",
@@ -4860,8 +4453,7 @@
         "shop": "supermarket"
       },
       "lat": 49.51914805,
-      "lon": 6.376537287731745,
-      "walkable": false
+      "lon": 6.376537287731745
     },
     {
       "osm_type": "way",
@@ -4872,8 +4464,7 @@
         "shop": "beverages"
       },
       "lat": 49.51662185,
-      "lon": 6.3753626,
-      "walkable": false
+      "lon": 6.3753626
     },
     {
       "osm_type": "way",
@@ -4884,8 +4475,7 @@
         "building": "yes"
       },
       "lat": 49.51602215,
-      "lon": 6.37512165,
-      "walkable": false
+      "lon": 6.37512165
     },
     {
       "osm_type": "way",
@@ -4895,8 +4485,7 @@
         "amenity": "kindergarten"
       },
       "lat": 49.53182305,
-      "lon": 6.383888739348362,
-      "walkable": false
+      "lon": 6.383888739348362
     },
     {
       "osm_type": "way",
@@ -4906,8 +4495,7 @@
         "leisure": "park"
       },
       "lat": 49.5044233,
-      "lon": 6.264046084612801,
-      "walkable": true
+      "lon": 6.264046084612801
     },
     {
       "osm_type": "way",
@@ -4918,8 +4506,7 @@
         "shop": "supermarket"
       },
       "lat": 49.496787850000004,
-      "lon": 6.085951345635671,
-      "walkable": false
+      "lon": 6.085951345635671
     },
     {
       "osm_type": "way",
@@ -4929,8 +4516,7 @@
         "leisure": "park"
       },
       "lat": 49.5197139,
-      "lon": 6.0946864989564435,
-      "walkable": false
+      "lon": 6.0946864989564435
     },
     {
       "osm_type": "way",
@@ -4940,8 +4526,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.540163899999996,
-      "lon": 6.374688521019454,
-      "walkable": false
+      "lon": 6.374688521019454
     },
     {
       "osm_type": "way",
@@ -4951,8 +4536,7 @@
         "leisure": "sports_centre"
       },
       "lat": 49.5119667,
-      "lon": 6.116469579885267,
-      "walkable": false
+      "lon": 6.116469579885267
     },
     {
       "osm_type": "way",
@@ -4963,8 +4547,7 @@
         "building": "yes"
       },
       "lat": 49.5287953,
-      "lon": 6.354045828032357,
-      "walkable": false
+      "lon": 6.354045828032357
     },
     {
       "osm_type": "way",
@@ -4974,8 +4557,7 @@
         "building": "retail"
       },
       "lat": 49.54706935,
-      "lon": 6.364174391476033,
-      "walkable": true
+      "lon": 6.364174391476033
     },
     {
       "osm_type": "way",
@@ -4985,8 +4567,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5479599,
-      "lon": 6.358030010786747,
-      "walkable": true
+      "lon": 6.358030010786747
     },
     {
       "osm_type": "way",
@@ -4997,8 +4578,7 @@
         "building": "yes"
       },
       "lat": 49.540538100000006,
-      "lon": 6.3660645999999925,
-      "walkable": true
+      "lon": 6.3660645999999925
     },
     {
       "osm_type": "way",
@@ -5009,8 +4589,7 @@
         "building": "yes"
       },
       "lat": 49.54325085,
-      "lon": 6.35605228383256,
-      "walkable": false
+      "lon": 6.35605228383256
     },
     {
       "osm_type": "way",
@@ -5020,8 +4599,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.54725405,
-      "lon": 6.358473685705742,
-      "walkable": true
+      "lon": 6.358473685705742
     },
     {
       "osm_type": "way",
@@ -5031,8 +4609,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49930555,
-      "lon": 6.1770636097188305,
-      "walkable": false
+      "lon": 6.1770636097188305
     },
     {
       "osm_type": "way",
@@ -5042,8 +4619,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49916685,
-      "lon": 6.176729497073577,
-      "walkable": false
+      "lon": 6.176729497073577
     },
     {
       "osm_type": "way",
@@ -5053,8 +4629,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49992745,
-      "lon": 6.171247536581241,
-      "walkable": false
+      "lon": 6.171247536581241
     },
     {
       "osm_type": "way",
@@ -5064,8 +4639,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.500934400000006,
-      "lon": 6.173181277589111,
-      "walkable": false
+      "lon": 6.173181277589111
     },
     {
       "osm_type": "way",
@@ -5075,8 +4649,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50499135,
-      "lon": 6.265867172305654,
-      "walkable": true
+      "lon": 6.265867172305654
     },
     {
       "osm_type": "way",
@@ -5086,8 +4659,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50986795,
-      "lon": 6.277677297738196,
-      "walkable": false
+      "lon": 6.277677297738196
     },
     {
       "osm_type": "way",
@@ -5097,8 +4669,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.507360500000004,
-      "lon": 6.288920899999997,
-      "walkable": false
+      "lon": 6.288920899999997
     },
     {
       "osm_type": "way",
@@ -5108,8 +4679,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50743625,
-      "lon": 6.283619732958476,
-      "walkable": true
+      "lon": 6.283619732958476
     },
     {
       "osm_type": "way",
@@ -5119,8 +4689,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5111231,
-      "lon": 6.2843958,
-      "walkable": false
+      "lon": 6.2843958
     },
     {
       "osm_type": "way",
@@ -5130,8 +4699,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.508994099999995,
-      "lon": 6.276794620589699,
-      "walkable": false
+      "lon": 6.276794620589699
     },
     {
       "osm_type": "way",
@@ -5141,8 +4709,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.509305499999996,
-      "lon": 6.27728873642519,
-      "walkable": false
+      "lon": 6.27728873642519
     },
     {
       "osm_type": "way",
@@ -5152,8 +4719,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51020665,
-      "lon": 6.279678454481132,
-      "walkable": true
+      "lon": 6.279678454481132
     },
     {
       "osm_type": "way",
@@ -5163,8 +4729,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50986895,
-      "lon": 6.2791962189351835,
-      "walkable": false
+      "lon": 6.2791962189351835
     },
     {
       "osm_type": "way",
@@ -5174,8 +4739,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51071115,
-      "lon": 6.2814309999999995,
-      "walkable": false
+      "lon": 6.2814309999999995
     },
     {
       "osm_type": "way",
@@ -5185,8 +4749,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.509882000000005,
-      "lon": 6.28098965,
-      "walkable": true
+      "lon": 6.28098965
     },
     {
       "osm_type": "way",
@@ -5196,8 +4759,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5091491,
-      "lon": 6.2814259743052725,
-      "walkable": true
+      "lon": 6.2814259743052725
     },
     {
       "osm_type": "way",
@@ -5207,8 +4769,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50683155,
-      "lon": 6.284795002363184,
-      "walkable": true
+      "lon": 6.284795002363184
     },
     {
       "osm_type": "way",
@@ -5218,8 +4779,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5069422,
-      "lon": 6.28511944999999,
-      "walkable": true
+      "lon": 6.28511944999999
     },
     {
       "osm_type": "way",
@@ -5229,8 +4789,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5045608,
-      "lon": 6.2800473,
-      "walkable": true
+      "lon": 6.2800473
     },
     {
       "osm_type": "way",
@@ -5241,8 +4800,7 @@
         "tourism": "hotel"
       },
       "lat": 49.5349364,
-      "lon": 6.386776852025857,
-      "walkable": false
+      "lon": 6.386776852025857
     },
     {
       "osm_type": "way",
@@ -5252,8 +4810,7 @@
         "leisure": "park"
       },
       "lat": 49.54641005,
-      "lon": 6.361637782236841,
-      "walkable": true
+      "lon": 6.361637782236841
     },
     {
       "osm_type": "way",
@@ -5263,8 +4820,7 @@
         "amenity": "marketplace"
       },
       "lat": 49.51913915,
-      "lon": 6.0984131958403776,
-      "walkable": false
+      "lon": 6.0984131958403776
     },
     {
       "osm_type": "way",
@@ -5274,8 +4830,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5399321,
-      "lon": 6.330210199999998,
-      "walkable": false
+      "lon": 6.330210199999998
     },
     {
       "osm_type": "way",
@@ -5285,8 +4840,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.54003695,
-      "lon": 6.329917369897962,
-      "walkable": false
+      "lon": 6.329917369897962
     },
     {
       "osm_type": "way",
@@ -5296,8 +4850,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.544433850000004,
-      "lon": 6.325176318361804,
-      "walkable": true
+      "lon": 6.325176318361804
     },
     {
       "osm_type": "way",
@@ -5307,8 +4860,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.54781335,
-      "lon": 6.323651700000008,
-      "walkable": true
+      "lon": 6.323651700000008
     },
     {
       "osm_type": "way",
@@ -5318,8 +4870,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5561521,
-      "lon": 6.3344602000000005,
-      "walkable": false
+      "lon": 6.3344602000000005
     },
     {
       "osm_type": "way",
@@ -5329,8 +4880,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.556243499999994,
-      "lon": 6.335292622902795,
-      "walkable": false
+      "lon": 6.335292622902795
     },
     {
       "osm_type": "way",
@@ -5340,8 +4890,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5554864,
-      "lon": 6.3143596430985,
-      "walkable": false
+      "lon": 6.3143596430985
     },
     {
       "osm_type": "way",
@@ -5351,8 +4900,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51835,
-      "lon": 6.301368348557775,
-      "walkable": true
+      "lon": 6.301368348557775
     },
     {
       "osm_type": "way",
@@ -5362,8 +4910,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5233206,
-      "lon": 6.342372403901516,
-      "walkable": false
+      "lon": 6.342372403901516
     },
     {
       "osm_type": "way",
@@ -5373,8 +4920,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.522441799999996,
-      "lon": 6.3422413785074605,
-      "walkable": false
+      "lon": 6.3422413785074605
     },
     {
       "osm_type": "way",
@@ -5384,8 +4930,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5228929,
-      "lon": 6.34224862469296,
-      "walkable": false
+      "lon": 6.34224862469296
     },
     {
       "osm_type": "way",
@@ -5395,8 +4940,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.525416,
-      "lon": 6.35553685,
-      "walkable": false
+      "lon": 6.35553685
     },
     {
       "osm_type": "way",
@@ -5406,8 +4950,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.53415575,
-      "lon": 6.355865349999997,
-      "walkable": false
+      "lon": 6.355865349999997
     },
     {
       "osm_type": "way",
@@ -5417,8 +4960,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5172984,
-      "lon": 6.189056670276873,
-      "walkable": true
+      "lon": 6.189056670276873
     },
     {
       "osm_type": "way",
@@ -5428,8 +4970,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5169535,
-      "lon": 6.19385175,
-      "walkable": true
+      "lon": 6.19385175
     },
     {
       "osm_type": "way",
@@ -5439,8 +4980,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.517147,
-      "lon": 6.1935497999999995,
-      "walkable": false
+      "lon": 6.1935497999999995
     },
     {
       "osm_type": "way",
@@ -5450,8 +4990,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.508251900000005,
-      "lon": 6.147119919026775,
-      "walkable": true
+      "lon": 6.147119919026775
     },
     {
       "osm_type": "way",
@@ -5461,8 +5000,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.510421449999996,
-      "lon": 6.147576150000003,
-      "walkable": true
+      "lon": 6.147576150000003
     },
     {
       "osm_type": "way",
@@ -5472,8 +5010,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.510054600000004,
-      "lon": 6.147875519556449,
-      "walkable": true
+      "lon": 6.147875519556449
     },
     {
       "osm_type": "way",
@@ -5483,8 +5020,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.509630349999995,
-      "lon": 6.148155650000002,
-      "walkable": true
+      "lon": 6.148155650000002
     },
     {
       "osm_type": "way",
@@ -5494,8 +5030,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5093706,
-      "lon": 6.148402990983607,
-      "walkable": true
+      "lon": 6.148402990983607
     },
     {
       "osm_type": "way",
@@ -5505,8 +5040,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5095156,
-      "lon": 6.1482422,
-      "walkable": true
+      "lon": 6.1482422
     },
     {
       "osm_type": "way",
@@ -5516,8 +5050,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5062073,
-      "lon": 6.143457700000001,
-      "walkable": true
+      "lon": 6.143457700000001
     },
     {
       "osm_type": "way",
@@ -5527,8 +5060,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50512845,
-      "lon": 6.13824005,
-      "walkable": true
+      "lon": 6.13824005
     },
     {
       "osm_type": "way",
@@ -5538,8 +5070,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51769685,
-      "lon": 6.19397645,
-      "walkable": false
+      "lon": 6.19397645
     },
     {
       "osm_type": "way",
@@ -5549,8 +5080,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.517511549999995,
-      "lon": 6.19455417818936,
-      "walkable": false
+      "lon": 6.19455417818936
     },
     {
       "osm_type": "way",
@@ -5560,8 +5090,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51787985,
-      "lon": 6.188415,
-      "walkable": true
+      "lon": 6.188415
     },
     {
       "osm_type": "way",
@@ -5571,8 +5100,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51331035,
-      "lon": 6.188606162009058,
-      "walkable": false
+      "lon": 6.188606162009058
     },
     {
       "osm_type": "way",
@@ -5582,8 +5110,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.513404300000005,
-      "lon": 6.186609249999997,
-      "walkable": false
+      "lon": 6.186609249999997
     },
     {
       "osm_type": "way",
@@ -5593,8 +5120,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51301625,
-      "lon": 6.18423795,
-      "walkable": false
+      "lon": 6.18423795
     },
     {
       "osm_type": "way",
@@ -5604,8 +5130,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.513785150000004,
-      "lon": 6.183617849999999,
-      "walkable": false
+      "lon": 6.183617849999999
     },
     {
       "osm_type": "way",
@@ -5615,8 +5140,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5222112,
-      "lon": 6.2229035653543,
-      "walkable": true
+      "lon": 6.2229035653543
     },
     {
       "osm_type": "way",
@@ -5626,8 +5150,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52303845,
-      "lon": 6.2295501,
-      "walkable": false
+      "lon": 6.2295501
     },
     {
       "osm_type": "way",
@@ -5637,8 +5160,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51676875,
-      "lon": 6.234043098930806,
-      "walkable": true
+      "lon": 6.234043098930806
     },
     {
       "osm_type": "way",
@@ -5648,8 +5170,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5201357,
-      "lon": 6.223074650000002,
-      "walkable": true
+      "lon": 6.223074650000002
     },
     {
       "osm_type": "way",
@@ -5659,8 +5180,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.520082200000004,
-      "lon": 6.22337225503597,
-      "walkable": true
+      "lon": 6.22337225503597
     },
     {
       "osm_type": "way",
@@ -5670,8 +5190,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5239797,
-      "lon": 6.230835200000003,
-      "walkable": false
+      "lon": 6.230835200000003
     },
     {
       "osm_type": "way",
@@ -5681,8 +5200,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5216158,
-      "lon": 6.21917438399303,
-      "walkable": false
+      "lon": 6.21917438399303
     },
     {
       "osm_type": "way",
@@ -5692,8 +5210,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52145505,
-      "lon": 6.22022248399583,
-      "walkable": false
+      "lon": 6.22022248399583
     },
     {
       "osm_type": "way",
@@ -5703,8 +5220,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.523101049999994,
-      "lon": 6.230942403779456,
-      "walkable": false
+      "lon": 6.230942403779456
     },
     {
       "osm_type": "way",
@@ -5714,8 +5230,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52318775,
-      "lon": 6.23083403354602,
-      "walkable": false
+      "lon": 6.23083403354602
     },
     {
       "osm_type": "way",
@@ -5725,8 +5240,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52336015,
-      "lon": 6.230640378634586,
-      "walkable": false
+      "lon": 6.230640378634586
     },
     {
       "osm_type": "way",
@@ -5736,8 +5250,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.522478199999995,
-      "lon": 6.229434883921019,
-      "walkable": false
+      "lon": 6.229434883921019
     },
     {
       "osm_type": "way",
@@ -5747,8 +5260,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.520136050000005,
-      "lon": 6.185939993793561,
-      "walkable": false
+      "lon": 6.185939993793561
     },
     {
       "osm_type": "way",
@@ -5758,8 +5270,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52092505,
-      "lon": 6.187562141474357,
-      "walkable": false
+      "lon": 6.187562141474357
     },
     {
       "osm_type": "way",
@@ -5769,8 +5280,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52153815,
-      "lon": 6.18800015,
-      "walkable": false
+      "lon": 6.18800015
     },
     {
       "osm_type": "way",
@@ -5780,8 +5290,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.516228999999996,
-      "lon": 6.115051510135142,
-      "walkable": false
+      "lon": 6.115051510135142
     },
     {
       "osm_type": "way",
@@ -5791,8 +5300,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51444525,
-      "lon": 6.11386025,
-      "walkable": true
+      "lon": 6.11386025
     },
     {
       "osm_type": "way",
@@ -5802,8 +5310,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51852375,
-      "lon": 6.106030040425853,
-      "walkable": false
+      "lon": 6.106030040425853
     },
     {
       "osm_type": "way",
@@ -5813,8 +5320,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51876455,
-      "lon": 6.1060587,
-      "walkable": false
+      "lon": 6.1060587
     },
     {
       "osm_type": "way",
@@ -5824,8 +5330,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5127292,
-      "lon": 6.1132984,
-      "walkable": true
+      "lon": 6.1132984
     },
     {
       "osm_type": "way",
@@ -5835,8 +5340,7 @@
         "leisure": "park"
       },
       "lat": 49.51686145,
-      "lon": 6.113506660764521,
-      "walkable": false
+      "lon": 6.113506660764521
     },
     {
       "osm_type": "way",
@@ -5846,8 +5350,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51411615,
-      "lon": 6.1068371500000005,
-      "walkable": true
+      "lon": 6.1068371500000005
     },
     {
       "osm_type": "way",
@@ -5857,8 +5360,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5132498,
-      "lon": 6.110775502702221,
-      "walkable": true
+      "lon": 6.110775502702221
     },
     {
       "osm_type": "way",
@@ -5868,8 +5370,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.514185749999996,
-      "lon": 6.108677033300578,
-      "walkable": true
+      "lon": 6.108677033300578
     },
     {
       "osm_type": "way",
@@ -5879,8 +5380,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50492175,
-      "lon": 6.0615308,
-      "walkable": false
+      "lon": 6.0615308
     },
     {
       "osm_type": "way",
@@ -5890,8 +5390,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.4912137,
-      "lon": 6.100427599999996,
-      "walkable": false
+      "lon": 6.100427599999996
     },
     {
       "osm_type": "way",
@@ -5901,8 +5400,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49289975,
-      "lon": 6.0968205,
-      "walkable": false
+      "lon": 6.0968205
     },
     {
       "osm_type": "way",
@@ -5912,8 +5410,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49685315,
-      "lon": 6.083539406176815,
-      "walkable": false
+      "lon": 6.083539406176815
     },
     {
       "osm_type": "way",
@@ -5923,8 +5420,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49685755,
-      "lon": 6.08261665,
-      "walkable": false
+      "lon": 6.08261665
     },
     {
       "osm_type": "way",
@@ -5934,8 +5430,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49686655,
-      "lon": 6.082307524239865,
-      "walkable": false
+      "lon": 6.082307524239865
     },
     {
       "osm_type": "way",
@@ -5945,8 +5440,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49686725,
-      "lon": 6.082830529792805,
-      "walkable": false
+      "lon": 6.082830529792805
     },
     {
       "osm_type": "way",
@@ -5956,8 +5450,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.49629885,
-      "lon": 6.082476049421746,
-      "walkable": false
+      "lon": 6.082476049421746
     },
     {
       "osm_type": "way",
@@ -5967,8 +5460,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.496491,
-      "lon": 6.084609272838181,
-      "walkable": false
+      "lon": 6.084609272838181
     },
     {
       "osm_type": "way",
@@ -5978,8 +5470,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52333255,
-      "lon": 6.21797175,
-      "walkable": false
+      "lon": 6.21797175
     },
     {
       "osm_type": "way",
@@ -5989,8 +5480,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52243315,
-      "lon": 6.220068799999999,
-      "walkable": false
+      "lon": 6.220068799999999
     },
     {
       "osm_type": "way",
@@ -6000,8 +5490,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.520508199999995,
-      "lon": 6.221057939967583,
-      "walkable": false
+      "lon": 6.221057939967583
     },
     {
       "osm_type": "way",
@@ -6011,8 +5500,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.506229950000005,
-      "lon": 6.062984849999994,
-      "walkable": false
+      "lon": 6.062984849999994
     },
     {
       "osm_type": "way",
@@ -6022,8 +5510,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.542697000000004,
-      "lon": 6.357452150000005,
-      "walkable": false
+      "lon": 6.357452150000005
     },
     {
       "osm_type": "way",
@@ -6033,8 +5520,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5039347,
-      "lon": 6.1992739499999985,
-      "walkable": false
+      "lon": 6.1992739499999985
     },
     {
       "osm_type": "way",
@@ -6044,8 +5530,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.504103549999996,
-      "lon": 6.199654803045329,
-      "walkable": false
+      "lon": 6.199654803045329
     },
     {
       "osm_type": "way",
@@ -6055,8 +5540,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5046189,
-      "lon": 6.198937950000004,
-      "walkable": false
+      "lon": 6.198937950000004
     },
     {
       "osm_type": "way",
@@ -6066,8 +5550,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5237987,
-      "lon": 6.186810599999999,
-      "walkable": false
+      "lon": 6.186810599999999
     },
     {
       "osm_type": "way",
@@ -6077,8 +5560,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51601425,
-      "lon": 6.192833735136988,
-      "walkable": false
+      "lon": 6.192833735136988
     },
     {
       "osm_type": "way",
@@ -6089,8 +5571,7 @@
         "shop": "convenience"
       },
       "lat": 49.515204100000005,
-      "lon": 6.101419030615019,
-      "walkable": true
+      "lon": 6.101419030615019
     },
     {
       "osm_type": "way",
@@ -6100,8 +5581,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50650365,
-      "lon": 6.2888693009353736,
-      "walkable": false
+      "lon": 6.2888693009353736
     },
     {
       "osm_type": "way",
@@ -6111,8 +5591,7 @@
         "amenity": "school"
       },
       "lat": 49.5121512,
-      "lon": 6.104565564641332,
-      "walkable": false
+      "lon": 6.104565564641332
     },
     {
       "osm_type": "way",
@@ -6122,8 +5601,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5090744,
-      "lon": 6.149844857190246,
-      "walkable": true
+      "lon": 6.149844857190246
     },
     {
       "osm_type": "way",
@@ -6133,8 +5611,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50929855,
-      "lon": 6.148276750000001,
-      "walkable": true
+      "lon": 6.148276750000001
     },
     {
       "osm_type": "way",
@@ -6144,8 +5621,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.520146100000005,
-      "lon": 6.108960522797926,
-      "walkable": false
+      "lon": 6.108960522797926
     },
     {
       "osm_type": "way",
@@ -6155,8 +5631,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5554077,
-      "lon": 6.324334649999998,
-      "walkable": false
+      "lon": 6.324334649999998
     },
     {
       "osm_type": "way",
@@ -6166,8 +5641,7 @@
         "office": "hedge"
       },
       "lat": 49.53785675,
-      "lon": 6.338495954392048,
-      "walkable": false
+      "lon": 6.338495954392048
     },
     {
       "osm_type": "way",
@@ -6177,8 +5651,7 @@
         "leisure": "park"
       },
       "lat": 49.54261285,
-      "lon": 6.364338857857883,
-      "walkable": true
+      "lon": 6.364338857857883
     },
     {
       "osm_type": "way",
@@ -6188,8 +5661,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5116745,
-      "lon": 6.155529150000001,
-      "walkable": true
+      "lon": 6.155529150000001
     },
     {
       "osm_type": "way",
@@ -6199,8 +5671,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.51183615,
-      "lon": 6.15104637732258,
-      "walkable": false
+      "lon": 6.15104637732258
     },
     {
       "osm_type": "way",
@@ -6210,8 +5681,7 @@
         "amenity": "school"
       },
       "lat": 49.502838499999996,
-      "lon": 6.2708977842416935,
-      "walkable": true
+      "lon": 6.2708977842416935
     },
     {
       "osm_type": "way",
@@ -6221,8 +5691,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5093763,
-      "lon": 6.2743325500000005,
-      "walkable": false
+      "lon": 6.2743325500000005
     },
     {
       "osm_type": "way",
@@ -6232,8 +5701,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.52314895,
-      "lon": 6.189356269472789,
-      "walkable": false
+      "lon": 6.189356269472789
     },
     {
       "osm_type": "way",
@@ -6243,8 +5711,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5237712,
-      "lon": 6.18659435,
-      "walkable": false
+      "lon": 6.18659435
     },
     {
       "osm_type": "way",
@@ -6254,8 +5721,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.50213705,
-      "lon": 6.195442441917293,
-      "walkable": false
+      "lon": 6.195442441917293
     },
     {
       "osm_type": "way",
@@ -6265,8 +5731,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5031363,
-      "lon": 6.196800469612103,
-      "walkable": false
+      "lon": 6.196800469612103
     },
     {
       "osm_type": "way",
@@ -6276,8 +5741,7 @@
         "leisure": "swimming_pool"
       },
       "lat": 49.5034618,
-      "lon": 6.192612995425562,
-      "walkable": false
+      "lon": 6.192612995425562
     },
     {
       "osm_type": "way",
@@ -6288,8 +5752,7 @@
         "building": "yes"
       },
       "lat": 49.5043935,
-      "lon": 6.092440180876069,
-      "walkable": false
+      "lon": 6.092440180876069
     }
   ]
 }
