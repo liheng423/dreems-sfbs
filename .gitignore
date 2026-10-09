@@ -8,4 +8,5 @@ data/*
 !data/busline/
 data/busline/*
 !data/busline/stops_550.json
+!data/busline/energy_550.json
 src/.deprecrated_demand_gen
