@@ -1,0 +1,44 @@
+# Route 550 REQreate area-demand settings. Paths are relative to the repository root.
+# Distribution parameters: uniform loc is the minimum and scale is the range width;
+# normal loc is the mean and scale is the standard deviation.
+seed = 42
+requests = 20000
+output_dir = "data/reqreate/area_550"
+pool_file = "550_raw_requests.json"
+metadata_file = "550_raw_requests_metadata.json"
+
+[method_pois]
+locations = ["origin", "destination"]
+rows = 50
+columns = 50
+
+[method_pois.pdf]
+type = "uniform"
+loc = 500
+scale = 14500
+
+[[parameters]]
+name = "min_early_departure"
+type = "integer"
+value = 17100
+time_unit = "s"
+
+[[parameters]]
+name = "max_early_departure"
+type = "integer"
+value = 86510
+time_unit = "s"
+
+# Keys name request fields; order follows their REQreate dependencies.
+[attributes]
+is_prebooked = { type = "integer", output_csv = true, pdf = [{ type = "uniform", loc = 0, scale = 1 }] }
+lt_dynamic = { type = "integer", time_unit = "s", output_csv = false, pdf = [{ type = "uniform", loc = 300, scale = 1500 }] }
+lt_prebooked = { type = "integer", time_unit = "s", output_csv = false, pdf = [{ type = "uniform", loc = 86400, scale = 172800 }] }
+lead_time = { type = "integer", time_unit = "s", expression = "lt_prebooked if is_prebooked >= 0.5 else lt_dynamic" }
+earliest_departure = { type = "integer", time_unit = "s", constraints = ["earliest_departure >= min_early_departure", "earliest_departure <= max_early_departure"], pdf = [{ type = "normal", loc = 51805, scale = 11568 }] }
+time_stamp = { type = "integer", time_unit = "s", expression = "earliest_departure - lead_time" }
+origin = { type = "location" }
+destination = { type = "location" }
+direct_distance = { type = "integer", length_unit = "m", expression = "dist_drive(origin,destination)", constraints = ["direct_distance >= min_distance"], output_csv = true }
+direct_travel_time = { type = "integer", time_unit = "s", expression = "dtt(origin,destination)", constraints = ["direct_travel_time > 0"] }
+latest_arrival = { type = "integer", time_unit = "s", expression = "earliest_departure + direct_travel_time + 600" }

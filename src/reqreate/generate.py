@@ -1,7 +1,8 @@
 """Generate raw REQreate demand within a saved service area.
 
 REQreate samples request locations inside the GeoJSON and routes them on its
-adjacent OSM graphs. No corridor feasibility filter or scenario selection runs.
+adjacent OSM graphs. Walking and scheduled Route 550 feasibility filters run
+before the raw request pool is saved.
 """
 
 import json
@@ -15,30 +16,38 @@ import pandas as pd
 from scipy.stats import uniform
 from REQreate.passenger_requests import _generate_single_data_impl
 
-from area_network import build_area_net
-from filters.filters import REQUEST_FILTERS, passes_filters
-from pois import load_pois, set_poi_zones
-from pool_output import write_pool
+from maps.area_network import build_area_net
+from filters.filters import REQUEST_FILTERS, passes_filters, select_scheduled_bus_stops
+from filters.route_schedule import index_route_departures
+from maps.pois import load_pois, set_poi_zones
+from adapters.pool_output import write_pool
 
 
 ROOT = Path(__file__).resolve().parents[2]
 CFG_PATH = ROOT / "src/reqreate/config_550.toml"
+MAPS_CFG_PATH = ROOT / "src/reqreate/maps/config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
 
 
 def load_config():
-    """Load generation, filter, and Route 550 stop settings."""
+    """Merge generation, map, and filter settings with Route 550 stops."""
     cfg = tomllib.loads(CFG_PATH.read_text())
+    cfg.update(tomllib.loads(MAPS_CFG_PATH.read_text()))
     filter_cfg = tomllib.loads(FILTERS_PATH.read_text())
     cfg["max_walking_distance_m"] = filter_cfg["max_walking_distance_m"]
+    cfg["walking_speed_mps"] = filter_cfg["walking_speed_mps"]
+    cfg["schedule_path"] = filter_cfg["schedule_path"]
     cfg["parameters"].extend(filter_cfg["parameters"])
     cfg["places"] = json.loads((ROOT / cfg["stops_path"]).read_text())
     return cfg
 
 
 def generate(cfg, area_path, poi_path):
-    """Generate candidates, then apply the registered request filters."""
+    """Generate filtered requests with their feasible Route 550 stop pairs."""
     net = build_area_net(area_path, cfg["places"], cfg["max_walking_distance_m"])
+    net.route_departures = index_route_departures(
+        json.loads((ROOT / cfg["schedule_path"]).read_text())
+    )
     pois = load_pois(cfg, net, area_path, poi_path)
     set_poi_zones(net, pois, cfg["method_pois"]["rows"], cfg["method_pois"]["columns"])
     params = {param["name"]: dict(param) for param in cfg["parameters"]}
@@ -67,10 +76,13 @@ def generate(cfg, area_path, poi_path):
         req_id: req for req_id, req in reqs.items()
         if passes_filters(req, REQUEST_FILTERS, net, cfg)
     }
+    for req in reqs.values():
+        req.update(select_scheduled_bus_stops(req, net, cfg))
     return {"num_data:": len(reqs), "requests": reqs}
 
 
 def main():
+    """Generate and save the configured request pool and metadata."""
     cfg = load_config()
     area_path = ROOT / cfg["service_area_path"]
     out_dir = ROOT / cfg["output_dir"]

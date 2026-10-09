@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     cfg = tomllib.loads((ROOT / "src/reqreate/config_550.toml").read_text())
+    cfg.update(tomllib.loads((ROOT / "src/reqreate/maps/config.toml").read_text()))
     out_dir = ROOT / cfg["output_dir"]
     pool_path = out_dir / cfg["pool_file"]
     pool = json.loads(pool_path.read_text())
@@ -28,6 +29,7 @@ def main():
     walk = ox.load_graphml(area_path.with_name("walk.graphml"))
     filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text())
     stops = json.loads((ROOT / cfg["stops_path"]).read_text())
+    stop_ids = {stop["name"].removeprefix("Stop_") for stop in stops}
     walk_routes = walk.to_undirected()
     source = "Route 550 stops"
     for stop in stops:
@@ -51,6 +53,10 @@ def main():
         assert "method_pois" in meta["spatial_sampling"]
     for idx, req in reqs.items():
         assert req["reqid"] == int(idx)
+        assert req["boarding_stop_id"] in stop_ids
+        assert req["alighting_stop_id"] in stop_ids
+        assert 0 <= req["boarding_walk_distance_m"] < filter_cfg["max_walking_distance_m"]
+        assert 0 <= req["alighting_walk_distance_m"] < filter_cfg["max_walking_distance_m"]
         for name in ("origin", "destination"):
             lat, lon = req[name]
             assert polygon.contains(Point(lon, lat))

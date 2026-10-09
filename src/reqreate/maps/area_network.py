@@ -21,7 +21,7 @@ class AreaNetwork(Network):
     walking_distance: WalkingDistance
 
     def _get_random_coord(self, polygon, seed_coord):
-        """Draw a point inside the POI-selected polygon."""
+        """Sample a seeded random point inside the given polygon."""
         min_lon, min_lat, max_lon, max_lat = polygon.bounds
         rng = np.random.default_rng(seed_coord)
         while True:
@@ -30,7 +30,7 @@ class AreaNetwork(Network):
                 return point
 
     def _get_random_coord_radius(self, lat, lon, radius, polygon, seed_coord):
-        """Apply REQreate's radial placement within the stop-accessible area."""
+        """Sample at a radius in metres inside the polygon, or return (-1, -1)."""
         rng = np.random.default_rng(seed_coord)
         radius_km = float(np.asarray(radius).item()) / 1000
         for _ in range(1000):
@@ -51,22 +51,19 @@ class AreaNetwork(Network):
 
     @lru_cache(maxsize=1)
     def _return_estimated_distance_drive(self, org, dst):
-        """Reuse the latest OD distance for its travel-time attribute.
-
-        REQreate rejects unreachable pairs through its minimum-distance constraint.
-        """
+        """Return directed driving metres, or -1 if no route exists."""
         try:
             return nx.shortest_path_length(self.G_drive, org, dst, weight="length")
         except nx.NetworkXNoPath:
             return -1
 
     def _return_estimated_travel_time_drive(self, org, dst):
-        """Match REQreate's 20 km/h (5.56 m/s) distance-based estimate."""
+        """Estimate driving seconds from distance at REQreate's 5.56 m/s rate."""
         return int(self._return_estimated_distance_drive(org, dst) / 5.56)
 
 
 def build_area_net(area_path, stops, max_walking_distance_m):
-    """Load the area and precompute shortest walking distances to its stops."""
+    """Load the service area and graphs, then attach stop walking distances."""
     polygon = shape(json.loads(area_path.read_text())["geometry"])
     net = AreaNetwork(
         "Route 550 service area",

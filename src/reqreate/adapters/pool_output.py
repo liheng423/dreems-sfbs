@@ -8,19 +8,21 @@ import subprocess
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 CFG_PATH = ROOT / "src/reqreate/config_550.toml"
+MAPS_CFG_PATH = ROOT / "src/reqreate/maps/config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
 
 
 def sha256(path):
-    """Fingerprint an input or generated output file."""
+    """Return the SHA-256 hex digest of a file's contents."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def write_pool(cfg, area_path, poi_path, out_dir, pool):
-    """Save requests and record the exact sources used to generate them."""
-    in_paths = (CFG_PATH, FILTERS_PATH, ROOT / cfg["stops_path"], area_path,
+    """Write the request pool and provenance metadata; return the pool path."""
+    in_paths = (CFG_PATH, MAPS_CFG_PATH, FILTERS_PATH, ROOT / cfg["stops_path"],
+                ROOT / cfg["schedule_path"], area_path,
                 area_path.with_name("drive.graphml"),
                 area_path.with_name("walk.graphml"), poi_path)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -33,7 +35,7 @@ def write_pool(cfg, area_path, poi_path, out_dir, pool):
         "generator": "REQreate._generate_single_data_impl",
         "instance_generator_commit": version,
         "local_patch": "src/reqreate/instance_generator.patch",
-        "local_patch_sha256": sha256(Path(__file__).with_name("instance_generator.patch")),
+        "local_patch_sha256": sha256(ROOT / "src/reqreate/instance_generator.patch"),
         "python_version": platform.python_version(),
         "package_versions": {
             name: metadata.version(name)
@@ -44,7 +46,7 @@ def write_pool(cfg, area_path, poi_path, out_dir, pool):
         "request_count": pool["num_data:"],
         "network_input": "GeoJSON service area and saved OSM drive/walk graphs",
         "travel_time_method": "REQreate 20 km/h distance fallback",
-        "spatial_sampling": "REQreate method_pois: POI-density zones and radial trip distances, followed by a walking-distance filter on both endpoints",
+        "spatial_sampling": "REQreate method_pois: POI-density zones and radial trip distances, followed by walking-access, walking-dominance, and scheduled Route 550 feasibility filters",
         "poi_count": len(json.loads(poi_path.read_text())["features"]),
         "distance_method": "Directed OSM shortest path weighted by length in metres",
         "inputs_sha256": {
