@@ -6,28 +6,31 @@ Run with .venv/bin/python test/test_reqreate_area.py.
 import hashlib
 import json
 from pathlib import Path
+import sys
 import tomllib
 
 import networkx as nx
 import osmnx as ox
 from shapely.geometry import Point, shape
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from src.output_adapters import busline_dir, busline_path, graph_dir, graph_path, request_path
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    cfg = tomllib.loads((ROOT / "src/reqreate/request_gen.toml").read_text())
-    out_dir = ROOT / cfg["output_dir"]
-    pool_path = out_dir / cfg["pool_file"]
+    instance_dir = sorted((ROOT / "data/requests").glob("550_550_[0-9]*"))[-1]
+    pool_path = request_path("pool", instance_dir)
     pool = json.loads(pool_path.read_text())
-    meta = json.loads((out_dir / cfg["metadata_file"]).read_text())
+    meta = json.loads(request_path("metadata", instance_dir).read_text())
     paths = [ROOT / path for path in meta["inputs_sha256"]]
     area_path = next(path for path in paths if path.suffix == ".geojson")
     polygon = shape(json.loads(area_path.read_text())["geometry"])
     graph = ox.load_graphml(area_path.with_name("drive.graphml"))
     walk = ox.load_graphml(area_path.with_name("walk.graphml"))
     filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text())
-    stops = json.loads((ROOT / cfg["stops_path"]).read_text())
+    stops = json.loads(busline_path("stops", busline_dir(meta["busline"])).read_text())
     stop_ids = {stop["name"].removeprefix("Stop_") for stop in stops}
     walk_routes = walk.to_undirected()
     source = "Route 550 stops"
@@ -46,7 +49,7 @@ def main():
     assert len(reqs) == pool["num_data:"] == meta["request_count"]
     assert meta["request_count"] <= meta["candidate_count"]
     if "poi_count" in meta:
-        poi_path = out_dir / cfg["poi_cache_file"]
+        poi_path = graph_path("pois", graph_dir(meta["graph"]))
         pois = json.loads(poi_path.read_text())["features"]
         assert len(pois) == meta["poi_count"]
         assert "method_pois" in meta["spatial_sampling"]

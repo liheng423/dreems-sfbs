@@ -1,12 +1,11 @@
 .ref
 .venv/
 .DS_Store
-instance-generator/
-.instance-generator/
 __pycache__/
 data/*
-!data/busline/
-data/busline/*
-!data/busline/stops_550.json
-!data/busline/energy_550.json
+!data/buslines/
+!data/graphs/
+!data/requests/
+data/requests/*
+!data/requests/*
 src/.deprecrated_demand_gen

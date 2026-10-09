@@ -1,12 +1,12 @@
 # Busline energy reference and configuration
 
-Source: Sammy Jablonski, Benedikt Tepe, Yuqing Zhao, and Andreas Jossen, “Analysis and Characterization of the Energy Consumption in an Electric Bus Fleet,” NEIS 2023, pp. 255–261. Local copy: [paper](../../.ref/papers/Analysis_and_Characterization_of_the_Energy_Consumption_in_an_Electric_Bus_Fleet.pdf). The values below are from **Table 1, printed p. 256**, unless another page or section is named. `energy.toml` transcribes the Table 1 values; `energy.py` uses them to estimate energy for each consecutive Route 550 stop pair.
+Source: Sammy Jablonski, Benedikt Tepe, Yuqing Zhao, and Andreas Jossen, “Analysis and Characterization of the Energy Consumption in an Electric Bus Fleet,” NEIS 2023, pp. 255–261. Local copy: [paper](../../.ref/papers/Analysis_and_Characterization_of_the_Energy_Consumption_in_an_Electric_Bus_Fleet.pdf). The values below are from **Table 1, printed p. 256**, unless another page or section is named. `energy.toml` transcribes the Table 1 values; `energy.py` uses them to estimate energy for each consecutive stop pair on the selected route.
 
 ## What the paper measured
 
 | Item | Reported value or condition | Source and use |
 | --- | --- | --- |
-| Fleet | 101 Hamburg buses: 85 Evobus and 16 Solaris; 86 non-articulated (NA, 12 m) and 15 articulated (AR, 18 m) | Table 1 caption, p. 256. This is **not** the identified Route 550 fleet. |
+| Fleet | 101 Hamburg buses: 85 Evobus and 16 Solaris; 86 non-articulated (NA, 12 m) and 15 articulated (AR, 18 m) | Table 1 caption, p. 256. This is **not** an identified fleet for the selected route. |
 | Heating | 82 NA and 15 AR buses use hybrid heating (HHS); 4 NA buses use electric-only heating (EHS) | Section 2, p. 256. Evobus fossil-heating threshold: 8 °C; Solaris: 5 °C. |
 | Empty mass | NA: 13.8–14.6 t; AR: 20.3–20.7 t | Section 2, p. 256. A range, not a per-model mass or a calibrated energy coefficient. |
 | Data and trip filter | Mileage, state of charge, and ambient temperature sampled every 10 s. 40,279 accepted trips, each >2 and <24 h with 20–300 km mileage change | Section 2, pp. 256–257. Trip energy was derived from state-of-energy and mileage changes. |
@@ -43,13 +43,13 @@ Table 1 calls the capacity column “Passenger Capacity”; it does not distingu
 | Road speed or type | The paper discusses these as possible influences but provides no speed-to-energy or road-class coefficient for the fleet. | GraphML road lengths determine segment distance. Speed and road class do **not** change kWh/km. |
 | Mechanical parameters | No per-model rolling resistance, drag area, drivetrain efficiency, regeneration efficiency, or auxiliary power is reported. | The previous unreferenced mechanical constants were removed. |
 
-## Route 550 calculation
+## Route calculation
 
-The explicit scenario in [energy.toml](energy.toml) selects `evobus_396_nmc_na_hybrid` at `reference_20_22_c`. This is an **illustrative profile**, not a claim that Route 550 uses that bus or that its ambient temperature was 20–22 °C. Change both keys to match a known vehicle and measured condition before treating the result as a Route 550 estimate. The selected profile's `reference_kwh_per_km` is multiplied by `1 + relative_increase_pct / 100` for the selected temperature case; each segment's energy is then `road_distance_m / 1000 × selected_kwh_per_km`.
+The explicit scenario in [energy.toml](energy.toml) selects `evobus_396_nmc_na_hybrid` at `reference_20_22_c`. This is an **illustrative profile**, not a claim that the selected route uses that bus or that its ambient temperature was 20–22 °C. Change both keys to match a known vehicle and measured condition before treating the result as a route estimate. The selected profile's `reference_kwh_per_km` is multiplied by `1 + relative_increase_pct / 100` for the selected temperature case; each segment's energy is then `road_distance_m / 1000 × selected_kwh_per_km`.
 
 The distance is a directed shortest path by GraphML edge length between the nearest road nodes, not a recorded bus path. If two stops snap to the same simplified node, the helper marks and uses their straight-line separation as a lower bound. Table 1 rates came from 20–300 km trips, so allocating one trip-average rate to every short segment is an approximation; the paper does not resolve stop-by-stop acceleration or route-specific passenger loads.
 
-After changing `energy.toml`, regenerate `data/busline/energy_550.json` from the repository root with `python3 src/busline/energy.py`.
+After changing `energy.toml`, regenerate `data/buslines/<route>/energy.json` from the repository root with `python3 src/busline/energy.py --route <route>`. The command reads that route's `businfo.json` and `data/graphs/<route>/drive.graphml`; both files must already exist. Segment stop IDs are the GTFS stop IDs from `businfo.json`.
 
 ```python
 import json
@@ -60,8 +60,8 @@ from energy import estimate_busline_energy
 
 with open("src/busline/energy.toml", "rb") as file:
     config = tomllib.load(file)
-with open("data/corridor_550.json") as file:
-    network = json.load(file)["network"]
-graph = ox.load_graphml("data/reqreate/service_area_550/drive.graphml")
-segments = estimate_busline_energy(graph, network, config)
+with open("data/buslines/550/businfo.json") as file:
+    businfo = json.load(file)
+graph = ox.load_graphml("data/graphs/550/drive.graphml")
+segments = estimate_busline_energy(graph, businfo, config)
 ```

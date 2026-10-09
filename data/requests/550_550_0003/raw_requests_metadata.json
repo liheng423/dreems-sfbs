@@ -1,0 +1,34 @@
+{
+  "busline": "550",
+  "graph": "550",
+  "generator": "REQreate._generate_single_data_impl",
+  "python_version": "3.12.15",
+  "package_versions": {
+    "reqreate": "0.1.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "osmnx": "2.1.1",
+    "networkx": "3.7"
+  },
+  "seed": 42,
+  "candidate_count": 1000,
+  "request_count": 92,
+  "network_input": "GeoJSON service area and saved OSM drive/walk graphs",
+  "travel_time_method": "REQreate 20 km/h distance fallback",
+  "spatial_sampling": "REQreate method_pois: POI-density zones and radial trip distances, followed by walking-access, walking-dominance, and scheduled-bus feasibility filters",
+  "poi_count": 540,
+  "distance_method": "Directed OSM shortest path weighted by length in metres",
+  "inputs_sha256": {
+    "src/reqreate/request_gen.toml": "bcea192a9c7ac841058fe717a04b65012b42f78b380663f4762df59750d7d353",
+    "src/reqreate/maps/map_config.toml": "59433f7477f869807ed0879ff479436ccda78f315718f1cd0cebf4f0445d89c7",
+    "src/reqreate/filters/filters.toml": "4aa3b82e83e80014dbd03250b584c3cd84aa3adf874de3f2e2b3ab008842074b",
+    "data/buslines/550/stops.json": "474837f19ded72e0a0a1fae53af0b5d861ae39632311f29fb3d071a64ea856cc",
+    "data/buslines/550/businfo.json": "365fd30af66105e6b3a3d4a3a0fcc1b7587f5c8584e00dc7838f6457d3a46b30",
+    "data/graphs/550/service_area.geojson": "fc4376386b4c46a4d1b8de4ebe0844a2a228bd31f2007935c6c04226b0444b59",
+    "data/graphs/550/drive.graphml": "e932e9040bb52d594285da104a1a7db7fc69e1b345a7748069066d83d49e7272",
+    "data/graphs/550/walk.graphml": "fab70ba246c56754c949950b4009906192f9af595ff56e61573daa20d2f5149d",
+    "data/requests/550_550_0003/pois.json": "667e50c0db7c09818929a496af0bd8adecc6332c78a13d19619434983c1506db"
+  },
+  "pool_sha256": "e89634984d566691362e4cfad3ee5ac34c211332dcfcebfd97a0f9fd5f508b2e"
+}

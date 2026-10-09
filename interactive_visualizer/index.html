@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <script src="route_550.js" defer></script>
   <script src="reqreate.js" defer></script>
 </head>
 <body>
@@ -16,7 +15,7 @@
       <header class="masthead">
         <span class="eyebrow">Luxembourg · REQreate</span>
         <h1>Requests,<br><em>on the map.</em></h1>
-        <p>Explore area_550 requests and points of interest by booking type, departure time, and origin–destination pair.</p>
+        <p>Choose folders from the repository's data directory to explore requests, routes, and service areas.</p>
       </header>
 
       <section class="selected-energy" aria-labelledby="selected-energy-heading">
@@ -28,26 +27,30 @@
 
       <section aria-labelledby="file-heading">
         <div class="section-heading"><h2 id="file-heading">REQreate output</h2><span>01</span></div>
-        <label class="file-button" for="inst-file">Choose requests JSON <span aria-hidden="true">↗</span></label>
-        <input id="inst-file" type="file" accept=".json,application/json">
-        <p id="file-name" class="file-name">Loading area_550 requests…</p>
+        <label class="field-label" for="request-folder">data/requests/</label>
+        <select id="request-folder"><option value="">Choose a request folder</option></select>
+        <p id="file-name" class="file-name"></p>
         <p id="file-error" class="error" role="alert" hidden></p>
-        <label class="file-button secondary-file" for="poi-file">Choose POIs JSON <span aria-hidden="true">↗</span></label>
-        <input id="poi-file" type="file" accept=".json,application/json">
-        <p id="poi-file-name" class="file-name">Loading area_550 POIs…</p>
+        <p id="poi-file-name" class="file-name"></p>
         <p id="poi-file-error" class="error" role="alert" hidden></p>
+      </section>
+
+      <section aria-labelledby="graph-heading">
+        <div class="section-heading"><h2 id="graph-heading">Service area</h2><span>02</span></div>
+        <label class="field-label" for="graph-folder">data/graphs/</label>
+        <select id="graph-folder"><option value="">Choose a graph folder</option></select>
+        <p id="graph-name" class="file-name"></p>
+        <p id="graph-error" class="error" role="alert" hidden></p>
       </section>
 
       <section aria-labelledby="busline-heading">
         <div class="section-heading"><h2 id="busline-heading">Busline stops</h2><span id="busline-count">—</span></div>
-        <label class="file-button secondary-file" for="busline-file">Add stop / route JSONs <span aria-hidden="true">↗</span></label>
-        <input id="busline-file" type="file" accept=".json,application/json" multiple>
-        <p class="hint">For Route 550, choose stops_550.json and energy_550.json; the route order is included in this viewer. Mandatory stops have a larger marker. Selecting a request shows estimated straight-line walks to a forward-route boarding and alighting stop pair.</p>
+        <label class="field-label" for="busline-folder">data/buslines/</label>
+        <select id="busline-folder"><option value="">Choose a busline folder</option></select>
+        <p class="hint">Mandatory stops have a larger marker. Selecting a request shows estimated straight-line walks to a forward-route boarding and alighting stop pair.</p>
         <p id="busline-error" class="error" role="alert" hidden></p>
         <div id="busline-list" class="busline-list"></div>
-        <label class="file-button secondary-file" for="energy-file">Choose bus energy JSON <span aria-hidden="true">↗</span></label>
-        <input id="energy-file" type="file" accept=".json,application/json">
-        <p id="energy-name" class="file-name">Loading data/busline/energy_550.json…</p>
+        <p id="energy-name" class="file-name"></p>
         <p id="energy-status" class="hint"></p>
         <p id="energy-error" class="error" role="alert" hidden></p>
       </section>
@@ -60,7 +63,7 @@
       </section>
 
       <section aria-labelledby="view-heading">
-        <div class="section-heading"><h2 id="view-heading">Filters</h2><span>02</span></div>
+        <div class="section-heading"><h2 id="view-heading">Filters</h2><span>03</span></div>
         <div class="filter-title">Booking type</div>
         <div class="check-row">
           <label><input id="prebooked-check" type="checkbox" checked> <span class="key prebooked"></span> Pre-booked</label>
@@ -74,31 +77,32 @@
       </section>
 
       <section aria-labelledby="demand-heading">
-        <div class="section-heading"><h2 id="demand-heading">Visible demand</h2><span>03</span></div>
+        <div class="section-heading"><h2 id="demand-heading">Visible demand</h2><span>04</span></div>
         <div class="metrics">
           <div><strong id="req-count">—</strong><span>requests</span></div>
           <div><strong id="stop-count">—</strong><span>locations</span></div>
           <div><strong id="pair-count">—</strong><span>OD pairs</span></div>
         </div>
-        <p class="hint">Circle size shows visible request endpoints. Select a location or request for details.</p>
+        <p class="hint">Circle size shows visible request endpoints. Click a point to see its route and energy; shared points list each request.</p>
       </section>
 
       <section class="requests-section" aria-labelledby="requests-heading">
         <div class="section-heading"><h2 id="requests-heading">Requests</h2><span id="list-count">—</span></div>
         <label class="field-label" for="req-id">Jump to request ID</label>
         <input id="req-id" type="number" min="0" placeholder="e.g. 1234" disabled>
-        <div id="req-list" class="req-list"><p class="empty-list">Open a REQreate requests JSON to begin.</p></div>
+        <div id="req-list" class="req-list"><p class="empty-list">Choose a request folder to begin.</p></div>
       </section>
       <footer>Raw REQreate output · locations and direct travel estimates</footer>
     </aside>
 
     <div class="map-shell">
-      <div id="map" aria-label="Interactive map of area_550 requests and points of interest"></div>
-      <div class="map-title"><span id="map-kicker">LUXEMBOURG / REQUEST VIEW</span><strong id="map-title">Choose a requests JSON</strong></div>
-      <div class="map-legend"><span><i class="circle-key"></i> Request endpoints</span><span><i class="line-key"></i> OD flows</span><span><i class="poi-key"></i> POIs (colors by type)</span><span><i class="busline-key"></i> Busline route and stops</span><span><i class="walk-key"></i> Estimated walk</span></div>
+      <div id="map" aria-label="Interactive map of requests, points of interest, routes, and service areas"></div>
+      <div class="map-title"><span id="map-kicker">LUXEMBOURG / REQUEST VIEW</span><strong id="map-title">Choose a request folder</strong></div>
+      <div class="map-legend"><span><i class="circle-key"></i> Request endpoints</span><span><i class="line-key"></i> OD flows</span><span><i class="poi-key"></i> POIs (colors by type)</span><span><i class="graph-key"></i> Service area</span><span><i class="busline-key"></i> Busline route and stops</span><span><i class="walk-key"></i> Estimated walk</span></div>
       <button id="fit-button" class="fit-button" type="button" disabled>Fit demand ↗</button>
     </div>
   </main>
   <script src="busline.js" defer></script>
+  <script src="sources.js" defer></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-"""Filter generated requests by walking access to Route 550 stops."""
+"""Filter generated requests by walking access to bus stops."""
 
 import networkx as nx
 import numpy as np
@@ -15,7 +15,7 @@ class WalkingDistance:
         self.max_distance_m = max_distance_m
         self.stop_distances = {}
         routes = self.graph.copy()
-        source = "Route 550 stops"
+        source = "Bus stops"
         for stop in stops:
             node = ox.nearest_nodes(graph, stop["lon"], stop["lat"])
             walk_node = graph.nodes[node]

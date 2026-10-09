@@ -6,36 +6,32 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 import sys
 
-import pandas as pd
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src/reqreate"))
 from src.reqreate import generate
-import pois as poi_module
+from src.output_adapters import graph_dir, graph_path, write_json
 from utils.walking_distance import WalkingDistance
 
 
 def main():
-    cfg = generate.load_config()
+    cfg = generate.load_config("550")
     cfg["requests"] = 5
-    area_path = generate.ROOT / cfg["service_area_path"]
+    area_path = graph_path("area", graph_dir("550"))
     with TemporaryDirectory() as directory:
-        poi_path = Path(directory) / cfg["poi_cache_file"]
+        poi_path = graph_path("pois", Path(directory))
         net = generate.build_area_net(area_path, cfg["places"], cfg["max_walking_distance_m"])
-        features = pd.DataFrame({
-            "geometry": [net._get_random_coord(net.polygon, seed) for seed in (1, 2, 3)],
-            "name": ["School", "Cafe", "Museum"],
-            "amenity": ["school", "cafe", None],
-            "tourism": [None, None, "museum"],
-        }, index=pd.MultiIndex.from_tuples([("node", 1), ("node", 2), ("way", 3)]))
-        with patch.object(poi_module, "configure_overpass"), patch.object(
-            poi_module.ox, "features_from_polygon", return_value=features
-        ) as fetch, patch.object(
+        write_json(poi_path, {"features": [
+            {"lat": point.y, "lon": point.x, "name": name, "tags": tags}
+            for seed, name, tags in ((1, "School", {"amenity": "school"}),
+                                     (2, "Cafe", {"amenity": "cafe"}),
+                                     (3, "Museum", {"tourism": "museum"}))
+            for point in [net._get_random_coord(net.polygon, seed)]
+        ]})
+        with patch.object(
             generate, "_generate_single_data_impl", wraps=generate._generate_single_data_impl
         ) as sample:
-            pois = generate.load_pois(cfg, net, area_path, poi_path)
+            pois = generate.load_pois(poi_path)
             pool = generate.generate(cfg, area_path, poi_path)
-        assert fetch.call_count == 1
         assert len(pois) == 3
         generate.set_poi_zones(net, pois, cfg["method_pois"]["rows"],
                                cfg["method_pois"]["columns"])
@@ -50,7 +46,7 @@ def main():
             rejected = generate.generate(cfg, area_path, poi_path)
         assert rejected == {"num_data:": 0, "requests": {}}
         assert walkable.call_count == cfg["requests"]
-    print("Validated POI retrieval, caching, and REQreate zone-density sampling")
+    print("Validated saved-map POIs and REQreate zone-density sampling")
 
 
 if __name__ == "__main__":

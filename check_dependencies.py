@@ -16,8 +16,8 @@ def missing_dependencies(requirements_path=REQUIREMENTS_PATH):
         requirement = line.split("#", 1)[0].strip()
         if not requirement:
             continue
-        # The local checkout installs a distribution named reqreate with a REQreate package.
-        package = "REQreate" if requirement == "./.instance-generator" else re.split(r"[<>=!~;\[]", requirement, 1)[0]
+        distribution = re.split(r"[<>=!~;\[]", requirement, 1)[0]
+        package = "REQreate" if distribution == "reqreate" else distribution
         if package == "scikit-learn":
             package = "sklearn"
         try:

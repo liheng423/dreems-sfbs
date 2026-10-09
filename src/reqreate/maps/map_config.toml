@@ -1,7 +1,4 @@
-# Route 550 map and POI sampling settings. Paths are relative to the repository root.
-service_area_path = "data/reqreate/service_area_550/service_area.geojson"
-stops_path = "data/busline/stops_550.json"
-poi_cache_file = "550_pois.json"
+# Map and POI sampling settings. File locations live in output_adapters.py.
 
 [poi_tags]
 amenity = ["arts_centre", "bar", "cafe", "cinema", "clinic", "college", "community_centre", "dentist", "doctors", "fast_food", "hospital", "kindergarten", "library", "marketplace", "nursing_home", "pub", "restaurant", "school", "social_facility", "theatre", "townhall", "university"]

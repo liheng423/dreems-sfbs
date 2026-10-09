@@ -32,8 +32,8 @@ const document = {
 };
 const context = vm.createContext({ document, L, map, location: { protocol: 'file:' } });
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'busline.js'), 'utf8'), context);
-const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'busline', 'stops_550.json'), 'utf8'));
-const crawled = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'crawled_550.json'), 'utf8'));
+const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'stops.json'), 'utf8'));
+const crawled = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'businfo.json'), 'utf8'));
 context.stops = stops;
 context.crawled = crawled;
 vm.runInContext('load_busline_patterns(crawled, "crawled_550.json")', context);

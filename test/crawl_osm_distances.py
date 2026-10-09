@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 
 build_mat = runpy.run_path(str(
-    Path(__file__).resolve().parents[1] / "src/crawler/python/crawl_osm_distances.py"
+    Path(__file__).resolve().parents[1] / "src/crawler/busline/crawl_osm_distances.py"
 ))["build_mat"]
 stops = [
     {"stop_id": "002", "stop_lon": 6.2, "stop_lat": 49.2},

@@ -11,6 +11,7 @@ import datetime as dt
 import hashlib
 import json
 from pathlib import Path
+import sys
 import urllib.parse
 import urllib.request
 
@@ -18,7 +19,7 @@ import urllib.request
 def build_mat(crawl, server, profile):
     """Fetch one all-pairs table, retaining source IDs, nulls and snap locations.
 
-    Accept the same single-route or multi-route snapshots as the Julia generator.
+    Accept one GTFS snapshot or a list of route snapshots.
     Shared physical stops are queried once. Rows are origins, columns destinations;
     reverse journeys remain independent and unreachable pairs remain null.
     """
@@ -70,20 +71,23 @@ def build_mat(crawl, server, profile):
 def main():
     """Write a separate distance matrix beside the normalized GTFS snapshot."""
     root = Path(__file__).resolve().parents[3]
+    sys.path.insert(0, str(root))
+    from src.output_adapters import busline_dir, busline_path, write_json
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--gtfs-json", type=Path, default=root / "data/crawled_550.json")
-    parser.add_argument("--output", type=Path, help="Defaults to distance_matrix_<line or network>.json")
+    parser.add_argument("--route", required=True)
+    parser.add_argument("--gtfs-json", type=Path)
+    parser.add_argument("--output", type=Path, help="Defaults to data/buslines/<route>/distance_matrix.json")
     parser.add_argument("--osrm-url", default="https://router.project-osrm.org")
     parser.add_argument("--profile", default="driving", help="URL profile; must match the server's prepared data")
     args = parser.parse_args()
-    in_bytes = args.gtfs_json.read_bytes()
+    route_dir = busline_dir(args.route)
+    gtfs_path = args.gtfs_json or busline_path("businfo", route_dir)
+    in_bytes = gtfs_path.read_bytes()
     crawl = json.loads(in_bytes)
     mat = build_mat(crawl, args.osrm_url, args.profile)
     mat["metadata"]["input_sha256"] = hashlib.sha256(in_bytes).hexdigest()
-    lbl = "network" if isinstance(crawl, list) else crawl["route"]["route_short_name"]
-    out_path = args.output or args.gtfs_json.parent / f"distance_matrix_{lbl}.json"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(mat, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    out_path = args.output or busline_path("distance_matrix", route_dir)
+    write_json(out_path, mat)
     print(f"Wrote {len(mat['stop_ids'])} × {len(mat['stop_ids'])} road distances to {out_path}")
 
 

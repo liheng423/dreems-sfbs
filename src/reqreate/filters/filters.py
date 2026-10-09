@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Protocol
 from shapely.geometry import Point
 
 if TYPE_CHECKING:
-    import pandas as pd
     from maps.area_network import AreaNetwork
 
 
@@ -26,11 +25,6 @@ def passes_filters[Candidate](candidate: Candidate, filters: Iterable[CandidateF
                               net: AreaNetwork, cfg: dict) -> bool:
     """Return True if every filter accepts the candidate, in order."""
     return all(predicate(candidate, net, cfg) for predicate in filters)
-
-
-def poi_within_area(feature: pd.Series, net: AreaNetwork, cfg: dict) -> bool:
-    """Accept a POI whose representative point lies inside the service area."""
-    return net.polygon.contains(feature.geometry.representative_point())
 
 
 def request_within_area(req: dict, net: AreaNetwork, cfg: dict) -> bool:
@@ -52,7 +46,7 @@ def request_has_positive_travel_time(req: dict, net: AreaNetwork, cfg: dict) -> 
 
 
 def request_within_walking_distance(req: dict, net: AreaNetwork, cfg: dict) -> bool:
-    """Accept a request when both endpoints can walk to a Route 550 stop."""
+    """Accept a request when both endpoints can walk to a bus stop."""
     return all(net.walking_distance.within_limit(Point(req[name][1], req[name][0]))
                for name in ("origin", "destination"))
 
@@ -104,12 +98,14 @@ def request_has_feasible_scheduled_bus(req: dict, net: AreaNetwork, cfg: dict) -
     return select_scheduled_bus_stops(req, net, cfg) is not None
 
 
-POI_FILTERS = (poi_within_area,)
-REQUEST_FILTERS = (
+BASE_REQUEST_FILTERS = (
     request_within_area,
     request_has_min_driving_distance,
     request_has_positive_travel_time,
+)
+BUS_REQUEST_FILTERS = (
     request_within_walking_distance,
     request_not_walk_dominated,
     request_has_feasible_scheduled_bus,
 )
+REQUEST_FILTERS = BASE_REQUEST_FILTERS + BUS_REQUEST_FILTERS

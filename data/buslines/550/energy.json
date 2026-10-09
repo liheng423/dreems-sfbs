@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "sources": {
-    "network": "data/corridor_550.json",
-    "road_graph": "data/reqreate/service_area_550/drive.graphml",
+    "businfo": "data/buslines/550/businfo.json",
+    "road_graph": "data/graphs/550/drive.graphml",
     "energy_config": "src/busline/energy.toml",
     "paper": ".ref/papers/Analysis_and_Characterization_of_the_Energy_Consumption_in_an_Electric_Bus_Fleet.pdf",
     "paper_location": "Table 1, printed page 256"
@@ -30,10 +30,10 @@
   "method": "Directed shortest road path distance times measured profile kWh/km at selected paper temperature case. Same-node stop pairs use marked straight-line lower bounds.",
   "segments": [
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 1,
-      "destination": 2,
+      "origin": "000220102005",
+      "destination": "000220102004",
       "origin_name": "Bettembourg, Gare routière",
       "destination_name": "Bettembourg, Café du Stadion",
       "distance_m": 716.7357311774692,
@@ -41,10 +41,10 @@
       "energy_kwh": 0.6235600861243983
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 2,
-      "destination": 3,
+      "origin": "000220102004",
+      "destination": "000220102008",
       "origin_name": "Bettembourg, Café du Stadion",
       "destination_name": "Bettembourg, Parc Merveilleux",
       "distance_m": 784.545951346967,
@@ -52,10 +52,10 @@
       "energy_kwh": 0.6825549776718612
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 3,
-      "destination": 4,
+      "origin": "000220102008",
+      "destination": "000220102007",
       "origin_name": "Bettembourg, Parc Merveilleux",
       "destination_name": "Bettembourg, Mosselter",
       "distance_m": 630.2274390607392,
@@ -63,10 +63,10 @@
       "energy_kwh": 0.5482978719828431
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 4,
-      "destination": 5,
+      "origin": "000220102007",
+      "destination": "000220503001",
       "origin_name": "Bettembourg, Mosselter",
       "destination_name": "Hellange, Beeteburgerstrooss",
       "distance_m": 1437.449039151935,
@@ -74,10 +74,10 @@
       "energy_kwh": 1.2505806640621835
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 5,
-      "destination": 6,
+      "origin": "000220503001",
+      "destination": "000220503003",
       "origin_name": "Hellange, Beeteburgerstrooss",
       "destination_name": "Hellange, Kierch",
       "distance_m": 232.77933092803806,
@@ -85,10 +85,10 @@
       "energy_kwh": 0.20251801790739313
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 6,
-      "destination": 7,
+      "origin": "000220503003",
+      "destination": "000220503002",
       "origin_name": "Hellange, Kierch",
       "destination_name": "Hellange, Hoëner Halt",
       "distance_m": 767.9735146386668,
@@ -96,10 +96,10 @@
       "energy_kwh": 0.6681369577356401
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 7,
-      "destination": 8,
+      "origin": "000220503002",
+      "destination": "000220502004",
       "origin_name": "Hellange, Hoëner Halt",
       "destination_name": "Frisange, Op der Kräizong",
       "distance_m": 2324.31373289508,
@@ -107,10 +107,10 @@
       "energy_kwh": 2.0221529476187197
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 8,
-      "destination": 9,
+      "origin": "000220502004",
+      "destination": "000220502002",
       "origin_name": "Frisange, Op der Kräizong",
       "destination_name": "Frisange, Ennescht Duerf",
       "distance_m": 396.59471689258424,
@@ -118,10 +118,10 @@
       "energy_kwh": 0.3450374036965483
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 9,
-      "destination": 10,
+      "origin": "000220502002",
+      "destination": "000220501002",
       "origin_name": "Frisange, Ennescht Duerf",
       "destination_name": "Aspelt, Op der Gare",
       "distance_m": 2414.324423589962,
@@ -129,10 +129,10 @@
       "energy_kwh": 2.1004622485232667
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 10,
-      "destination": 11,
+      "origin": "000220501002",
+      "destination": "000220501001",
       "origin_name": "Aspelt, Op der Gare",
       "destination_name": "Aspelt, Am Grëndchen",
       "distance_m": 728.4856043611111,
@@ -140,10 +140,10 @@
       "energy_kwh": 0.6337824757941667
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 11,
-      "destination": 12,
+      "origin": "000220501001",
+      "destination": "000210501002",
       "origin_name": "Aspelt, Am Grëndchen",
       "destination_name": "Altwies, Beckeschmillen",
       "distance_m": 3761.454913569891,
@@ -151,10 +151,10 @@
       "energy_kwh": 3.2724657748058052
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 12,
-      "destination": 13,
+      "origin": "000210501002",
+      "destination": "000210501001",
       "origin_name": "Altwies, Beckeschmillen",
       "destination_name": "Altwies, An der Kaatz",
       "distance_m": 599.5409985725316,
@@ -162,10 +162,10 @@
       "energy_kwh": 0.5216006687581025
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 13,
-      "destination": 14,
+      "origin": "000210501001",
+      "destination": "000210501004",
       "origin_name": "Altwies, An der Kaatz",
       "destination_name": "Altwies, Millbaach",
       "distance_m": 495.1242583578952,
@@ -173,10 +173,10 @@
       "energy_kwh": 0.43075810477136883
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 14,
-      "destination": 15,
+      "origin": "000210501004",
+      "destination": "000210503005",
       "origin_name": "Altwies, Millbaach",
       "destination_name": "Mondorf-les-Bains, Kleng Gare",
       "distance_m": 660.6643217991904,
@@ -184,10 +184,10 @@
       "energy_kwh": 0.5747779599652956
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 15,
-      "destination": 16,
+      "origin": "000210503005",
+      "destination": "000210503001",
       "origin_name": "Mondorf-les-Bains, Kleng Gare",
       "destination_name": "Mondorf-les-Bains, Bei der Douane",
       "distance_m": 345.3582439187232,
@@ -195,10 +195,10 @@
       "energy_kwh": 0.30046167220928915
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 16,
-      "destination": 17,
+      "origin": "000210503001",
+      "destination": "000210503003",
       "origin_name": "Mondorf-les-Bains, Bei der Douane",
       "destination_name": "Mondorf-les-Bains, Christophorus",
       "distance_m": 308.5046894760146,
@@ -206,10 +206,10 @@
       "energy_kwh": 0.2683990798441327
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 17,
-      "destination": 18,
+      "origin": "000210503003",
+      "destination": "000210503002",
       "origin_name": "Mondorf-les-Bains, Christophorus",
       "destination_name": "Mondorf-les-Bains, Casino 2000",
       "distance_m": 525.6349984128011,
@@ -217,10 +217,10 @@
       "energy_kwh": 0.457302448619137
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 18,
-      "destination": 19,
+      "origin": "000210503002",
+      "destination": "000210503006",
       "origin_name": "Mondorf-les-Bains, Casino 2000",
       "destination_name": "Mondorf-les-Bains, Réimecherstrooss",
       "distance_m": 361.9965188131319,
@@ -228,10 +228,10 @@
       "energy_kwh": 0.3149369713674247
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 19,
-      "destination": 20,
+      "origin": "000210503006",
+      "destination": "000210503007",
       "origin_name": "Mondorf-les-Bains, Réimecherstrooss",
       "destination_name": "Mondorf-les-Bains, Stade John Grün",
       "distance_m": 599.7939322194668,
@@ -239,10 +239,10 @@
       "energy_kwh": 0.521820721030936
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 20,
-      "destination": 21,
+      "origin": "000210503007",
+      "destination": "000210502001",
       "origin_name": "Mondorf-les-Bains, Stade John Grün",
       "destination_name": "Ellange, Ellenger Gare",
       "distance_m": 2514.0189772051103,
@@ -250,10 +250,10 @@
       "energy_kwh": 2.187196510168446
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 21,
-      "destination": 22,
+      "origin": "000210502001",
+      "destination": "000210502002",
       "origin_name": "Ellange, Ellenger Gare",
       "destination_name": "Ellange, Martialis",
       "distance_m": 886.71211672519,
@@ -261,10 +261,10 @@
       "energy_kwh": 0.7714395415509152
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 22,
-      "destination": 23,
+      "origin": "000210502002",
+      "destination": "000210105001",
       "origin_name": "Ellange, Martialis",
       "destination_name": "Erpeldange (Bous), Emeringerhaff",
       "distance_m": 3462.291293388723,
@@ -272,10 +272,10 @@
       "energy_kwh": 3.0121934252481886
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 23,
-      "destination": 24,
+      "origin": "000210105001",
+      "destination": "000210103003",
       "origin_name": "Erpeldange (Bous), Emeringerhaff",
       "destination_name": "Erpeldange (Bous), Scheierbierg",
       "distance_m": 361.39437993865124,
@@ -283,10 +283,10 @@
       "energy_kwh": 0.3144131105466266
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 24,
-      "destination": 25,
+      "origin": "000210103003",
+      "destination": "000210103001",
       "origin_name": "Erpeldange (Bous), Scheierbierg",
       "destination_name": "Erpeldange (Bous), Kräizgaass",
       "distance_m": 452.635302148159,
@@ -294,10 +294,10 @@
       "energy_kwh": 0.39379271286889833
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 25,
-      "destination": 26,
+      "origin": "000210103001",
+      "destination": "000210701017",
       "origin_name": "Erpeldange (Bous), Kräizgaass",
       "destination_name": "Remich, Op der Kopp",
       "distance_m": 2697.654217737665,
@@ -305,10 +305,10 @@
       "energy_kwh": 2.3469591694317686
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 26,
-      "destination": 27,
+      "origin": "000210701017",
+      "destination": "000210701024",
       "origin_name": "Remich, Op der Kopp",
       "destination_name": "Remich, Schoul",
       "distance_m": 652.1179756513345,
@@ -316,10 +316,10 @@
       "energy_kwh": 0.567342638816661
     },
     {
-      "route_id": "2483_0",
+      "route_id": "2483",
       "pattern_id": "0-00",
-      "origin": 27,
-      "destination": 28,
+      "origin": "000210701024",
+      "destination": "000210701006",
       "origin_name": "Remich, Schoul",
       "destination_name": "Remich, Gare routière",
       "distance_m": 566.0993511479599,
@@ -327,10 +327,10 @@
       "energy_kwh": 0.4925064354987251
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 29,
-      "destination": 30,
+      "origin": "000210701006",
+      "destination": "000210701024",
       "origin_name": "Remich, Gare routière",
       "destination_name": "Remich, Schoul",
       "distance_m": 566.0993511479599,
@@ -338,10 +338,10 @@
       "energy_kwh": 0.4925064354987251
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 30,
-      "destination": 31,
+      "origin": "000210701024",
+      "destination": "000210701017",
       "origin_name": "Remich, Schoul",
       "destination_name": "Remich, Op der Kopp",
       "distance_m": 652.1179756513345,
@@ -349,10 +349,10 @@
       "energy_kwh": 0.567342638816661
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 31,
-      "destination": 32,
+      "origin": "000210701017",
+      "destination": "000210103001",
       "origin_name": "Remich, Op der Kopp",
       "destination_name": "Erpeldange (Bous), Kräizgaass",
       "distance_m": 2697.654217737665,
@@ -360,10 +360,10 @@
       "energy_kwh": 2.3469591694317686
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 32,
-      "destination": 33,
+      "origin": "000210103001",
+      "destination": "000210103003",
       "origin_name": "Erpeldange (Bous), Kräizgaass",
       "destination_name": "Erpeldange (Bous), Scheierbierg",
       "distance_m": 452.6353021481589,
@@ -371,10 +371,10 @@
       "energy_kwh": 0.3937927128688983
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 33,
-      "destination": 34,
+      "origin": "000210103003",
+      "destination": "000210105001",
       "origin_name": "Erpeldange (Bous), Scheierbierg",
       "destination_name": "Erpeldange (Bous), Emeringerhaff",
       "distance_m": 361.39437993865124,
@@ -382,10 +382,10 @@
       "energy_kwh": 0.3144131105466266
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 34,
-      "destination": 35,
+      "origin": "000210105001",
+      "destination": "000210502002",
       "origin_name": "Erpeldange (Bous), Emeringerhaff",
       "destination_name": "Ellange, Martialis",
       "distance_m": 3462.2912933887224,
@@ -393,10 +393,10 @@
       "energy_kwh": 3.012193425248188
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 35,
-      "destination": 36,
+      "origin": "000210502002",
+      "destination": "000210502001",
       "origin_name": "Ellange, Martialis",
       "destination_name": "Ellange, Ellenger Gare",
       "distance_m": 789.4449821099382,
@@ -404,10 +404,10 @@
       "energy_kwh": 0.6868171344356462
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 36,
-      "destination": 37,
+      "origin": "000210502001",
+      "destination": "000210503006",
       "origin_name": "Ellange, Ellenger Gare",
       "destination_name": "Mondorf-les-Bains, Réimecherstrooss",
       "distance_m": 1828.9584234113036,
@@ -415,10 +415,10 @@
       "energy_kwh": 1.5911938283678342
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 37,
-      "destination": 38,
+      "origin": "000210503006",
+      "destination": "000210503002",
       "origin_name": "Mondorf-les-Bains, Réimecherstrooss",
       "destination_name": "Mondorf-les-Bains, Casino 2000",
       "distance_m": 356.6570299013402,
@@ -426,10 +426,10 @@
       "energy_kwh": 0.31029161601416594
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 38,
-      "destination": 39,
+      "origin": "000210503002",
+      "destination": "000210503003",
       "origin_name": "Mondorf-les-Bains, Casino 2000",
       "destination_name": "Mondorf-les-Bains, Christophorus",
       "distance_m": 525.6349984128011,
@@ -437,10 +437,10 @@
       "energy_kwh": 0.457302448619137
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 39,
-      "destination": 40,
+      "origin": "000210503003",
+      "destination": "000210503001",
       "origin_name": "Mondorf-les-Bains, Christophorus",
       "destination_name": "Mondorf-les-Bains, Bei der Douane",
       "distance_m": 308.5046894760146,
@@ -448,10 +448,10 @@
       "energy_kwh": 0.2683990798441327
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 40,
-      "destination": 41,
+      "origin": "000210503001",
+      "destination": "000210503005",
       "origin_name": "Mondorf-les-Bains, Bei der Douane",
       "destination_name": "Mondorf-les-Bains, Kleng Gare",
       "distance_m": 345.35824391872313,
@@ -459,10 +459,10 @@
       "energy_kwh": 0.3004616722092891
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 41,
-      "destination": 42,
+      "origin": "000210503005",
+      "destination": "000210501004",
       "origin_name": "Mondorf-les-Bains, Kleng Gare",
       "destination_name": "Altwies, Millbaach",
       "distance_m": 660.6643217991905,
@@ -470,10 +470,10 @@
       "energy_kwh": 0.5747779599652957
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 42,
-      "destination": 43,
+      "origin": "000210501004",
+      "destination": "000210501003",
       "origin_name": "Altwies, Millbaach",
       "destination_name": "Altwies, Bourgässel",
       "distance_m": 625.4522290576544,
@@ -481,10 +481,10 @@
       "energy_kwh": 0.5441434392801593
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 43,
-      "destination": 44,
+      "origin": "000210501003",
+      "destination": "000210501002",
       "origin_name": "Altwies, Bourgässel",
       "destination_name": "Altwies, Beckeschmillen",
       "distance_m": 666.0309388410922,
@@ -492,10 +492,10 @@
       "energy_kwh": 0.5794469167917502
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 44,
-      "destination": 45,
+      "origin": "000210501002",
+      "destination": "000220501001",
       "origin_name": "Altwies, Beckeschmillen",
       "destination_name": "Aspelt, Am Grëndchen",
       "distance_m": 3758.9225958192424,
@@ -503,10 +503,10 @@
       "energy_kwh": 3.270262658362741
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 45,
-      "destination": 46,
+      "origin": "000220501001",
+      "destination": "000220501002",
       "origin_name": "Aspelt, Am Grëndchen",
       "destination_name": "Aspelt, Op der Gare",
       "distance_m": 759.8308275111426,
@@ -514,10 +514,10 @@
       "energy_kwh": 0.6610528199346941
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 46,
-      "destination": 47,
+      "origin": "000220501002",
+      "destination": "000220502002",
       "origin_name": "Aspelt, Op der Gare",
       "destination_name": "Frisange, Ennescht Duerf",
       "distance_m": 2431.337656459006,
@@ -525,10 +525,10 @@
       "energy_kwh": 2.1152637611193357
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 47,
-      "destination": 48,
+      "origin": "000220502002",
+      "destination": "000220502004",
       "origin_name": "Frisange, Ennescht Duerf",
       "destination_name": "Frisange, Op der Kräizong",
       "distance_m": 396.59471689258424,
@@ -536,10 +536,10 @@
       "energy_kwh": 0.3450374036965483
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 48,
-      "destination": 49,
+      "origin": "000220502004",
+      "destination": "000220503002",
       "origin_name": "Frisange, Op der Kräizong",
       "destination_name": "Hellange, Hoëner Halt",
       "distance_m": 2326.755631736448,
@@ -547,10 +547,10 @@
       "energy_kwh": 2.0242773996107095
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 49,
-      "destination": 50,
+      "origin": "000220503002",
+      "destination": "000220503003",
       "origin_name": "Hellange, Hoëner Halt",
       "destination_name": "Hellange, Kierch",
       "distance_m": 767.9735146386669,
@@ -558,10 +558,10 @@
       "energy_kwh": 0.6681369577356402
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 50,
-      "destination": 51,
+      "origin": "000220503003",
+      "destination": "000220503001",
       "origin_name": "Hellange, Kierch",
       "destination_name": "Hellange, Beeteburgerstrooss",
       "distance_m": 232.77933092803806,
@@ -569,10 +569,10 @@
       "energy_kwh": 0.20251801790739313
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 51,
-      "destination": 52,
+      "origin": "000220503001",
+      "destination": "000220102007",
       "origin_name": "Hellange, Beeteburgerstrooss",
       "destination_name": "Bettembourg, Mosselter",
       "distance_m": 1412.2652730051202,
@@ -580,10 +580,10 @@
       "energy_kwh": 1.2286707875144545
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 52,
-      "destination": 53,
+      "origin": "000220102007",
+      "destination": "000220102008",
       "origin_name": "Bettembourg, Mosselter",
       "destination_name": "Bettembourg, Parc Merveilleux",
       "distance_m": 630.2274390607392,
@@ -591,10 +591,10 @@
       "energy_kwh": 0.5482978719828431
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 53,
-      "destination": 54,
+      "origin": "000220102008",
+      "destination": "000220102004",
       "origin_name": "Bettembourg, Parc Merveilleux",
       "destination_name": "Bettembourg, Café du Stadion",
       "distance_m": 783.3557063892362,
@@ -602,10 +602,10 @@
       "energy_kwh": 0.6815194645586354
     },
     {
-      "route_id": "2483_1",
+      "route_id": "2483",
       "pattern_id": "1-01",
-      "origin": 54,
-      "destination": 55,
+      "origin": "000220102004",
+      "destination": "000220102005",
       "origin_name": "Bettembourg, Café du Stadion",
       "destination_name": "Bettembourg, Gare routière",
       "distance_m": 691.6758871450461,

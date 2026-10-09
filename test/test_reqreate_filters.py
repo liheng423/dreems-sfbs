@@ -5,10 +5,11 @@ import sys
 from types import SimpleNamespace
 from unittest.mock import Mock
 
-from shapely.geometry import Point, box
+from shapely.geometry import box
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src/reqreate"))
-from filters.filters import (POI_FILTERS, REQUEST_FILTERS, passes_filters,
+from filters.filters import (BASE_REQUEST_FILTERS, BUS_REQUEST_FILTERS,
+                             REQUEST_FILTERS, passes_filters,
                              select_scheduled_bus_stops)
 from filters.route_schedule import index_route_departures
 
@@ -29,6 +30,7 @@ def main():
            "direct_distance": 100, "direct_travel_time": 1,
            "earliest_departure": 400, "latest_arrival": 1000}
     assert passes_filters(req, REQUEST_FILTERS, net, cfg)
+    assert REQUEST_FILTERS == BASE_REQUEST_FILTERS + BUS_REQUEST_FILTERS
     assert select_scheduled_bus_stops(req, net, cfg) == {
         "boarding_stop_id": "A", "alighting_stop_id": "B",
         "boarding_walk_distance_m": 100, "alighting_walk_distance_m": 100,
@@ -39,6 +41,7 @@ def main():
         assert not passes_filters(req | change, REQUEST_FILTERS, net, cfg)
     walking_distance.within_limit.return_value = False
     assert not passes_filters(req, REQUEST_FILTERS, net, cfg)
+    assert passes_filters(req, BASE_REQUEST_FILTERS, net, cfg)
     walking_distance.within_limit.return_value = True
     walking_distance.direct_distance_within.return_value = True
     assert not passes_filters(req, REQUEST_FILTERS, net, cfg)
@@ -67,8 +70,6 @@ def main():
     ]}]}]}
     assert index_route_departures(schedule) == {("A", "B"): [(600, 900)]}
 
-    assert passes_filters(SimpleNamespace(geometry=Point(1, 1)), POI_FILTERS, net, cfg)
-    assert not passes_filters(SimpleNamespace(geometry=Point(3, 3)), POI_FILTERS, net, cfg)
     assert not passes_filters(req, REQUEST_FILTERS + (lambda candidate, net, cfg: False,),
                               net, cfg)
     print("Validated REQreate filter predicates and extension point")

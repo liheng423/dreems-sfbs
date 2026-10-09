@@ -1,11 +1,8 @@
-# Route 550 REQreate area-demand settings. Paths are relative to the repository root.
+# REQreate demand settings. The selected route supplies service hours at runtime.
 # Distribution parameters: uniform loc is the minimum and scale is the range width;
 # normal loc is the mean and scale is the standard deviation.
 seed = 42
 requests = 20000
-output_dir = "data/reqreate/area_550"
-pool_file = "550_raw_requests.json"
-metadata_file = "550_raw_requests_metadata.json"
 
 [method_pois]
 locations = ["origin", "destination"]

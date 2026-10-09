@@ -13,8 +13,9 @@ function element() {
   };
 }
 function layer() {
-  return { addTo(target) { if (target?.layers) target.layers.push(this); return this; },
-    bindPopup() { return this; }, on() { return this; } };
+  return { listeners: {}, addTo(target) { if (target?.layers) target.layers.push(this); return this; },
+    bindPopup(content) { this.popup = content; return this; },
+    on(name, listener) { this.listeners[name] = listener; return this; } };
 }
 function layerGroup() {
   return { ...layer(), layers: [], clearLayers() { this.layers = []; } };
@@ -31,12 +32,11 @@ const L = {
   latLngBounds() { return { pad() { return this; } }; }
 };
 const context = vm.createContext({ document, L, location: { protocol: 'file:' } });
-vm.runInContext(fs.readFileSync(path.join(__dirname, 'route_550.js'), 'utf8'), context);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'reqreate.js'), 'utf8'), context);
 vm.runInContext(fs.readFileSync(path.join(__dirname, 'busline.js'), 'utf8'), context);
-const area_dir = path.join(__dirname, '..', 'data', 'reqreate', 'area_550');
-const data = JSON.parse(fs.readFileSync(path.join(area_dir, '550_raw_requests.json'), 'utf8'));
-const pois = JSON.parse(fs.readFileSync(path.join(area_dir, '550_pois.json'), 'utf8'));
+const area_dir = path.join(__dirname, '..', 'data', 'requests', '550');
+const data = JSON.parse(fs.readFileSync(path.join(area_dir, 'raw_requests.json'), 'utf8'));
+const pois = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'graphs', '550', 'pois.json'), 'utf8'));
 context.data = data;
 context.pois = pois;
 vm.runInContext('load_reqs(data, "550_raw_requests.json")', context);
@@ -67,11 +67,13 @@ vm.runInContext('show_req(reqs.find((req) => req.is_prebooked))', context);
 assert.match(elements.get('req-details').textContent, /-3d|\-2d|\-1d/);
 assert.match(elements.get('req-details').textContent, /Direct distance/);
 assert.match(elements.get('selected-energy-note').textContent, /Load the bus energy JSON/);
-const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'busline', 'stops_550.json'), 'utf8'));
-const energy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'busline', 'energy_550.json'), 'utf8'));
+const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'stops.json'), 'utf8'));
+const businfo = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'businfo.json'), 'utf8'));
+const energy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'energy.json'), 'utf8'));
 context.stops = stops;
+context.businfo = businfo;
 context.energy = energy;
-vm.runInContext('load_busline(stops, "stops_550.json"); load_energy(energy, "energy.json")', context);
+vm.runInContext('load_busline(stops, "stops_550.json"); load_busline_patterns(businfo, "crawled_550.json"); load_energy(energy, "energy.json")', context);
 vm.runInContext('show_req(req_by_id.get(3423))', context);
 assert.match(elements.get('selected-energy').textContent, /^\d+\.\d\d$/);
 assert.ok(Number(elements.get('selected-energy').textContent) > 0);
@@ -89,4 +91,15 @@ context.bad = { ...data, 'num_data:': 1 };
 assert.throws(() => vm.runInContext('read_reqs(bad)', context), /REQreate raw requests/);
 vm.runInContext('load_reqs(data, "550_raw_requests.json")', context);
 assert.match(elements.get('selected-energy').textContent, /^\d+\.\d\d$/);
+const point = vm.runInContext('stop_layer.layers[0]', context);
+point.listeners.click();
+assert.match(elements.get('energy-request').textContent, /^Request #\d+$/);
+assert.match(elements.get('req-details').textContent, /Estimated route:.*Estimated bus trip energy: \d+\.\d\d kWh/s);
+assert.match(point.popup().children[1].textContent, /\d+\.\d\d kWh/);
+const shared = vm.runInContext(`request_point_popup({node: 1, endpoints: [
+  {req: reqs[0], endpoint: 'origin'}, {req: reqs[1], endpoint: 'destination'}
+]})`, context);
+assert.equal(shared.children.length, 3);
+shared.children[2].listeners.click();
+assert.equal(elements.get('energy-request').textContent, `Request #${vm.runInContext('reqs[1].reqid', context)}`);
 console.log('REQreate viewer checks passed.');

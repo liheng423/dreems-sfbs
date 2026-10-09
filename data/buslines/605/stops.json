@@ -1,0 +1,149 @@
+[
+  {
+    "name": "Stop_000200403015",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.120829,
+    "lat": 49.607454
+  },
+  {
+    "name": "Stop_000200405025",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 6.125013,
+    "lat": 49.610454
+  },
+  {
+    "name": "Stop_000200412006",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.115351,
+    "lat": 49.583476
+  },
+  {
+    "name": "Stop_000200412009",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.116975,
+    "lat": 49.592774
+  },
+  {
+    "name": "Stop_000200412018",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.113133,
+    "lat": 49.579552
+  },
+  {
+    "name": "Stop_000200412028",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.116219,
+    "lat": 49.58823
+  },
+  {
+    "name": "Stop_000200412031",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.111496,
+    "lat": 49.576813
+  },
+  {
+    "name": "Stop_000200415002",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.117916,
+    "lat": 49.597233
+  },
+  {
+    "name": "Stop_000200415005",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.11994,
+    "lat": 49.601404
+  },
+  {
+    "name": "Stop_000220401001",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.946548,
+    "lat": 49.499159
+  },
+  {
+    "name": "Stop_000220402077",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.945299,
+    "lat": 49.502986
+  },
+  {
+    "name": "Stop_000220402079",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.955406,
+    "lat": 49.508992
+  },
+  {
+    "name": "Stop_000220402129",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.947317,
+    "lat": 49.503915
+  },
+  {
+    "name": "Stop_000220701003",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.079761,
+    "lat": 49.565652
+  },
+  {
+    "name": "Stop_000220701011",
+    "type": "location",
+    "class": "optional",
+    "lon": 6.069746,
+    "lat": 49.563347
+  },
+  {
+    "name": "Stop_000221301004",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.937191,
+    "lat": 49.501352
+  },
+  {
+    "name": "Stop_000221301027",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.943146,
+    "lat": 49.502881
+  },
+  {
+    "name": "Stop_000400000101",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.944148,
+    "lat": 49.475292
+  },
+  {
+    "name": "Stop_000400000102",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 5.929944,
+    "lat": 49.470597
+  },
+  {
+    "name": "Stop_000400000103",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.937913,
+    "lat": 49.474533
+  },
+  {
+    "name": "Stop_000400000162",
+    "type": "location",
+    "class": "optional",
+    "lon": 5.930294,
+    "lat": 49.470966
+  }
+]

@@ -24,7 +24,7 @@ function draw_busline_lines(file_name) {
   });
 }
 
-/** Match crawled_<route>.json with stops_<route>.json, regardless of selection order. */
+/** Match route patterns with the stops loaded from the same busline folder. */
 function load_busline_patterns(data, file_name) {
   if (!Array.isArray(data.stops) || !Array.isArray(data.patterns) || !data.patterns.every((pattern) =>
     typeof pattern.label === 'string' && Array.isArray(pattern.stop_ids) &&
@@ -98,39 +98,4 @@ function draw_busline_list() {
     list.append(label);
   }
   document.getElementById('busline-count').textContent = `${count} stops`;
-}
-
-document.getElementById('busline-file').addEventListener('change', async (event) => {
-  for (const file of event.target.files) {
-    try {
-      const data = JSON.parse(await file.text());
-      if (file.name.startsWith('crawled_')) load_busline_patterns(data, file.name);
-      else load_busline(data, file.name);
-    } catch (error) {
-      const message = document.getElementById('busline-error');
-      message.textContent = error instanceof SyntaxError ? `${file.name} is not valid JSON.` : error.message;
-      message.hidden = false;
-    }
-  }
-});
-
-/** Discover stop files and their matching crawled route patterns on the documented local server. */
-if (location.protocol !== 'file:') {
-  fetch('../data/busline/')
-    .then((response) => response.text())
-    .then((html) => [...new DOMParser().parseFromString(html, 'text/html').querySelectorAll('a')]
-      .map((link) => link.getAttribute('href'))
-      .filter((name) => /^stops_[^/]+\.json$/.test(name)))
-    .then((names) => Promise.all(names.map(async (name) => {
-      const stops_response = await fetch(`../data/busline/${name}`);
-      load_busline(await stops_response.json(), name);
-      const route_name = name.replace(/^stops_/, 'crawled_');
-      const route_response = await fetch(`../data/${route_name}`);
-      if (route_response.ok) load_busline_patterns(await route_response.json(), route_name);
-    })))
-    .catch((error) => {
-      const message = document.getElementById('busline-error');
-      message.textContent = error.message;
-      message.hidden = false;
-    });
 }

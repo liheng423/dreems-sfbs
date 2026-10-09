@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Extract one route's scheduled corridor data from a static GTFS archive.
 
-This crawler deliberately stops at source data: it does not classify stops,
-generate passenger requests, or create optimization instances. Those steps are
-implemented in Julia under ``src/reqreate_gen`` and use shared helpers from
-``src/tools``.
+This crawler saves the selected route's timetable and REQreate stop places.
+Request generation lives in the Python modules under ``src/reqreate``.
 """
 
 from __future__ import annotations
@@ -15,6 +13,7 @@ import datetime as dt
 import hashlib
 import io
 import json
+import sys
 import urllib.request
 import zipfile
 from collections import defaultdict
@@ -69,7 +68,7 @@ def time_seconds(value: str) -> Optional[int]:
 
 
 def stop_event(row: dict) -> dict:
-    """Keep one scheduled second value for stops without dwell time."""
+    """Preserve separate arrival and departure times when a bus dwells."""
     arrival = row.get("arrival_time", "")
     departure = row.get("departure_time", "")
     arrival_seconds = time_seconds(arrival)
@@ -78,10 +77,6 @@ def stop_event(row: dict) -> dict:
         arrival_seconds = departure_seconds
     if departure_seconds is None:
         departure_seconds = arrival_seconds
-    if arrival_seconds != departure_seconds:
-        raise ValueError(
-            "Stop arrivals and departures differ; the normalized timetable stores one time per stop"
-        )
     return {
         "stop_sequence": int(row["stop_sequence"]),
         "stop_id": row["stop_id"],
@@ -97,7 +92,7 @@ def stop_event(row: dict) -> dict:
 def load_archive(path: Optional[Path], url: str) -> tuple[bytes, str]:
     if path:
         return path.read_bytes(), path.name
-    request = urllib.request.Request(url, headers={"User-Agent": "bus550-corridor-crawler/1.0"})
+    request = urllib.request.Request(url, headers={"User-Agent": "dreems-busline-crawler/1.0"})
     with urllib.request.urlopen(request, timeout=90) as response:
         return response.read(), url.rsplit("/", 1)[-1]
 
@@ -259,15 +254,34 @@ def crawl(
     }
 
 
+def build_stops(businfo, mandatory_stop_ids=()):
+    """Make REQreate places; route terminals are mandatory by default."""
+    mandatory_ids = set(mandatory_stop_ids)
+    mandatory_ids.update(stop_id for pattern in businfo["patterns"]
+                         for stop_id in pattern["terminal_stop_ids"])
+    return [{
+        "name": f"Stop_{stop['stop_id']}",
+        "type": "location",
+        "class": "mandatory" if stop["stop_id"] in mandatory_ids else "optional",
+        "lon": stop["stop_lon"],
+        "lat": stop["stop_lat"],
+    } for stop in businfo["stops"]]
+
+
 def main() -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[3]
+    sys.path.insert(0, str(root))
+    from src.output_adapters import busline_dir, busline_path, write_json
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--route-short-name", default="550")
+    parser.add_argument("--route", required=True)
     parser.add_argument("--route-id")
     parser.add_argument("--service-date", default=DEFAULT_SERVICE_DATE)
     parser.add_argument("--gtfs-url", default=DEFAULT_GTFS_URL)
     parser.add_argument("--gtfs-zip", type=Path, help="Use a previously downloaded GTFS ZIP")
-    parser.add_argument("--output", type=Path, default=root / "data" / "crawled_550.json")
+    parser.add_argument("--mandatory-stop-id", action="append", default=[],
+                        help="Mark an additional GTFS stop ID as mandatory")
+    parser.add_argument("--output", type=Path, help="Override the businfo.json path")
+    parser.add_argument("--stops-output", type=Path, help="Override the stops.json path")
     args = parser.parse_args()
 
     service_date = dt.date.fromisoformat(args.service_date)
@@ -276,13 +290,18 @@ def main() -> None:
         archive_bytes,
         archive_name,
         args.gtfs_url,
-        args.route_short_name,
+        args.route,
         service_date,
         args.route_id,
     )
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {len(result['stops'])} stops and {len(result['patterns'])} patterns to {args.output}")
+    route_dir = busline_dir(args.route)
+    businfo_path = args.output or busline_path("businfo", route_dir)
+    stops_path = args.stops_output or (businfo_path.with_name("stops.json") if args.output
+                                       else busline_path("stops", route_dir))
+    write_json(businfo_path, result)
+    write_json(stops_path, build_stops(result, args.mandatory_stop_id))
+    print(f"Wrote {len(result['stops'])} stops and {len(result['patterns'])} patterns to {businfo_path}")
+    print(f"Wrote REQreate stop places to {stops_path}")
 
 
 if __name__ == "__main__":

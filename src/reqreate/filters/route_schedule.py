@@ -1,4 +1,4 @@
-"""Index scheduled Route 550 trips by ordered boarding and alighting stops."""
+"""Index scheduled trips by ordered boarding and alighting stops."""
 
 from collections import defaultdict
 
@@ -16,10 +16,10 @@ def index_route_departures(schedule):
         for trip in pattern["trips"]:
             stop_times = trip["stop_times"]
             for index, boarding in enumerate(stop_times):
-                if boarding["pickup_type"] != "0":
+                if boarding["pickup_type"] not in ("", "0"):
                     continue
                 for alighting in stop_times[index + 1:]:
-                    if alighting["drop_off_type"] == "0":
+                    if alighting["drop_off_type"] in ("", "0"):
                         pair = boarding["stop_id"], alighting["stop_id"]
                         departures[pair].append((boarding["departure_seconds"],
                                                  arrival_seconds(alighting)))

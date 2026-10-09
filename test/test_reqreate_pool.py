@@ -4,14 +4,17 @@ import hashlib
 import json
 import tomllib
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from src.output_adapters import request_path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
-STOPS_PATH = ROOT / "data/busline/stops_550.json"
-POOL_PATH = ROOT / "data/reqreate/550_raw_requests.json"
-META_PATH = ROOT / "data/reqreate/550_raw_requests_metadata.json"
-DIST_PATH = ROOT / "data/distance_matrix_550.json"
+INSTANCE_DIR = sorted((ROOT / "data/requests").glob("550_550_[0-9]*"))[-1]
+POOL_PATH = request_path("pool", INSTANCE_DIR)
+META_PATH = request_path("metadata", INSTANCE_DIR)
 
 
 def read_json(path):
@@ -24,28 +27,21 @@ def sha256(path):
 
 def main():
     cfg = tomllib.loads(CFG_PATH.read_text())
+    filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text())
     pool = read_json(POOL_PATH)
     meta = read_json(META_PATH)
-    dist_mat = read_json(DIST_PATH)
-    places = {int(place["name"].removeprefix("Stop_")): place
-              for place in read_json(STOPS_PATH)}
-    dist_idx = {int(stop_id): idx for idx, stop_id in enumerate(dist_mat["stop_ids"])}
-    params = {param["name"]: param["value"] for param in cfg["parameters"] if "value" in param}
+    params = {param["name"]: param["value"]
+              for param in cfg["parameters"] + filter_cfg["parameters"] if "value" in param}
     reqs = pool["requests"]
 
-    assert len(reqs) == pool["num_data:"] == cfg["requests"]
+    assert len(reqs) == pool["num_data:"] == meta["request_count"] <= cfg["requests"]
     assert meta["pool_sha256"] == sha256(POOL_PATH)
     for path, digest in meta["inputs_sha256"].items():
         assert sha256(ROOT / path) == digest
     for idx, req in reqs.items():
         assert req["reqid"] == int(idx)
-        org_id = req["originnode_drive"]
-        dst_id = req["destinationnode_drive"]
-        assert req["origin"] == [places[org_id]["lat"], places[org_id]["lon"]]
-        assert req["destination"] == [places[dst_id]["lat"], places[dst_id]["lon"]]
-        dist = dist_mat["distances_m"][dist_idx[org_id]][dist_idx[dst_id]]
-        assert req["direct_distance"] == dist >= params["min_distance"]
-        assert req["direct_travel_time"] == int(dist / 5.56) > 0
+        assert req["direct_distance"] >= params["min_distance"]
+        assert req["direct_travel_time"] == int(req["direct_distance"] / 5.56) > 0
         assert params["min_early_departure"] <= req["earliest_departure"] <= params["max_early_departure"]
         assert req["is_prebooked"] in (0, 1)
         assert req["lead_time"] == req["lt_prebooked" if req["is_prebooked"] else "lt_dynamic"]

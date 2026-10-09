@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
-<title>Route 550 service area</title>
+<title>Map __MAP__ service area</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
@@ -12,7 +12,7 @@
 </style>
 <div id="toolbar">
   <span>Draw one rectangle or polygon around the service area, then save it.</span>
-  <button id="save" disabled>Save area and road graphs</button>
+  <button id="save" disabled>Save area, road graphs, and POIs</button>
   <span id="status"></span>
 </div>
 <div id="map"></div>
@@ -29,7 +29,11 @@
     L.circleMarker([stop.stop_lat, stop.stop_lon], {radius: 3, color: '#174b9b'})
       .bindTooltip(stop.stop_name)
   )).addTo(map);
-  map.fitBounds(stopLayer.getBounds().pad(0.15));
+  if (stops.length) {
+    map.fitBounds(stopLayer.getBounds().pad(0.15));
+  } else {
+    map.setView([49.61, 6.13], 10);
+  }
 
   const selection = new L.FeatureGroup().addTo(map);
   map.addControl(new L.Control.Draw({
@@ -52,7 +56,7 @@
     const button = document.querySelector('#save');
     const status = document.querySelector('#status');
     button.disabled = true;
-    status.textContent = 'Downloading OSM roads; this may take several minutes…';
+    status.textContent = 'Downloading OSM roads and POIs; this may take several minutes…';
     try {
       const response = await fetch('/save', {
         method: 'POST',

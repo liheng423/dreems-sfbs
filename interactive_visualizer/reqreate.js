@@ -1,4 +1,4 @@
-/* REQreate's raw JSON is the viewer input; no corridor instance is required. */
+/* REQreate requests, GTFS stops, and bus energy are loaded from their source files. */
 const map = L.map('map', { preferCanvas: true, zoomControl: false }).setView([49.52, 6.23], 11);
 L.control.zoom({ position: 'topright' }).addTo(map);
 L.control.scale({ position: 'bottomright', imperial: false }).addTo(map);
@@ -107,19 +107,6 @@ function load_energy(data, file_name) {
     energy_segments.set(`${segment.pattern_id}|${segments.length}`, segment.energy_kwh);
     segments.push(segment);
   }
-  // The energy file gives logical stop numbers; this snapshot maps them to physical stop IDs.
-  if (data.segments[0].route_id === '2483_0' && !busline_patterns.has('stops_550.json')) {
-    const patterns = route_550_patterns.map((pattern) => {
-      const segments = segments_by_pattern.get(pattern.pattern_id);
-      return { ...pattern, label: `${segments[0].origin_name} -> ${segments.at(-1).destination_name}` };
-    });
-    const stops = patterns.flatMap((pattern) => {
-      const segments = segments_by_pattern.get(pattern.pattern_id);
-      return pattern.stop_ids.map((stop_id, index) => ({ stop_id,
-        stop_name: index ? segments[index - 1].destination_name : segments[0].origin_name }));
-    });
-    load_busline_patterns({ patterns, stops }, 'crawled_550.json');
-  }
   $('energy-name').textContent = file_name;
   $('energy-status').textContent = data.status;
   $('energy-error').hidden = true;
@@ -189,7 +176,7 @@ function load_pois(data, file_name) {
   if (!Array.isArray(data.features) || !data.features.every((poi) =>
     Number.isFinite(poi.lat) && Number.isFinite(poi.lon) && poi.tags &&
     Object.keys(poi.tags).some((type) => type in poi_colors))) {
-    throw new Error('Choose the area_550 POIs JSON with features, coordinates, and OSM tags.');
+    throw new Error('The selected POIs JSON needs features, coordinates, and OSM tags.');
   }
   poi_layer.clearLayers();
   const counts = new Map();
@@ -247,9 +234,9 @@ function show_req(req, fit_map = true) {
   sel_layer.clearLayers();
   const color = book_colors[req.is_prebooked];
   L.polyline([req.origin, req.destination], { color, weight: 4, dashArray: '7 6' }).addTo(sel_layer);
-  L.circleMarker(req.origin, { radius: 8, color: '#fff', weight: 2, fillColor: color, fillOpacity: 1 })
+  L.circleMarker(req.origin, { radius: 8, color: '#fff', weight: 2, fillColor: color, fillOpacity: 1, interactive: false })
     .addTo(sel_layer);
-  L.circleMarker(req.destination, { radius: 8, color: '#fff', weight: 2, fillColor: '#17342f', fillOpacity: 1 })
+  L.circleMarker(req.destination, { radius: 8, color: '#fff', weight: 2, fillColor: '#17342f', fillOpacity: 1, interactive: false })
     .addTo(sel_layer);
   let walk_details = '';
   let trip = null;
@@ -279,13 +266,15 @@ function show_req(req, fit_map = true) {
     bounds.push(boarding_xy, alighting_xy);
     walk_details = `\nEstimated walk: ${Math.round(boarding_distance_m)} m to ${walk_stop_label(boarding)}; ` +
       `${Math.round(alighting_distance_m)} m from ${walk_stop_label(alighting)} (straight line)`;
+    if (trip) walk_details += `\nEstimated route: ${trip.pattern.label} · ` +
+      `${walk_stop_label(boarding)} → ${walk_stop_label(alighting)}`;
     energy_kwh = req_energy_kwh(trip);
     if (energy_segments.size) walk_details += `\nEstimated bus trip energy: ${energy_kwh === null ? 'unavailable' : `${energy_kwh.toFixed(2)} kWh`}`;
   }
   $('energy-request').textContent = `Request #${req.reqid}`;
   $('selected-energy').textContent = energy_kwh === null ? '—' : energy_kwh.toFixed(2);
   $('selected-energy-note').textContent = !energy_segments.size ? 'Load the bus energy JSON to calculate this value.' :
-    !trip ? 'Load stops_550.json to calculate this value.' :
+    !trip ? 'No forward bus route matches this request.' :
     energy_kwh === null ? 'No energy segment matches this estimated bus trip.' :
     'Vehicle energy over the estimated boarding-to-alighting interval.';
   $('req-details').hidden = false;
@@ -333,6 +322,27 @@ function draw_list() {
   }
 }
 
+/** Show the requests sharing one map location, with their route and energy. */
+function request_point_popup(stop) {
+  const popup = document.createElement('div');
+  popup.className = 'request-point-popup';
+  const title = document.createElement('strong');
+  title.textContent = `Node ${stop.node} · ${stop.endpoints.length} request${stop.endpoints.length === 1 ? '' : 's'}`;
+  popup.append(title);
+  for (const { req, endpoint } of stop.endpoints) {
+    const trip = walking_stops.length ? estimated_bus_trip(req) : null;
+    const energy_kwh = req_energy_kwh(trip);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = `#${req.reqid} · ${endpoint}\n` +
+      `${trip ? trip.pattern.label : 'Route unavailable'}\n` +
+      `${energy_kwh === null ? 'Energy unavailable' : `${energy_kwh.toFixed(2)} kWh`}`;
+    button.addEventListener('click', () => show_req(req, false));
+    popup.append(button);
+  }
+  return popup;
+}
+
 function draw_map() {
   stop_layer.clearLayers();
   flow_layer.clearLayers();
@@ -349,8 +359,10 @@ function draw_map() {
     for (const endpoint of ['origin', 'destination']) {
       const xy = req[endpoint];
       const key = coord_key(xy);
-      if (!stops.has(key)) stops.set(key, { xy, node: req[`${endpoint}node_drive`], board: 0, alight: 0 });
-      stops.get(key)[endpoint === 'origin' ? 'board' : 'alight']++;
+      if (!stops.has(key)) stops.set(key, { xy, node: req[`${endpoint}node_drive`], board: 0, alight: 0, endpoints: [] });
+      const stop = stops.get(key);
+      stop[endpoint === 'origin' ? 'board' : 'alight']++;
+      stop.endpoints.push({ req, endpoint });
     }
     const od_key = `${coord_key(req.origin)}|${coord_key(req.destination)}|${req.is_prebooked}`;
     if (!pairs.has(od_key)) pairs.set(od_key, { origin: req.origin, destination: req.destination,
@@ -377,7 +389,8 @@ function draw_map() {
     const total = stop.board + stop.alight;
     L.circleMarker(stop.xy, { radius: 4 + Math.sqrt(total), color: '#fff', weight: 2,
       fillColor: '#e79b50', fillOpacity: .8 })
-      .bindPopup(`Node ${stop.node}<br>${stop.board} origins · ${stop.alight} destinations`)
+      .bindPopup(() => request_point_popup(stop))
+      .on('click', () => show_req(stop.endpoints[0].req, false))
       .addTo(stop_layer);
   }
   $('req-count').textContent = visible_reqs.length;
@@ -420,36 +433,6 @@ function load_reqs(data, file_name) {
   map.fitBounds(demand_bounds.pad(.12));
 }
 
-$('inst-file').addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-  try {
-    load_reqs(JSON.parse(await file.text()), file.name);
-  } catch (error) {
-    $('file-error').textContent = error instanceof SyntaxError ? 'This file is not valid JSON.' : error.message;
-    $('file-error').hidden = false;
-  }
-});
-$('poi-file').addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-  try {
-    load_pois(JSON.parse(await file.text()), file.name);
-  } catch (error) {
-    $('poi-file-error').textContent = error instanceof SyntaxError ? 'This file is not valid JSON.' : error.message;
-    $('poi-file-error').hidden = false;
-  }
-});
-$('energy-file').addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-  try {
-    load_energy(JSON.parse(await file.text()), file.name);
-  } catch (error) {
-    $('energy-error').textContent = error instanceof SyntaxError ? 'This file is not valid JSON.' : error.message;
-    $('energy-error').hidden = false;
-  }
-});
 for (const id of ['prebooked-check', 'dynamic-check', 'flows-check', 'walks-check', 'time-range']) {
   $(id).addEventListener(id === 'time-range' ? 'input' : 'change', draw_map);
 }
@@ -458,23 +441,3 @@ $('req-id').addEventListener('change', () => {
   if (req) show_req(req);
 });
 $('fit-button').addEventListener('click', () => map.fitBounds(demand_bounds.pad(.12)));
-
-/** Load the area_550 pair automatically when the page is served over HTTP. */
-if (location.protocol !== 'file:') {
-  fetch('../data/reqreate/area_550/550_raw_requests.json')
-    .then((response) => response.json())
-    .then((data) => load_reqs(data, 'area_550/550_raw_requests.json'))
-    .catch((error) => { $('file-error').textContent = error.message; $('file-error').hidden = false; });
-  fetch('../data/reqreate/area_550/550_pois.json')
-    .then((response) => response.json())
-    .then((data) => load_pois(data, 'area_550/550_pois.json'))
-    .catch((error) => { $('poi-file-error').textContent = error.message; $('poi-file-error').hidden = false; });
-  fetch('../data/busline/energy_550.json')
-    .then((response) => response.json())
-    .then((data) => load_energy(data, 'data/busline/energy_550.json'))
-    .catch((error) => { $('energy-error').textContent = error.message; $('energy-error').hidden = false; });
-} else {
-  $('file-name').textContent = 'Choose data/reqreate/area_550/550_raw_requests.json';
-  $('poi-file-name').textContent = 'Choose data/reqreate/area_550/550_pois.json';
-  $('energy-name').textContent = 'Choose data/busline/energy_550.json';
-}

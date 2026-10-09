@@ -1,0 +1,33 @@
+{
+  "busline": null,
+  "graph": "Esch",
+  "generator": "REQreate._generate_single_data_impl",
+  "python_version": "3.12.15",
+  "package_versions": {
+    "reqreate": "0.1.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "osmnx": "2.1.1",
+    "networkx": "3.7"
+  },
+  "seed": 42,
+  "candidate_count": 5000,
+  "request_count": 5000,
+  "network_input": "GeoJSON service area and saved OSM drive/walk graphs",
+  "travel_time_method": "REQreate 20 km/h distance fallback",
+  "spatial_sampling": "REQreate method_pois: POI-density zones and radial trip distances, followed by area, minimum-distance, and positive-travel-time filters",
+  "bus_filters_enabled": false,
+  "poi_count": 666,
+  "distance_method": "Directed OSM shortest path weighted by length in metres",
+  "inputs_sha256": {
+    "src/reqreate/request_gen.toml": "bcea192a9c7ac841058fe717a04b65012b42f78b380663f4762df59750d7d353",
+    "src/reqreate/maps/map_config.toml": "59433f7477f869807ed0879ff479436ccda78f315718f1cd0cebf4f0445d89c7",
+    "src/reqreate/filters/filters.toml": "4aa3b82e83e80014dbd03250b584c3cd84aa3adf874de3f2e2b3ab008842074b",
+    "data/graphs/Esch/service_area.geojson": "3a183d738018921e36a80b5376de57e2a658833bce7cf5acd3b9ab92da0b3fcf",
+    "data/graphs/Esch/drive.graphml": "47ff643c06dcf963df39cb85c7161e2d93e764a4eed94b24b39bfa438f0f51a3",
+    "data/graphs/Esch/walk.graphml": "a3f50910c3b232af22451384b56918b5997b247940d5fbce428d2c7cf272b2eb",
+    "data/graphs/Esch/pois.json": "ffd3d894cccc18efa799ff92b97b39b15fd8e5bb52106bcafaaf2e964458ce0d"
+  },
+  "pool_sha256": "f1c0006070d209bcb0f5fdc6ddaab3b7e7880cebfadd461f5f16d5c9672a0dba"
+}
