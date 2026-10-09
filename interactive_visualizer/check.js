@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 function element() {
   return {
-    value: '', checked: true, children: [], dataset: {}, attributes: {}, listeners: {}, classList: { toggle() {} },
+    value: '', checked: true, children: [], dataset: {}, style: {}, attributes: {}, listeners: {}, classList: { toggle() {} },
     addEventListener(name, listener) { this.listeners[name] = listener; },
     setAttribute(name, value) { this.attributes[name] = value; },
     getAttribute(name) { return this.attributes[name]; },
@@ -17,8 +17,11 @@ function element() {
 
 const tooltips = [];
 function layer() {
-  return { addTo() { return this; }, bindPopup() { return this; },
+  return { addTo(target) { if (target?.layers) target.layers.push(this); return this; }, on() { return this; }, bindPopup() { return this; },
     bindTooltip(label) { tooltips.push(label); return this; }, openPopup() { return this; }, clearLayers() {} };
+}
+function layerGroup() {
+  return { ...layer(), layers: [], clearLayers() { this.layers = []; } };
 }
 
 const elements = new Map();
@@ -30,8 +33,8 @@ const document = {
 };
 const map = { setView() { return this; }, fitBounds() {} };
 const L = {
-  map() { return map; }, control: { zoom() { return layer(); } }, tileLayer: layer,
-  layerGroup: layer, polyline: layer, circleMarker: layer,
+  map() { return map; }, control: { zoom: layer, scale: layer }, tileLayer: layer,
+  layerGroup, polyline: layer, circleMarker: layer,
   latLngBounds() { return { pad() { return this; } }; }
 };
 const context = vm.createContext({ document, L, Option: function (label, value) { return { label, value }; } });
@@ -65,7 +68,7 @@ vm.runInContext('load_inst(data, "550_base.json")', context);
 context.data = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'candidate_pool_550.json'), 'utf8'));
 vm.runInContext('cand_pool = data; audit_inst(); draw_map()', context);
 assert.equal(vm.runInContext('issues.length', context), 0);
-assert.equal(vm.runInContext('req_cands.size', context), 100);
+assert.equal(vm.runInContext('req_cands.size', context), 99);
 context.data = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'timetable_550.json'), 'utf8'));
 vm.runInContext('timetable = data; audit_inst()', context);
 assert.equal(vm.runInContext('issues.length', context), 0);
@@ -73,14 +76,15 @@ assert.equal(vm.runInContext('issues.length', context), 0);
 vm.runInContext('reqs[0].time_window[0]++; audit_inst(); draw_map()', context);
 assert.match(vm.runInContext('issues.find(issue => issue.req_id === reqs[0].id).message', context), /pickup window/);
 vm.runInContext('reqs[0].desired_time++; audit_inst()', context);
-assert.ok(vm.runInContext('issues.some(issue => issue.message.includes("selected pool candidate"))', context));
+assert.ok(vm.runInContext('issues.some(issue => issue.message.includes("no matching raw pool candidate"))', context));
 elements.get('issues-check').checked = true;
 vm.runInContext('draw_map()', context);
 assert.equal(Number(elements.get('req-count').textContent), 1);
 
-vm.runInContext('cand_pool.candidate_pool[0].candidates[0].scheduled_arrival_minute = 0; audit_inst()', context);
-assert.ok(vm.runInContext('issues.some(issue => issue.message.includes("matrix travel time"))', context));
-assert.ok(vm.runInContext('issues.some(issue => issue.message.includes("differ from timetable"))', context));
+vm.runInContext('cand_pool.candidate_pool[0].candidates[0].source_origin_stop_id = "wrong"; audit_inst()', context);
+assert.ok(vm.runInContext('issues.some(issue => issue.message.includes("source stop ID"))', context));
+vm.runInContext('timetable.service_date = "wrong"; audit_inst()', context);
+assert.ok(vm.runInContext('issues.some(issue => issue.message.includes("Timetable service date"))', context));
 vm.runInContext('show_cand(issues.find(issue => issue.cand).cand)', context);
 assert.match(elements.get('req-details').innerHTML, /Candidate/);
 for (const scen of ['low', 'high']) {
@@ -109,6 +113,47 @@ async function check_distances() {
   elements.get('dist-button').listeners.click();
   assert.equal(elements.get('dist-button').getAttribute('aria-pressed'), 'false');
   assert.doesNotMatch(elements.get('req-details').innerHTML, /Road distance/);
-  console.log('Viewer checks passed for filters, generator audits, and the distance overlay.');
+
+  elements.get('debug-mode-check').checked = true;
+  elements.get('debug-mode-check').listeners.change();
+  const debug = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'debug', 'rejected_candidates_550.debug.json'), 'utf8'));
+  await elements.get('debug-file').listeners.change({ target: { files: [{ name: 'rejected_candidates_550.debug.json', text: async () => JSON.stringify(debug) }] } });
+  assert.equal(vm.runInContext('visible_debug.length', context), 31);
+  assert.equal(vm.runInContext('[...debug_findings.values()].filter(items => items.length).length', context), 0);
+  assert.equal(vm.runInContext('debug_layer.layers.length', context), 62);
+  vm.runInContext('show_debug(visible_debug[0])', context);
+  assert.match(elements.get('req-details').innerHTML, /Feasible/);
+  assert.match(elements.get('req-details').innerHTML, /Debug checks: passed/);
+  elements.get('time-range').value = 0;
+  vm.runInContext('draw_map()', context);
+  assert.equal(vm.runInContext('visible_debug.length', context), 31);
+  elements.get('debug-reason').value = 'pickup_after_latest_feasible_time';
+  elements.get('debug-reason').listeners.change();
+  assert.equal(vm.runInContext('visible_debug.length', context), debug.rejected_candidates.filter((cand) => cand.rejection_reasons.includes('pickup_after_latest_feasible_time')).length);
+  elements.get('debug-reason').value = 'all';
+  elements.get('debug-outside-check').checked = true;
+  elements.get('debug-outside-check').listeners.change();
+  assert.equal(vm.runInContext('visible_debug.length', context), debug.rejected_candidates.length);
+  const pool = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'candidate_pool_550.json'), 'utf8'));
+  const src = pool.candidate_pool[0].candidates[0];
+  const start = context.data.network.patterns[0].service_period.start_minute;
+  context.alloc = { ...src, scenario: 'base', booking_type: 'dynamic', request_time: start - 1,
+    service_start_minute: start, rejection_reasons: ['booking_before_service_start'] };
+  elements.get('debug-outside-check').checked = false;
+  vm.runInContext('debug_data.rejected_allocations.push(alloc); debug_data.rejected_allocation_count++; audit_debug(); draw_map()', context);
+  assert.equal(vm.runInContext('visible_debug.length', context), 32);
+  assert.equal(vm.runInContext('debug_findings.get(alloc).length', context), 0);
+  vm.runInContext('show_debug(alloc)', context);
+  assert.match(elements.get('req-details').innerHTML, /Service starts/);
+  elements.get('debug-reason').value = 'booking_before_service_start';
+  elements.get('debug-reason').listeners.change();
+  assert.equal(vm.runInContext('visible_debug.length', context), 1);
+  elements.get('debug-reason').value = 'all';
+  vm.runInContext('debug_data.rejected_candidates[0].rejection_reasons = []; audit_debug()', context);
+  assert.match(elements.get('debug-warnings').textContent, /1 rejected candidate/);
+  elements.get('debug-mode-check').checked = false;
+  elements.get('debug-mode-check').listeners.change();
+  assert.equal(vm.runInContext('debug_layer.layers.length', context), 0);
+  console.log('Viewer checks passed for filters, generator audits, distance overlay, and rejected-candidate debug mode.');
 }
 check_distances().catch((error) => { console.error(error); process.exitCode = 1; });

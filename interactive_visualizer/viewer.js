@@ -1,6 +1,7 @@
 /* The viewer reads a generator instance through the file picker so file:// works. */
 const map = L.map('map', { preferCanvas: true, zoomControl: false }).setView([49.611, 6.131], 10);
 L.control.zoom({ position: 'topright' }).addTo(map);
+L.control.scale({ position: 'bottomright', imperial: false }).addTo(map);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -55,6 +56,10 @@ function pattern_key(pattern) {
   return `${pattern.route_id}|${pattern.pattern_id}`;
 }
 
+function cand_key(cand) {
+  return `${pattern_key(cand)}|${cand.origin}|${cand.destination}|${cand.desired_time}`;
+}
+
 function compare_text(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
@@ -74,6 +79,7 @@ function dist_label(metres) {
 }
 
 function debug_deviation(cand) {
+  if (!cand.feasible_pickup_bounds) return 0;
   const [earliest, latest] = cand.feasible_pickup_bounds;
   return cand.desired_time < earliest ? cand.desired_time - earliest : Math.max(0, cand.desired_time - latest);
 }
@@ -93,15 +99,17 @@ function audit_debug() {
   const patterns = new Map(net.patterns.map((pattern) => [pattern_key(pattern), pattern]));
   const warnings = [];
   debug_findings = new Map();
-  if (debug_data.rejected_count !== debug_data.rejected_candidates.length) warnings.push('Rejected count differs from the file contents.');
+  if (debug_data.rejected_count !== debug_data.rejected_candidates.length) warnings.push('Rejected preference count differs from the file contents.');
+  if (debug_data.rejected_allocation_count !== (debug_data.rejected_allocations?.length || 0)) warnings.push('Rejected allocation count differs from the file contents.');
   if (debug_data.seed !== inst.generation.seed) warnings.push('Debug seed differs from the instance seed.');
   if (debug_data.service_date !== inst.config.service_date) warnings.push('Debug service date differs from the instance.');
   const cand_ids = new Set();
-  for (const cand of debug_data.rejected_candidates) {
+  for (const cand of [...debug_data.rejected_candidates, ...(debug_data.rejected_allocations || [])]) {
     const findings = [];
     const pattern = patterns.get(pattern_key(cand));
-    if (cand_ids.has(cand.candidate_id)) findings.push('Duplicate candidate ID.');
-    cand_ids.add(cand.candidate_id);
+    const cand_id = `${cand.scenario || 'raw'}|${cand.candidate_id}`;
+    if (cand_ids.has(cand_id)) findings.push('Duplicate candidate ID in this stage and scenario.');
+    cand_ids.add(cand_id);
     if (!pattern || pattern.stops.indexOf(cand.origin) < 0 || pattern.stops.indexOf(cand.destination) <= pattern.stops.indexOf(cand.origin)) {
       findings.push('Stops are not in forward pattern order.');
     }
@@ -111,16 +119,21 @@ function audit_debug() {
     if (cand.time_window[0] !== cand.desired_time - width || cand.time_window[1] !== cand.desired_time + width) {
       findings.push('Pickup window differs from the configured width.');
     }
-    if (pattern && (cand.operating_hours[0] !== pattern.service_period.start_minute ||
-        cand.operating_hours[1] !== pattern.service_period.end_minute)) findings.push('Operating hours differ from the pattern service period.');
-    const [earliest, latest] = cand.feasible_pickup_bounds;
-    const [start, end] = cand.operating_hours;
-    if (earliest < start || latest > end || earliest > latest) findings.push('Feasible pickup bounds fall outside operating hours.');
     const expected = [];
-    if (cand.desired_time < earliest) expected.push('pickup_before_earliest_feasible_time');
-    if (cand.desired_time > latest) expected.push('pickup_after_latest_feasible_time');
-    if (cand.booking_type === 'dynamic' && cand.request_time < start) expected.push('booking_before_service_start');
-    if (cand.booking_type === 'dynamic' && cand.request_time > end) expected.push('booking_after_service_end');
+    if (cand.feasible_pickup_bounds) {
+      const [earliest, latest] = cand.feasible_pickup_bounds;
+      const [start, end] = cand.operating_hours;
+      if (pattern && (start !== pattern.service_period.start_minute || end !== pattern.service_period.end_minute)) {
+        findings.push('Operating hours differ from the pattern service period.');
+      }
+      if (earliest < start || latest > end || earliest > latest) findings.push('Feasible pickup bounds fall outside operating hours.');
+      if (cand.desired_time < earliest) expected.push('pickup_before_earliest_feasible_time');
+      if (cand.desired_time > latest) expected.push('pickup_after_latest_feasible_time');
+    } else {
+      if (pattern && cand.service_start_minute !== pattern.service_period.start_minute) findings.push('Service start differs from the pattern.');
+      if (cand.booking_type !== 'dynamic') findings.push('Rejected allocation is not dynamic.');
+      if (cand.request_time < cand.service_start_minute) expected.push('booking_before_service_start');
+    }
     if (expected.length !== cand.rejection_reasons.length || expected.some((reason) => !cand.rejection_reasons.includes(reason))) {
       findings.push('Rejection reasons disagree with recorded times and bounds.');
     }
@@ -225,7 +238,44 @@ function audit_inst() {
   if (timetable && timetable.service_date !== inst.config.service_date) {
     add(`Timetable service date ${timetable.service_date} differs from instance ${inst.config.service_date}.`);
   }
-  if (cand_pool) {
+  if (cand_pool?.candidate_attempts_per_pattern) {
+    if (cand_pool.seed !== inst.generation.seed) add('Candidate pool and instance use different random seeds.');
+    if (cand_pool.pickup_window_half_width_minutes !== width) add('Candidate pool and instance use different pickup widths.');
+    const cand_ids = new Set();
+    const matches = new Map();
+    for (const cell of cand_pool.candidate_pool) {
+      const pattern = patterns.get(pattern_key(cell));
+      if (cell.candidates.length > cand_pool.candidate_attempts_per_pattern) {
+        add(`${cell.route_id}/${cell.pattern_id}: candidate count exceeds the raw draw count.`);
+      }
+      for (const cand of cell.candidates) {
+        const add_cand = (message) => add(`Candidate ${cand.candidate_id}: ${message}`, null, cand);
+        if (cand_ids.has(cand.candidate_id)) add_cand('candidate ID is duplicated.');
+        cand_ids.add(cand.candidate_id);
+        if (pattern_key(cand) !== pattern_key(cell) || !pattern ||
+            pattern.stops.indexOf(cand.origin) < 0 || pattern.stops.indexOf(cand.destination) <= pattern.stops.indexOf(cand.origin)) {
+          add_cand('stops or cell identity are not in forward pattern order.');
+          continue;
+        }
+        if (cand.source_origin_stop_id !== net.source_stop_ids[String(cand.origin)] ||
+            cand.source_destination_stop_id !== net.source_stop_ids[String(cand.destination)]) add_cand('source stop ID differs from network mapping.');
+        if (cand.time_window[0] !== cand.desired_time - width || cand.time_window[1] !== cand.desired_time + width) {
+          add_cand(`pickup window differs from desired ±${width} min.`);
+        }
+        if (cand.time_window[0] < pattern.service_period.start_minute || cand.time_window[1] > pattern.service_period.end_minute) {
+          add_cand('pickup window exceeds the pattern service period.');
+        }
+        const key = cand_key(cand);
+        if (!matches.has(key)) matches.set(key, []);
+        matches.get(key).push(cand);
+      }
+    }
+    for (const req of reqs) {
+      const candidates = matches.get(cand_key(req)) || [];
+      if (!candidates.length) add(`Request #${req.id}: no matching raw pool candidate.`, req.id);
+      if (candidates.length === 1) req_cands.set(req.id, candidates[0]);
+    }
+  } else if (cand_pool) {
     if (cand_pool.seed !== inst.generation.seed) add('Candidate pool and instance use different random seeds.');
     if (cand_pool.pickup_window_half_width_minutes !== width) add('Candidate pool and instance use different pickup widths.');
     const cells = new Map(cand_pool.candidate_pool.map((cell) => [pattern_key(cell).concat('|', cell.booking_type), cell]));
@@ -342,6 +392,7 @@ function draw_issues() {
 
 function show_req(req) {
   selected_req = req;
+  selected_debug = null;
   sel_layer.clearLayers();
   const net = inst.network;
   const org_xy = stop_xy(net, req.origin);
@@ -357,7 +408,9 @@ function show_req(req) {
     `Desired ${minute_label(req.desired_time)} · Booked ${minute_label(req.request_time)} · Lead ${req.desired_time - req.request_time} min<br>` +
     `Pickup ${req.time_window.map(minute_label).join('–')} · Matrix travel ${trav_min ?? 'missing'} min` +
     (dist_mat && $('dist-button').getAttribute('aria-pressed') === 'true' ? `<br>Road distance ${dist_label(dist_m(req.origin, req.destination))}` : '') +
-    (cand ? `<br>Selected pool slot: ${escape_html(cand.candidate_id)} · Trip ${escape_html(cand.source_trip_id)}` +
+    (cand && cand.booking_type === undefined ? `<br>Matching raw pool draw: ${escape_html(cand.candidate_id)}` +
+      `<br>Source stops: ${escape_html(cand.source_origin_stop_id)} → ${escape_html(cand.source_destination_stop_id)}` : '') +
+    (cand && cand.booking_type !== undefined ? `<br>Selected pool slot: ${escape_html(cand.candidate_id)} · Trip ${escape_html(cand.source_trip_id)}` +
       `<br>Source stops: ${escape_html(cand.source_origin_stop_id)} → ${escape_html(cand.source_destination_stop_id)}` +
       `<br>Destination departure ${minute_label(cand.scheduled_arrival_minute)} · Candidate travel slack ${cand_trav_min === undefined ? 'unavailable' : `${cand.scheduled_arrival_minute - cand.desired_time - cand_trav_min} min`}` : '') +
     (req_issues.length ? `<br><span class="bad">${req_issues.map((issue) => escape_html(issue.message)).join('<br>')}</span>` : '');
@@ -375,33 +428,74 @@ function show_req(req) {
     .bindPopup(`<strong>Alight · ${escape_html(stop_name(net, req.destination))}</strong><br>Request #${escape_html(req.id)}`)
     .addTo(sel_layer);
   map.fitBounds(L.latLngBounds([org_xy, dst_xy]).pad(.35), { maxZoom: 14 });
+  document.querySelectorAll('.debug-item').forEach((button) => button.classList.toggle('active', false));
   document.querySelectorAll('.req-item').forEach((button) => button.classList.toggle('active', Number(button.dataset.reqId) === req.id));
 }
 
 function show_cand(cand) {
   selected_req = null;
+  selected_debug = null;
   sel_layer.clearLayers();
   const net = inst.network;
   const trav_min = net.travel_times[`${cand.origin},${cand.destination}`];
   const details_panel = $('req-details');
   details_panel.hidden = false;
-  details_panel.innerHTML = `<strong>Candidate ${escape_html(cand.candidate_id)} · ${escape_html(cand.booking_type)}</strong><br>` +
+  details_panel.innerHTML = `<strong>Candidate ${escape_html(cand.candidate_id)}${cand.booking_type ? ` · ${escape_html(cand.booking_type)}` : ' · raw pool draw'}</strong><br>` +
     `${escape_html(stop_name(net, cand.origin))} → ${escape_html(stop_name(net, cand.destination))}<br>` +
-    `Desired ${minute_label(cand.desired_time)} · Booked ${minute_label(cand.request_time)} · Lead ${cand.desired_time - cand.request_time} min<br>` +
+    `Desired ${minute_label(cand.desired_time)}` +
+    (cand.request_time === undefined ? '<br>' : ` · Booked ${minute_label(cand.request_time)} · Lead ${cand.desired_time - cand.request_time} min<br>`) +
     `Pickup ${cand.time_window.map(minute_label).join('–')} · Matrix travel ${trav_min ?? 'missing'} min<br>` +
     (dist_mat && $('dist-button').getAttribute('aria-pressed') === 'true' ? `Road distance ${dist_label(dist_m(cand.origin, cand.destination))}<br>` : '') +
-    `Trip ${escape_html(cand.source_trip_id)} · Source stops ${escape_html(cand.source_origin_stop_id)} → ${escape_html(cand.source_destination_stop_id)}<br>` +
-    `Destination departure ${minute_label(cand.scheduled_arrival_minute)} · Travel slack ${trav_min === undefined ? 'unavailable' : `${cand.scheduled_arrival_minute - cand.desired_time - trav_min} min`}`;
+    (cand.source_trip_id ? `Trip ${escape_html(cand.source_trip_id)} · ` : '') +
+    `Source stops ${escape_html(cand.source_origin_stop_id)} → ${escape_html(cand.source_destination_stop_id)}` +
+    (cand.scheduled_arrival_minute === undefined ? '' : `<br>Destination departure ${minute_label(cand.scheduled_arrival_minute)} · Travel slack ${trav_min === undefined ? 'unavailable' : `${cand.scheduled_arrival_minute - cand.desired_time - trav_min} min`}`);
   if (net.coordinates[String(cand.origin)] && net.coordinates[String(cand.destination)]) {
     const org_xy = stop_xy(net, cand.origin);
     const dst_xy = stop_xy(net, cand.destination);
     L.polyline([org_xy, dst_xy], { color: '#b65143', weight: 4, dashArray: '7 6' }).addTo(sel_layer);
     L.circleMarker(org_xy, { radius: 8, color: '#fff', weight: 2, fillColor: '#b65143', fillOpacity: 1 })
-      .bindPopup(`<strong>Candidate ${escape_html(cand.candidate_id)}</strong><br>Trip ${escape_html(cand.source_trip_id)}`)
+      .bindPopup(`<strong>Candidate ${escape_html(cand.candidate_id)}</strong>${cand.source_trip_id ? `<br>Trip ${escape_html(cand.source_trip_id)}` : ''}`)
       .addTo(sel_layer).openPopup();
     L.circleMarker(dst_xy, { radius: 8, color: '#fff', weight: 2, fillColor: '#17342f', fillOpacity: 1 }).addTo(sel_layer);
     map.fitBounds(L.latLngBounds([org_xy, dst_xy]).pad(.35), { maxZoom: 14 });
   }
+  document.querySelectorAll('.debug-item').forEach((button) => button.classList.toggle('active', false));
+  document.querySelectorAll('.req-item').forEach((button) => button.classList.toggle('active', false));
+}
+
+function show_debug(cand) {
+  selected_req = null;
+  selected_debug = cand;
+  sel_layer.clearLayers();
+  const net = inst.network;
+  const deviation = debug_deviation(cand);
+  const status = deviation < 0 ? `${-deviation} min early` : deviation > 0 ? `${deviation} min late` : 'inside feasible pickup bounds';
+  const findings = debug_findings.get(cand);
+  const details_panel = $('req-details');
+  details_panel.hidden = false;
+  details_panel.innerHTML = `<strong>Rejected draw ${escape_html(cand.candidate_id)}</strong><br>` +
+    `${escape_html(stop_name(net, cand.origin))} → ${escape_html(stop_name(net, cand.destination))}<br>` +
+    `${cand.scenario ? `${escape_html(cand.scenario)} · ${escape_html(cand.booking_type)} allocation` : 'raw preference'} · ${escape_html(cand.route_id)}/${escape_html(cand.pattern_id)}<br>` +
+    `Reasons: ${cand.rejection_reasons.map((reason) => escape_html(debug_reason(reason))).join(', ')}<br>` +
+    `Desired ${minute_label(cand.desired_time)}` +
+    (cand.feasible_pickup_bounds ? ` · Feasible ${cand.feasible_pickup_bounds.map(minute_label).join('–')} · ${status}<br>` : '<br>') +
+    (cand.request_time === undefined ? '' : `Booked ${minute_label(cand.request_time)} · Lead ${cand.desired_time - cand.request_time} min<br>`) +
+    (cand.operating_hours ? `Operating ${cand.operating_hours.map(minute_label).join('–')}` : `Service starts ${minute_label(cand.service_start_minute)}`) +
+    ` · Pickup window ${cand.time_window.map(minute_label).join('–')}<br>` +
+    `Source stops ${escape_html(cand.source_origin_stop_id)} → ${escape_html(cand.source_destination_stop_id)}` +
+    (dist_mat && $('dist-button').getAttribute('aria-pressed') === 'true' ? `<br>Road distance ${dist_label(dist_m(cand.origin, cand.destination))}` : '') +
+    (findings.length ? `<br><span class="bad">Debug checks: ${findings.map(escape_html).join(' ')}</span>` : '<br>Debug checks: passed');
+  if (net.coordinates[String(cand.origin)] && net.coordinates[String(cand.destination)]) {
+    const org_xy = stop_xy(net, cand.origin);
+    const dst_xy = stop_xy(net, cand.destination);
+    const color = debug_color(cand);
+    L.polyline([org_xy, dst_xy], { color, weight: 5, dashArray: '8 6' }).addTo(sel_layer);
+    L.circleMarker(org_xy, { radius: 8, color: '#fff', weight: 2, fillColor: color, fillOpacity: 1 }).addTo(sel_layer);
+    L.circleMarker(dst_xy, { radius: 8, color: '#fff', weight: 2, fillColor: '#17342f', fillOpacity: 1 }).addTo(sel_layer);
+    map.fitBounds(L.latLngBounds([org_xy, dst_xy]).pad(.35), { maxZoom: 14 });
+  }
+  document.querySelectorAll('.debug-item').forEach((button) => button.classList.toggle('active',
+    button.dataset.candId === cand.candidate_id && button.dataset.scenario === (cand.scenario || '')));
   document.querySelectorAll('.req-item').forEach((button) => button.classList.toggle('active', false));
 }
 
@@ -464,11 +558,58 @@ function stop_demand(patterns, filtered) {
   return [...stops.values()];
 }
 
+/** Draw rejected raw candidates independently of the demand time slider. */
+function draw_debug(patterns) {
+  const list = $('debug-list');
+  list.replaceChildren();
+  visible_debug = [];
+  $('debug-legend').hidden = !$('debug-mode-check').checked || !debug_data;
+  if (!$('debug-mode-check').checked || !debug_data) return;
+  const keys = new Set(patterns.map(pattern_key));
+  const reason = $('debug-reason').value;
+  visible_debug = [...debug_data.rejected_candidates, ...(debug_data.rejected_allocations || [])].filter((cand) =>
+    keys.has(pattern_key(cand)) &&
+    (!cand.booking_type || $(cand.booking_type === 'prebooked' ? 'prebooked-check' : 'dynamic-check').checked) &&
+    (reason === 'all' || cand.rejection_reasons.includes(reason)) &&
+    (!$('debug-outside-check').checked || debug_deviation(cand) !== 0));
+  visible_debug.sort((left, right) => Math.abs(debug_deviation(right)) - Math.abs(debug_deviation(left)));
+  const early = visible_debug.filter((cand) => debug_deviation(cand) < 0).length;
+  const late = visible_debug.filter((cand) => debug_deviation(cand) > 0).length;
+  $('debug-counts').textContent = `${visible_debug.length} of ${debug_data.rejected_count + (debug_data.rejected_allocation_count || 0)} rejected draws visible · ${early} early · ${late} late · ${visible_debug.length - early - late} booking allocation. Sorted by pickup deviation.`;
+  if (selected_debug && !visible_debug.includes(selected_debug)) {
+    selected_debug = null;
+    $('req-details').hidden = true;
+  }
+  for (const cand of visible_debug) {
+    const deviation = debug_deviation(cand);
+    const color = debug_color(cand);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `debug-item${selected_debug === cand ? ' active' : ''}`;
+    button.dataset.candId = cand.candidate_id;
+    button.dataset.scenario = cand.scenario || '';
+    button.style.borderLeftColor = color;
+    button.innerHTML = `<strong>${escape_html(cand.candidate_id)}</strong> · ${deviation < 0 ? `${-deviation} min early` : deviation > 0 ? `${deviation} min late` : 'booking allocation'}${debug_findings.get(cand).length ? ' ⚠' : ''}<small>${escape_html(stop_name(inst.network, cand.origin))} → ${escape_html(stop_name(inst.network, cand.destination))} · ${cand.rejection_reasons.map((item) => escape_html(debug_reason(item))).join(', ')}</small>`;
+    button.addEventListener('click', () => show_debug(cand));
+    list.append(button);
+    if (inst.network.coordinates[String(cand.origin)] && inst.network.coordinates[String(cand.destination)]) {
+      const org_xy = stop_xy(inst.network, cand.origin);
+      const dst_xy = stop_xy(inst.network, cand.destination);
+      L.polyline([org_xy, dst_xy], { color, weight: 2, opacity: .55, dashArray: '5 5' })
+        .on('click', () => show_debug(cand)).addTo(debug_layer);
+      L.circleMarker(org_xy, { radius: 4, color: '#fff', weight: 1, fillColor: color, fillOpacity: .9 })
+        .on('click', () => show_debug(cand)).addTo(debug_layer);
+    }
+  }
+  if (selected_debug) show_debug(selected_debug);
+}
+
 function draw_map() {
   route_layer.clearLayers();
   stop_layer.clearLayers();
   flow_layer.clearLayers();
   dist_layer.clearLayers();
+  debug_layer.clearLayers();
   sel_layer.clearLayers();
   if (!inst) return;
 
@@ -531,6 +672,8 @@ function draw_map() {
       .addTo(stop_layer);
   }
 
+  draw_debug(patterns);
+
   $('req-count').textContent = visible_reqs.length;
   $('stop-count').textContent = stops.filter((stop) => stop.board + stop.alight > 0).length;
   $('pattern-count').textContent = patterns.length;
@@ -553,6 +696,10 @@ function load_inst(data, file_name) {
   timetable = null;
   dist_mat = null;
   dist_idx = new Map();
+  debug_data = null;
+  visible_debug = [];
+  selected_debug = null;
+  debug_findings = new Map();
   selected_req = null;
   $('req-details').hidden = true;
   $('cand-file').disabled = false;
@@ -568,6 +715,20 @@ function load_inst(data, file_name) {
   $('dist-button').disabled = true;
   $('dist-button').setAttribute('aria-pressed', 'false');
   $('dist-button').textContent = 'Show road distances';
+  $('debug-mode-check').disabled = false;
+  $('debug-mode-check').checked = false;
+  $('debug-tools').hidden = true;
+  $('debug-file').value = '';
+  $('debug-name').textContent = 'data/debug/rejected_candidates_550.debug.json';
+  $('debug-error').hidden = true;
+  $('debug-counts').textContent = 'Choose the matching debug file to see rejected candidates.';
+  $('debug-warnings').textContent = '';
+  $('debug-list').replaceChildren();
+  $('debug-reason').replaceChildren(new Option('All reasons', 'all'));
+  $('debug-reason').value = 'all';
+  $('debug-reason').disabled = true;
+  $('debug-outside-check').checked = false;
+  $('debug-outside-check').disabled = true;
   $('prebooked-check').checked = true;
   $('dynamic-check').checked = true;
   $('flows-check').checked = false;
@@ -671,7 +832,46 @@ $('dist-button').addEventListener('click', () => {
   draw_map();
 });
 
-for (const id of ['pattern-select', 'prebooked-check', 'dynamic-check', 'time-range', 'flows-check', 'issues-check']) {
+$('debug-mode-check').addEventListener('change', () => {
+  $('debug-tools').hidden = !$('debug-mode-check').checked;
+  if (!$('debug-mode-check').checked && selected_debug) {
+    selected_debug = null;
+    $('req-details').hidden = true;
+  }
+  draw_map();
+});
+
+$('debug-file').addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (data.debug !== true || !Array.isArray(data.rejected_candidates) || !Number.isInteger(data.rejected_count) ||
+        (data.rejected_allocations && !Array.isArray(data.rejected_allocations))) {
+      throw new Error('Choose a rejected-candidates debug JSON from data/debug/.');
+    }
+    debug_data = data;
+    selected_debug = null;
+    $('req-details').hidden = true;
+    $('debug-name').textContent = file.name;
+    $('debug-error').hidden = true;
+    const reasons = [...new Set([...data.rejected_candidates, ...(data.rejected_allocations || [])]
+      .flatMap((cand) => cand.rejection_reasons))].sort();
+    $('debug-reason').replaceChildren(new Option('All reasons', 'all'));
+    for (const reason of reasons) $('debug-reason').add(new Option(debug_reason(reason), reason));
+    $('debug-reason').value = 'all';
+    $('debug-reason').disabled = false;
+    $('debug-outside-check').checked = false;
+    $('debug-outside-check').disabled = false;
+    audit_debug();
+    draw_map();
+  } catch (error) {
+    $('debug-error').textContent = error instanceof SyntaxError ? 'This file is not valid JSON.' : error.message;
+    $('debug-error').hidden = false;
+  }
+});
+
+for (const id of ['pattern-select', 'prebooked-check', 'dynamic-check', 'time-range', 'flows-check', 'issues-check', 'debug-reason', 'debug-outside-check']) {
   $(id).addEventListener(id === 'time-range' ? 'input' : 'change', draw_map);
 }
 $('pattern-select').addEventListener('change', () => map.fitBounds(route_bounds.pad(.14)));

@@ -16,8 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    cfg = tomllib.loads((ROOT / "src/reqreate/config_550.toml").read_text())
-    cfg.update(tomllib.loads((ROOT / "src/reqreate/maps/config.toml").read_text()))
+    cfg = tomllib.loads((ROOT / "src/reqreate/request_gen.toml").read_text())
     out_dir = ROOT / cfg["output_dir"]
     pool_path = out_dir / cfg["pool_file"]
     pool = json.loads(pool_path.read_text())
