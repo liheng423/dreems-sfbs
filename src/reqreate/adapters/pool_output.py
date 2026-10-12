@@ -55,20 +55,26 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
     meta = {
         "busline": busline_name,
         "graph": graph_name,
-        "generator": "REQreate._generate_single_data_impl",
+        "generator": "REQreate._generate_single_data_impl + configured time sampler",
         "python_version": platform.python_version(),
         "package_versions": {
             name: metadata.version(name)
             for name in ("reqreate", "numpy", "pandas", "scipy", "osmnx", "networkx")
         },
         "seed": cfg["seed"],
-        "candidate_count": cfg["requests"],
+        "candidate_count": cfg.get("generated_candidate_count", cfg["requests"]),
+        "mean_candidate_count": cfg["requests"],
+        "prebooked_probability": cfg["prebooked_probability"],
+        "dynamic_time_stamp_distribution": cfg["distributions"]["dynamic_time_stamp"],
+        "prebooked_earliest_departure_distribution": cfg["distributions"]["prebooked_earliest_departure"],
         "request_count": pool["num_data:"],
         "simulation_start_s": cfg["simulation_start_s"],
         "simulation_end_s": cfg["simulation_end_s"],
         "demand_start_s": cfg["demand_start_s"],
         "network_input": "GeoJSON service area and saved OSM drive/walk graphs",
-        "travel_time_method": "REQreate 20 km/h distance fallback",
+        "vehicle_speed_mps": cfg["vehicle_speed_mps"],
+        "detour_factor": cfg["detour_factor"],
+        "travel_time_method": "Directed road distance / DARP vehicle_speed",
         "spatial_sampling": (
             "REQreate method_pois: POI-density zones and radial trip distances, "
             "followed by area, minimum-distance, and positive-travel-time filters"

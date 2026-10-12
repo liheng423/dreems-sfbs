@@ -19,6 +19,7 @@ class AreaNetwork(Network):
 
     # build_area_net attaches the precomputed stop-access distances.
     walking_distance: WalkingDistance
+    vehicle_speed_mps: float
     radial_direction = (0, 360)
 
     def _get_random_coord(self, polygon, seed_coord):
@@ -60,8 +61,8 @@ class AreaNetwork(Network):
             return -1
 
     def _return_estimated_travel_time_drive(self, org, dst):
-        """Estimate driving seconds from distance at REQreate's 5.56 m/s rate."""
-        return int(self._return_estimated_distance_drive(org, dst) / 5.56)
+        """Estimate driving seconds using the selected operation profile's speed."""
+        return int(self._return_estimated_distance_drive(org, dst) / self.vehicle_speed_mps)
 
 
 def build_area_net(area_path, stops, max_walking_distance_m):

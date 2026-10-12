@@ -35,6 +35,7 @@ from src.reqreate.utils.graph_utils import nearest_graph_point
 CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
 MAPS_CFG_PATH = ROOT / "src/reqreate/maps/map_config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
+OPERATION_CFG_PATH = ROOT / "src/reqreate/operation/operation_profile.toml"
 DAY_END_S = 86399
 
 
@@ -53,33 +54,18 @@ def clock_seconds(value):
     return hour * 3600 + minute * 60 + second
 
 
-def request_attributes(cfg):
-    """Build REQreate fields in dependency order from the tunable distributions."""
+def request_attributes(cfg, prebooked=False):
+    """Build REQreate fields for the sampled request type and trip."""
     distributions = cfg["distributions"]
-    start_s, end_s = cfg["demand_start_s"], cfg["simulation_end_s"]
-    departure_settings = distributions["earliest_departure"]
-    if departure_settings["type"] == "normal":
-        loc, scale = (start_s + end_s) / 2, (end_s - start_s) / 6
-    elif departure_settings["type"] == "uniform":
-        loc, scale = start_s, end_s - start_s
-    else:
-        raise ValueError("earliest_departure distribution must be normal or uniform")
-    departure_pdf = {"loc": loc, "scale": scale, **departure_settings}
     return {
         "is_prebooked": {"type": "integer", "output_csv": True,
-                         "pdf": [dict(distributions["is_prebooked"])]},
+                         "pdf": [{"type": "uniform", "loc": int(prebooked), "scale": 0}]},
         "lt_dynamic": {"type": "integer", "time_unit": "s", "output_csv": False,
                        "pdf": [dict(distributions["lt_dynamic"])]},
         "lt_prebooked": {"type": "integer", "time_unit": "s", "output_csv": False,
                          "pdf": [dict(distributions["lt_prebooked"])]},
         "lead_time": {"type": "integer", "time_unit": "s",
                       "expression": "lt_prebooked if is_prebooked >= 0.5 else lt_dynamic"},
-        "earliest_departure": {"type": "integer", "time_unit": "s",
-                               "constraints": ["earliest_departure >= min_early_departure",
-                                               "earliest_departure <= max_early_departure"],
-                               "pdf": [departure_pdf]},
-        "time_stamp": {"type": "integer", "time_unit": "s",
-                       "expression": "earliest_departure - lead_time"},
         "origin": {"type": "location"},
         "destination": {"type": "location"},
         "direct_distance": {"type": "integer", "length_unit": "m",
@@ -89,15 +75,63 @@ def request_attributes(cfg):
         "direct_travel_time": {"type": "integer", "time_unit": "s",
                                "expression": "dtt(origin,destination)",
                                "constraints": ["direct_travel_time > 0"]},
-        "latest_arrival": {"type": "integer", "time_unit": "s",
-                           "expression": "earliest_departure + direct_travel_time + 600"},
     }
+
+
+def expected_events(distribution, start_s, end_s):
+    """Return the mean count for a configured event process."""
+    if distribution["type"] != "poisson":
+        raise ValueError("event-time distribution must be poisson")
+    rate = distribution["rate_per_hour"]
+    if rate < 0:
+        raise ValueError("Poisson rate_per_hour must be nonnegative")
+    return rate * (end_s - start_s) / 3600
+
+
+def sample_arrivals(cfg):
+    """Sample the configured dynamic arrivals and prebooked departures."""
+    rng = np.random.default_rng(cfg["seed"])
+    distributions = cfg["distributions"]
+    prebooked_count = int(rng.poisson(expected_events(
+        distributions["prebooked_earliest_departure"],
+        cfg["demand_start_s"], cfg["simulation_end_s"])))
+    dynamic_count = int(rng.poisson(expected_events(
+        distributions["dynamic_time_stamp"],
+        cfg["simulation_start_s"], cfg["simulation_end_s"])))
+    prebooked = np.array([True] * prebooked_count + [False] * dynamic_count, dtype=bool)
+    rng.shuffle(prebooked)
+    count = len(prebooked)
+    dynamic_ids = np.flatnonzero(~prebooked)
+    prebooked_ids = np.flatnonzero(prebooked)
+    times = np.zeros(count, dtype=int)
+    times[dynamic_ids] = np.sort(rng.uniform(
+        cfg["simulation_start_s"], cfg["simulation_end_s"], len(dynamic_ids)
+    )).astype(int)
+    times[prebooked_ids] = np.sort(rng.uniform(
+        cfg["demand_start_s"], cfg["simulation_end_s"], len(prebooked_ids)
+    )).astype(int)
+    return prebooked, times
+
+
+def set_request_times(req, prebooked, time, detour_factor):
+    """Turn a request arrival or prebooked departure into all trip times."""
+    if prebooked:
+        req["earliest_departure"] = int(time)
+        req["time_stamp"] = req["earliest_departure"] - req["lead_time"]
+    else:
+        req["time_stamp"] = int(time)
+        req["earliest_departure"] = req["time_stamp"] + req["lead_time"]
+    req["latest_arrival"] = int(req["earliest_departure"]
+                                + req["direct_travel_time"] * detour_factor)
 
 
 def load_config(busline_name):
     """Load demand settings and optional route stop data."""
     cfg = tomllib.loads(CFG_PATH.read_text())
     cfg.update(tomllib.loads(MAPS_CFG_PATH.read_text()))
+    operation_cfg = tomllib.loads(OPERATION_CFG_PATH.read_text())["darp"]["attribute"]
+    cfg["vehicle_speed_mps"] = operation_cfg["vehicle_speed"]
+    cfg["detour_factor"] = operation_cfg["detour_factor"]
     filter_cfg = tomllib.loads(FILTERS_PATH.read_text())
     cfg["max_walking_distance_m"] = filter_cfg["max_walking_distance_m"]
     cfg["walking_speed_mps"] = filter_cfg["walking_speed_mps"]
@@ -115,25 +149,39 @@ def load_config(busline_name):
         raise ValueError("simulation start and end must be ordered within 00:00–23:59:59")
     if not start_s <= demand_start_s < end_s:
         raise ValueError("demand start must be within the simulation window before its end")
-    cfg["parameters"].extend([
-        {"name": name, "type": "integer", "value": value, "time_unit": "s"}
-        for name, value in (("min_early_departure", demand_start_s),
-                            ("max_early_departure", end_s))
-    ])
     cfg["simulation_start_s"] = start_s
     cfg["simulation_end_s"] = end_s
     cfg["demand_start_s"] = demand_start_s
+    distributions = cfg["distributions"]
+    expected_dynamic = expected_events(distributions["dynamic_time_stamp"], start_s, end_s)
+    expected_prebooked = expected_events(distributions["prebooked_earliest_departure"],
+                                         demand_start_s, end_s)
+    cfg["requests"] = expected_dynamic + expected_prebooked
+    cfg["prebooked_probability"] = (expected_prebooked / cfg["requests"]
+                                    if cfg["requests"] else 0)
     cfg["attributes"] = request_attributes(cfg)
+    cfg["prebooked_attributes"] = request_attributes(cfg, prebooked=True)
     return cfg
 
 
-def generate(cfg, area_path, poi_path):
-    """Apply area and trip filters, plus bus filters when a route is selected."""
+def set_expected_requests(cfg, count):
+    """Scale both configured event rates for the --requests override."""
+    if count < 0 or (count and not cfg["requests"]):
+        raise ValueError("--requests requires a nonnegative count and nonzero configured rates")
+    scale = count / cfg["requests"] if cfg["requests"] else 1
+    for name in ("dynamic_time_stamp", "prebooked_earliest_departure"):
+        cfg["distributions"][name]["rate_per_hour"] *= scale
+    cfg["requests"] = count
+
+
+def prepare_network(cfg, area_path, poi_path):
+    """Load the service area, route timetable, and POI sampling zones."""
     direction = cfg["distributions"]["radial_direction"]
     start, span = direction["loc"], direction["scale"]
     if direction["type"] != "uniform" or not (0 <= start < 360 and 0 <= span <= 360):
         raise ValueError("radial_direction must be uniform with 0 <= loc < 360 and 0 <= scale <= 360")
     net = build_area_net(area_path, cfg["places"], cfg["max_walking_distance_m"])
+    net.vehicle_speed_mps = cfg["vehicle_speed_mps"]
     net.radial_direction = start, span
     if cfg["busline_name"] is not None:
         net.route_departures = index_route_departures(
@@ -141,34 +189,56 @@ def generate(cfg, area_path, poi_path):
         )
     pois = load_pois(poi_path)
     set_poi_zones(net, pois, cfg["method_pois"]["rows"], cfg["method_pois"]["columns"])
+    return net
+
+
+def request_graph(attributes):
+    """Give REQreate the fields and polygon location sampling it expects."""
+    graph = nx.DiGraph()
+    for name, attr in attributes.items():
+        graph.add_node(name, **attr)
+    graph.nodes["origin"]["subset_zones"] = False
+    graph.nodes["destination"]["subset_zones"] = False
+    return graph
+
+
+def generate_candidates(cfg, net):
+    """Sample request times and let REQreate fill in each trip."""
     params = {param["name"]: dict(param) for param in cfg["parameters"]}
     pdf = cfg["distributions"]["radial_distance"]
     distance_sampler = {"uniform": uniform, "normal": norm}.get(pdf["type"])
     if distance_sampler is None:
         raise ValueError("radial_distance distribution must be uniform or normal")
-    graph = nx.DiGraph()
-    for name, attr in cfg["attributes"].items():
-        graph.add_node(name, **attr)
-    # REQreate enables polygon sampling through subset_zones=False.
-    graph.nodes["origin"]["subset_zones"] = False
-    graph.nodes["destination"]["subset_zones"] = False
-    graph.nodes["time_stamp"]["static_probability"] = 0
+    graphs = {False: request_graph(cfg["attributes"]),
+              True: request_graph(cfg["prebooked_attributes"])}
 
     np.random.seed(cfg["seed"])
     random.seed(cfg["seed"])
-    names = list(cfg["attributes"])
+    prebooked_flags, times = sample_arrivals(cfg)
+    count = len(prebooked_flags)
+    cfg["generated_candidate_count"] = count
     reqs = {}
-    for req_idx in range(cfg["requests"]):
+    for req_idx, prebooked in enumerate(prebooked_flags):
+        graph = graphs[bool(prebooked)]
         distance = distance_sampler.rvs(loc=pdf["loc"], scale=pdf["scale"])
-        reqs[str(req_idx)] = _generate_single_data_impl(
-            graph, net, names.copy(), params, req_idx, True, distance,
+        req = _generate_single_data_impl(
+            graph, net, list(graph.nodes), params, req_idx, True, distance,
             "origin", "destination", pdf["type"], pdf["loc"], pdf["scale"], None,
-            [], 0, [], cfg["requests"], pd.DataFrame(),
+            [], 0, [], count, pd.DataFrame(),
         )
+        set_request_times(req, bool(prebooked), times[req_idx], cfg["detour_factor"])
+        reqs[str(req_idx)] = req
+    return reqs
+
+
+def filter_requests(cfg, net, reqs):
+    """Keep feasible trips and attach scheduled bus stops when applicable."""
     request_filters = REQUEST_FILTERS if cfg["busline_name"] is not None else BASE_REQUEST_FILTERS
     reqs = {
         req_id: req for req_id, req in reqs.items()
-        if req["latest_arrival"] <= cfg["simulation_end_s"]
+        if cfg["demand_start_s"] <= req["earliest_departure"] <= cfg["simulation_end_s"]
+        and req["latest_arrival"] <= cfg["simulation_end_s"]
+        and (not req["is_prebooked"] or req["time_stamp"] < cfg["simulation_start_s"])
         and passes_filters(req, request_filters, net, cfg)
     }
     for req in reqs.values():
@@ -206,7 +276,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--map", required=True, help="Saved service-area map name")
     parser.add_argument("--busline", help="Route to use; prompts for one when omitted")
-    parser.add_argument("--requests", type=int, help="Override the candidate count")
+    parser.add_argument("--requests", type=int, help="Override the expected candidate count")
     args = parser.parse_args()
     graph_names = available_graphs()
     if args.map not in graph_names:
@@ -228,7 +298,10 @@ def main():
     except ValueError as exc:
         parser.error(str(exc))
     if args.requests is not None:
-        cfg["requests"] = args.requests
+        try:
+            set_expected_requests(cfg, args.requests)
+        except ValueError as exc:
+            parser.error(str(exc))
     route_dir = busline_dir(busline_name) if busline_name is not None else None
     area_dir = graph_dir(graph_name)
     area_path = graph_path("area", area_dir)

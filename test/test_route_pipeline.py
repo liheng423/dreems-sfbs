@@ -132,6 +132,11 @@ def test_route_pipeline():
         assert request_path("pool", requests_dir / "605_550_0002").is_file()
         meta = json.loads(request_path("metadata", instance_dir).read_text())
         assert (meta["candidate_count"], meta["busline"], meta["graph"]) == (2, "605", "550")
+        assert (meta["mean_candidate_count"], meta["prebooked_probability"]) == (2, 0.5)
+        assert meta["dynamic_time_stamp_distribution"] == {
+            "type": "poisson", "rate_per_hour": 0.25}
+        assert meta["prebooked_earliest_departure_distribution"] == {
+            "type": "poisson", "rate_per_hour": 0.25}
         assert (meta["simulation_start_s"], meta["simulation_end_s"],
                 meta["demand_start_s"]) == (28800, 43200, cfg["demand_start_s"])
         assert {path.relative_to(instance_dir).as_posix() for path in instance_dir.rglob("*")
@@ -188,6 +193,8 @@ def test_generate_without_busline():
     )), patch.object(
         generate, "load_pois", return_value=[[49.5, 6.1]]
     ), patch.object(generate, "set_poi_zones"), patch.object(
+        generate, "sample_arrivals", return_value=([False, True], [30000, 30000])
+    ), patch.object(
         generate, "_generate_single_data_impl", side_effect=[valid_req, short_req]
     ), patch.object(
         generate, "select_scheduled_bus_stops", side_effect=AssertionError("bus stops selected")
@@ -305,12 +312,7 @@ def test_demand_time_window():
                                    changed, count=1, flags=re.MULTILINE))
         with patch.object(generate, "CFG_PATH", cfg_path):
             cfg = generate.load_config(None)
-    assert [param["value"] for param in cfg["parameters"]
-            if param["name"] in ("min_early_departure", "max_early_departure")] == [5400, 7200]
-    assert cfg["attributes"]["earliest_departure"]["pdf"][0] == {
-        "type": "normal", "loc": 6300, "scale": 300,
-    }
-    assert cfg["demand_start_s"] == 5400
+    assert (cfg["demand_start_s"], cfg["simulation_end_s"]) == (5400, 7200)
     cfg["requests"] = 3
     drive = nx.DiGraph()
     drive.add_node(1, x=0.51, y=0.52)
@@ -325,6 +327,8 @@ def test_demand_time_window():
         polygon=box(0, 0, 1, 1), G_drive=drive
     )), patch.object(generate, "load_pois", return_value=[]), patch.object(
         generate, "set_poi_zones"
+    ), patch.object(
+        generate, "sample_arrivals", return_value=([True, False, False], [6000, 6000, 7000])
     ), patch.object(generate, "_generate_single_data_impl",
                     side_effect=[early, on_time, late_arrival]):
         pool = generate.generate(cfg, Path("unused"), Path("unused"))
@@ -334,13 +338,13 @@ def test_demand_time_window():
 
 
 def test_request_distributions_from_toml():
-    """Changing TOML distributions changes the REQreate field definitions."""
+    """Changing TOML lead times and arrival rates changes sampling settings."""
     source = generate.CFG_PATH.read_text()
     source = re.sub(r'^lt_dynamic = .*$',
                     'lt_dynamic = { type = "uniform", loc = 60, scale = 120 }',
                     source, count=1, flags=re.MULTILINE)
-    source = re.sub(r'^earliest_departure = .*$',
-                    'earliest_departure = { type = "uniform" }',
+    source = re.sub(r'^dynamic_time_stamp = .*$',
+                    'dynamic_time_stamp = { type = "poisson", rate_per_hour = 10 }',
                     source, count=1, flags=re.MULTILINE)
     with TemporaryDirectory() as directory:
         cfg_path = Path(directory) / "request_gen.toml"
@@ -349,9 +353,42 @@ def test_request_distributions_from_toml():
             cfg = generate.load_config(None)
     assert cfg["attributes"]["lt_dynamic"]["pdf"] == [
         {"type": "uniform", "loc": 60, "scale": 120}]
-    assert cfg["attributes"]["earliest_departure"]["pdf"] == [
-        {"type": "uniform", "loc": cfg["demand_start_s"],
-         "scale": cfg["simulation_end_s"] - cfg["demand_start_s"]}]
+    assert cfg["distributions"]["dynamic_time_stamp"] == {
+        "type": "poisson", "rate_per_hour": 10}
+    assert cfg["requests"] == 90
+
+
+def test_event_time_distribution_requires_poisson():
+    source = generate.CFG_PATH.read_text()
+    source = re.sub(r'^dynamic_time_stamp = .*$',
+                    'dynamic_time_stamp = { type = "uniform", rate_per_hour = 10 }',
+                    source, count=1, flags=re.MULTILINE)
+    with TemporaryDirectory() as directory:
+        cfg_path = Path(directory) / "request_gen.toml"
+        cfg_path.write_text(source)
+        with patch.object(generate, "CFG_PATH", cfg_path):
+            try:
+                generate.load_config(None)
+            except ValueError as exc:
+                assert "event-time distribution must be poisson" in str(exc)
+            else:
+                raise AssertionError("Unsupported event-time distribution was accepted")
+
+
+def test_poisson_arrival_windows():
+    """Each Poisson event stream has a variable count and ordered times."""
+    cfg = generate.load_config(None)
+    generate.set_expected_requests(cfg, 1000)
+    flags, times = generate.sample_arrivals(cfg)
+    dynamic = [int(time) for flag, time in zip(flags, times) if not flag]
+    prebooked = [int(time) for flag, time in zip(flags, times) if flag]
+    assert dynamic == sorted(dynamic)
+    assert prebooked == sorted(prebooked)
+    assert all(cfg["simulation_start_s"] <= time < cfg["simulation_end_s"] for time in dynamic)
+    assert all(cfg["demand_start_s"] <= time < cfg["simulation_end_s"] for time in prebooked)
+    assert 400 < len(dynamic) < 600 and 400 < len(prebooked) < 600
+    generate.set_expected_requests(cfg, 0)
+    assert len(generate.sample_arrivals(cfg)[0]) == 0
 
 
 def test_distance_distribution_from_request_config():
@@ -380,6 +417,8 @@ def test_distance_distribution_from_request_config():
         generate, "passes_filters", return_value=True
     ), patch.object(generate.norm, "rvs", return_value=950) as sample_distance, patch.object(
         generate.uniform, "rvs", side_effect=AssertionError("uniform distance sampled")
+    ), patch.object(
+        generate, "sample_arrivals", return_value=([False], [30000])
     ), patch.object(generate, "_generate_single_data_impl", return_value=req) as sample_request:
         pool = generate.generate(cfg, Path("unused"), Path("unused"))
     sample_distance.assert_called_once_with(loc=900, scale=100)
@@ -408,5 +447,7 @@ if __name__ == "__main__":
     test_generate_with_busline_saves_stop_points()
     test_demand_time_window()
     test_request_distributions_from_toml()
+    test_event_time_distribution_requires_poisson()
+    test_poisson_arrival_windows()
     test_distance_distribution_from_request_config()
     test_select_area_command()

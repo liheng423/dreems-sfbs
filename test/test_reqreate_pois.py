@@ -15,7 +15,7 @@ from utils.walking_distance import WalkingDistance
 
 def main():
     cfg = generate.load_config("550")
-    cfg["requests"] = 5
+    generate.set_expected_requests(cfg, 5)
     area_path = graph_path("area", graph_dir("550"))
     with TemporaryDirectory() as directory:
         poi_path = graph_path("pois", Path(directory))
@@ -37,7 +37,7 @@ def main():
                                cfg["method_pois"]["columns"])
         assert net.zones["number_pois"].sum() == len(pois)
         assert abs(net.zones["density_pois"].sum() - 1) < 1e-12
-        assert len(pool["requests"]) <= cfg["requests"]
+        assert len(pool["requests"]) <= cfg["generated_candidate_count"]
         assert all(call.args[5] is True for call in sample.call_args_list)
         snapshot = json.loads(poi_path.read_text())
         assert [poi["name"] for poi in snapshot["features"]] == ["School", "Cafe", "Museum"]
@@ -45,7 +45,7 @@ def main():
         with patch.object(WalkingDistance, "within_limit", return_value=False) as walkable:
             rejected = generate.generate(cfg, area_path, poi_path)
         assert rejected == {"num_data:": 0, "requests": {}}
-        assert 0 < walkable.call_count <= cfg["requests"]
+        assert 0 < walkable.call_count <= cfg["generated_candidate_count"]
     print("Validated saved-map POIs and REQreate zone-density sampling")
 
 

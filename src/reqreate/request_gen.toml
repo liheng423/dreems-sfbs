@@ -2,25 +2,24 @@
 # Distribution parameters: uniform loc is the minimum and scale is the range width;
 # normal loc is the mean and scale is the standard deviation.
 seed = 42
-requests = 100
 
 [simulation]
 start = "08:00:00"
 end = "12:00:00"
 demand_start = "08:00:00"
 
-# Request distributions. REQreate field definitions live in generate.py.
-# is_prebooked samples 0 (dynamic) or 1 (prebooked); lead times are in seconds.
+# Dynamic request time_stamps follow a Poisson process over simulation.start..end.
+# Prebooked earliest_departure times independently follow a Poisson process over
+# simulation.demand_start..end; their time_stamps are departure minus lead time.
+# Lead times are in seconds. REQreate field definitions live in generate.py.
 # radial_distance samples the distance from the POI-zone endpoint to the other endpoint.
 # radial_direction samples that endpoint's bearing clockwise from north: 0° north, 90° east.
 # loc is the first degree and scale is the clockwise range; loc=0, scale=360 allows every direction.
-# earliest_departure uses the simulation window for its normal or uniform defaults;
-# loc and scale can be set here to override them.
 [distributions]
-is_prebooked = { type = "uniform", loc = 0, scale = 1 }
+dynamic_time_stamp = { type = "poisson", rate_per_hour = 12.5 }
+prebooked_earliest_departure = { type = "poisson", rate_per_hour = 12.5 }
 lt_dynamic = { type = "uniform", loc = 300, scale = 1500 }
 lt_prebooked = { type = "uniform", loc = 36000, scale = 72000 }
-earliest_departure = { type = "normal" } # default loc and scale are the simulation window
 radial_distance = { type = "uniform", loc = 500, scale = 14500 } # [m]
 radial_direction = { type = "uniform", loc = 0, scale = 360 }
 pickup_timewindow = { type = "uniform", loc = 900, scale = 0 } # 15 min
