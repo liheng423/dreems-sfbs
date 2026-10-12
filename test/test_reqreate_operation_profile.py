@@ -23,7 +23,7 @@ def main():
         profile_path = Path(directory) / "operation_profile.toml"
         profile_path.write_text("[darp.attribute]\nvehicle_speed = 10.0\ndetour_factor = 2.0\n")
         with patch.object(generate, "OPERATION_CFG_PATH", profile_path):
-            cfg = generate.load_config(None)
+            cfg = generate.load_config("DARP")
 
     assert cfg["vehicle_speed_mps"] == 10.0
     req = {"lead_time": 300, "direct_travel_time": 12}

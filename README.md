@@ -15,7 +15,7 @@ This repository prepares synthetic passenger demand for Luxembourg bus routes, w
 | `src/output_adapters.py` | Define the shared data paths and output filenames. |
 | `data/buslines/<route>/` | Route timetable (`businfo.json`), REQreate stops, and optional road distance and energy files. |
 | `data/graphs/<name>/` | Service area GeoJSON, drive/walk GraphML files, and POIs. |
-| `data/requests/<busline>_<graph>_<number>/` | A generated request pool and provenance metadata. |
+| `data/requests/<task>_<map>_<number>/` | A generated request pool and provenance metadata, for example `sfbs_550_0001`. |
 | `interactive_visualizer/` | Static Route 550 request viewer and Node.js checks. |
 | `test/` | Python checks for crawlers, request generation, and energy. |
 
@@ -44,7 +44,8 @@ python main.py select-area 550
 The `select-area` argument names the saved map. For a separate map name, use `python main.py select-area test --busline 550` to display Route 550 stops, or omit `--busline` to draw without stops. In the browser page, draw the **operation area** first; the **service area** initially matches it and can be drawn or edited separately with the selector. If the service area extends outside the operation area, it stays visible in red so you can drag its vertices inside; **Save** remains disabled until it fits. Click **Save** to write `service_area.geojson`, `drive.graphml`, `walk.graphml`, `pois.json`, and `depot.json` under `data/graphs/<map>/`. Only the service boundary is saved: requests and POIs use it, while the road graphs cover the operation area, which may also contain the depot. The depot's source coordinate comes from `map_config.toml`; `depot.json` stores it and its nearest drive graph node. Stop the area-selection server with Ctrl+C after saving. To generate requests, run:
 
 ```bash
-python main.py generate-demand --map 550
+python main.py generate-demand SFBS --map 550 --busline 550
+python main.py generate-demand DARP --map Esch
 ```
 
 `--map` selects a saved map in `data/graphs/`; `550` is only the example map name. Without `--busline <route>`, the command lists available buslines and offers `0. Skip`, even when no buslines are available. Skipping keeps the area, minimum driving distance, and positive travel time filters; it disables only bus stop walking and scheduled-bus filters. Output uses `no_bus` in directory names and records `null` for the busline in metadata. Omit `--requests` to use the 20,000 candidate default. Each run creates a new directory such as `data/requests/550_550_0001/` with `requests.json`, `operations.json`, and `requests_metadata.json`. POIs are saved with the map, so request generation makes no Overpass call. Area selection requires OSM access. Existing maps need `pois.json` before generating requests. See the REQreate installation limitation above before starting generation.
@@ -52,6 +53,8 @@ python main.py generate-demand --map 550
 Each saved request includes `origin_drive_point` and `destination_drive_point`, the coordinates of its existing `originnode_drive` and `destinationnode_drive` nodes in `drive.graphml`. Busline requests also include `boarding_stop_point` and `alighting_stop_point`, the coordinates of their selected stop IDs. All four coordinate fields use `[latitude, longitude]`, like `origin` and `destination`.
 
 Set `simulation.start`, `simulation.demand_start`, and `simulation.end` in [`src/reqreate/request_gen.toml`](src/reqreate/request_gen.toml), using `HH:MM` or `HH:MM:SS`. The simulation window and passenger departures currently start at 08:00. Requests whose latest arrival exceeds the end are excluded. REQreate calculates request appearance (`time_stamp`) as earliest departure minus lead time. Prebooked requests can appear on the previous day, represented by a negative `time_stamp`; their appearance time does not exclude them. The TOML controls the request distributions and lead times. Effective times are saved in request metadata. The selected busline still supplies its timetable and bus filters, but does not override these times.
+Set the Poisson arrival rates in [`src/reqreate/request_gen.toml`](src/reqreate/request_gen.toml).
+Saved DARP requests contain drive pickup and dropoff node IDs. Saved SFBS requests contain boarding and alighting bus stop IDs and walking distances instead of drive endpoint IDs. Both keep the passenger origin and destination coordinates. Add `--debug` to retain REQreate's extra sampling fields, including `lt_dynamic` and `lt_prebooked`.
 
 To calculate Route 550's optional bus energy after saving the drive graph, run:
 
@@ -73,7 +76,7 @@ Choose folders from `data/requests/`, `data/graphs/`, and `data/buslines/` in th
 
 1. `crawl_busline.py --route <route>` extracts the route's stops, patterns, and trips from GTFS into `data/buslines/<route>/businfo.json` and `stops.json`. Its default archive and service date are 1 and 6 October 2026, respectively; use `--gtfs-url` or `--gtfs-zip` and `--service-date` to select other inputs.
 2. `main.py select-area <map> [--busline <route>]` shows optional route stops and saves the service boundary, operation-area OSM drive/walk graphs, and service-area POIs in `data/graphs/<map>/`.
-3. `main.py generate-demand --map <map> [--busline <route>]` samples requests using the saved map and POIs, applies area and trip filters, adds bus filters when a busline is selected, and saves a numbered request instance with metadata.
+3. `main.py generate-demand DARP --map <map>` samples demand without a bus route. `main.py generate-demand SFBS --map <map> --busline <route>` also applies stop access and timetable filters. The task is required and selects the operation and filter profiles recorded in the request metadata.
 
 The GTFS and OSRM crawlers access external services unless given a local GTFS ZIP or routing server. The area selector also needs OSM access.
 
@@ -81,9 +84,9 @@ The GTFS and OSRM crawlers access external services unless given a local GTFS ZI
 
 | Page | Input | What it shows |
 | --- | --- | --- |
-| [Request explorer](interactive_visualizer/index.html) | Selected folders under `data/requests/`, `data/graphs/`, and `data/buslines/` | Request locations, booking and time filters, origin–destination flows, service area, drive/walk GraphML nodes, saved pickup/dropoff nodes, walking links, and estimated bus energy. |
+| [Request explorer](interactive_visualizer/index.html) | Selected folders under `data/requests/`, `data/graphs/`, and `data/buslines/` | Request locations, booking and time filters, origin–destination flows, service area, drive/walk GraphML nodes, DARP drive endpoints, SFBS bus stops and walking links, and saved energy estimates. |
 
-The request explorer lists available folders from the local server. A selected request folder supplies `requests.json` (or `raw_requests.json` for an older run); a graph folder supplies `service_area.geojson`, `pois.json`, and the selected `drive.graphml` or `walk.graphml`; a busline folder supplies `stops.json`, `businfo.json`, and optional `energy.json`. Click a graph node to see its ID. Saved pickup and dropoff nodes appear for visible requests; selecting one request highlights its nodes and the links from its coordinates. Click a request point to see its estimated route and bus energy; shared locations list each request. It uses Leaflet and online OSM map tiles.
+The request explorer lists available folders from the local server. A selected request folder supplies `requests.json` (or `raw_requests.json` for an older run); a graph folder supplies `service_area.geojson`, `pois.json`, and the selected `drive.graphml` or `walk.graphml`; a busline folder supplies `stops.json`, `businfo.json`, and optional `energy.json`. DARP highlights saved drive pickup and dropoff nodes. SFBS highlights its saved boarding and alighting bus stops and shows the passenger walks to those stops. Click a request point to see its route and saved energy; shared locations list each request. It uses Leaflet and online OSM map tiles.
 
 New request instances save `pickup_from`/`pickup_to`, `dropoff_from`/`dropoff_to`, and `service_time` in seconds. Each window bounds the full stop operation: boarding or alighting must finish by its upper bound. The configured service time applies at each stop. `latest_arrival` equals `dropoff_to`; the detour factor sets the allowance after the pickup window for the ride and dropoff service. The request timeline draws both permitted windows on one axis; old saved pools without these fields show that the windows are unavailable.
 
@@ -94,13 +97,17 @@ New request instances save `pickup_from`/`pickup_to`, `dropoff_from`/`dropoff_to
 | [`src/reqreate/request_gen.toml`](src/reqreate/request_gen.toml) | Seed, candidate count, simulation window, request distributions, and sampled radial distance and direction. |
 | [`src/reqreate/maps/map_config.toml`](src/reqreate/maps/map_config.toml) | POI tags, spatial sampling grid, and depot source coordinate. |
 | `data/graphs/<map>/depot.json` | `original_point`, nearest `drive_node_id`, `drive_point` in `[latitude, longitude]`, and `snap_distance_m`. |
-| [`src/reqreate/filters/filters.toml`](src/reqreate/filters/filters.toml) | Maximum walk distance, walk speed, and minimum trip distance. |
+=======
+| [`src/reqreate/operation/operation_profile.toml`](src/reqreate/operation/operation_profile.toml) | DARP vehicle speed for direct travel time and detour factor for latest arrival. |
+| [`src/reqreate/maps/map_config.toml`](src/reqreate/maps/map_config.toml) | POI tags and spatial sampling grid. |
+>>>>>>> reqreate
+| [`src/reqreate/filters/filters.toml`](src/reqreate/filters/filters.toml) | DARP and SFBS filter profiles: minimum trip distance plus SFBS walk settings. |
 | [`src/operation/operation_profile.toml`](src/operation/operation_profile.toml) | Selected vehicle profile, temperature case, and operation settings. |
 | [`src/operation/veh_profile.toml`](src/operation/veh_profile.toml) | Vehicle parameters for the energy calculation. |
-| `data/requests/<busline>_<graph>_<number>/requests.json` | Request pool; `num_data:` is the retained count and `requests` is keyed by request ID. |
-| `data/requests/<busline>_<graph>_<number>/operations.json` | DARP and SFBS start/end times, `average_speed_mps`, `vehicle_count`, and each task's selected `vehicle_type` and vehicle profile. |
-| `data/requests/<busline>_<graph>_<number>/requests.json` | Each generated request includes `energy_kwh`, estimated from its directed road `direct_distance` and the DARP vehicle and temperature profile; walking distance is excluded. |
-| `data/requests/<busline>_<graph>_<number>/requests_metadata.json` | Selected busline and graph, package versions, seed, input hashes, and provenance. |
+| `data/requests/<task>_<map>_<number>/requests.json` | Request pool; `num_data:` is the retained count and `requests` is keyed by request ID. |
+| `data/requests/<task>_<map>_<number>/operations.json` | DARP and SFBS start/end times, `average_speed_mps`, `vehicle_count`, and each task's selected `vehicle_type` and vehicle profile. |
+| `data/requests/<task>_<map>_<number>/requests.json` | Each generated request includes `energy_kwh`, estimated from its directed road `direct_distance` and the selected task's vehicle and temperature profile; walking distance is excluded. |
+| `data/requests/<task>_<map>_<number>/requests_metadata.json` | Selected busline and graph, package versions, seed, input hashes, and provenance. |
 
 Request coordinate arrays use latitude/longitude; GeoJSON uses longitude/latitude. Road and walking distances are metres, request times are seconds relative to the service day, and energy is kWh.
 

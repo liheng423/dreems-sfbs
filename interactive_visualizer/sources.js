@@ -106,7 +106,6 @@ $('busline-folder').addEventListener('change', async (event) => {
   busline_layers.clear();
   busline_patterns.clear();
   busline_stop_names.clear();
-  energy_segments = new Map();
   $('energy-name').textContent = '';
   $('energy-status').textContent = '';
   draw_busline_list();

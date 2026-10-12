@@ -1,4 +1,5 @@
 {
+  "task": "DARP",
   "busline": null,
   "graph": "Esch",
   "generator": "REQreate._generate_single_data_impl + configured time sampler",
@@ -23,7 +24,7 @@
     "type": "poisson",
     "rate_per_hour": 12.5
   },
-  "request_count": 101,
+  "request_count": 95,
   "simulation_start_s": 28800,
   "simulation_end_s": 43200,
   "demand_start_s": 28800,
@@ -36,10 +37,10 @@
   "poi_count": 824,
   "distance_method": "Directed OSM shortest path weighted by length in metres",
   "inputs_sha256": {
-    "src/reqreate/request_gen.toml": "839c82892de2e2d24d46981ed8a8847257669e1e8329a697ced34e6435cdeaf1",
+    "src/reqreate/request_gen.toml": "35088b59ed6523febcb0ae8c0f9456868f6893d8e6fc9447823acc58762d2297",
     "src/reqreate/maps/map_config.toml": "fd41fd72b4f16042cab62c545766ab834797f56a9b085e466a23a9b1b2502c99",
-    "src/reqreate/filters/filters.toml": "4aa3b82e83e80014dbd03250b584c3cd84aa3adf874de3f2e2b3ab008842074b",
-    "src/reqreate/operation/operation_profile.toml": "d1bbf6b1c360f6566a6b5519c3e1ae9313f9fe1ac704cd954d1b0191ec14f820",
+    "src/reqreate/filters/filters.toml": "a0332086397193b6f1195b8fd6e2995ed21a647162af665f243b564402706501",
+    "src/reqreate/operation/operation_profile.toml": "4b9e64a1bd48c78bb854897f9126f613d02993575f42c79a42581eaed72523ee",
     "src/reqreate/operation/veh_profile.toml": "abf5f6b5e8861234716ce0e38b8fff0f6b7862dd87757fb41109848000c42598",
     "data/graphs/Esch/service_area.geojson": "592a75fe4a25602f82d6b912ba236c45ffbdf8708ce824122804e6e271076188",
     "data/graphs/Esch/drive.graphml": "320e77edb59c7d6f2192848e570099b86652c6dcb3b554cc54a93833d4ae320c",
@@ -47,6 +48,6 @@
     "data/graphs/Esch/pois.json": "41695fa940cedfc7fe3ab14572662c73a1e2fd948c93107e642e9a0954540c49",
     "data/graphs/Esch/depot.json": "1e4ccc9f01c2d644fc229eb537f91595d3489af648091925ff23a0b0b9cd2d8f"
   },
-  "pool_sha256": "9d949bb2b316b9d273dbbd65aaa399654eb77e24497d33a23018aa711424e748",
-  "operations_sha256": "7444a94dc7e367273a9a8dcd2fd5cbdfc6fb1341dc77afe86e7a42910c655e77"
+  "pool_sha256": "b8d7ac168c1b4b69f89afea2480467794d3b4bdb17d54cd414c9475a508db7ed",
+  "operations_sha256": "92c338b662ff9a7b951831a139cb7b6c6154aeb829e7f4600873f4b0d4ce89f3"
 }

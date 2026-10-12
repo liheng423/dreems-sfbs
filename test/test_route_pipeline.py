@@ -83,7 +83,7 @@ def test_route_pipeline():
         }
         assert route_schedule.index_route_departures(businfo)[("A", "C")] == [(21600, 22800)]
         with patch.object(generate, "busline_dir", return_value=route_dir):
-            cfg = generate.load_config("605")
+            cfg = generate.load_config("SFBS", "605")
         assert cfg["busline_name"] == "605"
         assert cfg["places"] == stops
         assert cfg["simulation_start_s"] == 28800
@@ -108,27 +108,21 @@ def test_route_pipeline():
         poi_path = graph_path("pois", area_dir)
         with patch.object(generate, "available_buslines", return_value=["605", "550"]), patch.object(
             generate, "available_graphs", return_value=["550"]
-        ), patch("builtins.input") as prompt, patch.object(
+        ), patch.object(
             generate, "busline_dir", return_value=route_dir
         ), patch.object(generate, "graph_dir", return_value=area_dir), patch.object(
             generate, "generate", return_value={"num_data:": 0, "requests": {}}
         ) as sample, patch.object(
             generate, "create_request_dir",
-            side_effect=lambda busline_name, graph_name: create_request_dir(
-                busline_name, graph_name, requests_dir),
-        ), patch.object(sys, "argv", ["generate.py", "--map", "550",
+            side_effect=lambda task, graph_name: create_request_dir(
+                task, graph_name, requests_dir),
+        ), patch.object(sys, "argv", ["generate.py", "SFBS", "--map", "550",
                                        "--busline", "605"]):
             generate.main()
-            prompt.assert_not_called()
-            prompt.return_value = "1"
-            sys.argv[:] = ["generate.py", "--map", "550"]
-            generate.main()
-        prompt.assert_called_once_with("Choose busline number: ")
         assert sample.call_args.args[0]["busline_name"] == "605"
         assert sample.call_args.args[1:] == (graph_path("area", area_dir), poi_path)
-        instance_dir = requests_dir / "605_550_0001"
+        instance_dir = requests_dir / "sfbs_550_0001"
         assert request_path("pool", instance_dir).is_file()
-        assert request_path("pool", requests_dir / "605_550_0002").is_file()
         meta = json.loads(request_path("metadata", instance_dir).read_text())
         assert (meta["candidate_count"], meta["busline"], meta["graph"]) == (100, "605", "550")
         assert (meta["mean_candidate_count"], meta["prebooked_probability"]) == (100, 0.5)
@@ -155,30 +149,30 @@ def test_route_pipeline():
 
 
 def test_generate_demand_command():
-    """The public command forwards the requested map and optional busline."""
-    with patch.object(sys, "argv", ["main.py", "generate-demand", "--map", "550",
+    """The public command forwards the required task and its inputs."""
+    with patch.object(sys, "argv", ["main.py", "generate-demand", "SFBS", "--map", "550",
                                    "--busline", "605"]), patch.object(
         project_main.subprocess, "run"
     ) as run:
         project_main.main()
     run.assert_called_once_with([
         sys.executable, str(project_main.COMMANDS["generate-demand"]),
-        "--map", "550", "--busline", "605",
+        "SFBS", "--map", "550", "--busline", "605",
     ], check=True)
-    with patch.object(sys, "argv", ["main.py", "generate-demand", "--map", "550"]), patch.object(
+    with patch.object(sys, "argv", ["main.py", "generate-demand", "DARP", "--map", "550"]), patch.object(
         project_main.subprocess, "run"
     ) as run:
         project_main.main()
     run.assert_called_once_with([
-        sys.executable, str(project_main.COMMANDS["generate-demand"]), "--map", "550",
+        sys.executable, str(project_main.COMMANDS["generate-demand"]), "DARP", "--map", "550",
     ], check=True)
-    with patch.object(sys, "argv", ["main.py", "generate-demand", "--map", "550", "--debug"]), patch.object(
+    with patch.object(sys, "argv", ["main.py", "generate-demand", "DARP", "--map", "550", "--debug"]), patch.object(
         project_main.subprocess, "run"
     ) as run:
         project_main.main()
     run.assert_called_once_with([
         sys.executable, str(project_main.COMMANDS["generate-demand"]),
-        "--map", "550", "--debug",
+        "DARP", "--map", "550", "--debug",
     ], check=True)
 
 
@@ -197,9 +191,9 @@ def test_debug_lead_time_fields():
         generate, "generate_candidates", side_effect=candidates
     ), patch.object(generate, "filter_requests", side_effect=lambda _, __, reqs: reqs):
         with patch.object(generate, "DEBUG", False):
-            ordinary = generate.generate({}, Path("unused"), Path("unused"))["requests"]["0"]
+            ordinary = generate.generate({"task": "DARP"}, Path("unused"), Path("unused"))["requests"]["0"]
         with patch.object(generate, "DEBUG", True):
-            debug = generate.generate({}, Path("unused"), Path("unused"))["requests"]["0"]
+            debug = generate.generate({"task": "DARP"}, Path("unused"), Path("unused"))["requests"]["0"]
     assert ordinary == {"is_prebooked": 0, "lead_time": 300,
                         "origin": [49.5, 6.1], "originnode_drive": 1,
                         "boarding_stop_id": "A"}
@@ -224,13 +218,13 @@ def test_generated_request_energy_uses_driving_distance_and_selected_vehicle():
         ), patch.object(generate, "filter_requests", side_effect=lambda _, __, requests: requests), patch.object(
             generate, "OPERATION_CFG_PATH", operation_path
         ), patch.object(generate, "VEHICLE_CFG_PATH", vehicle_path):
-            pool = generate.generate({}, Path("unused"), Path("unused"))
+            pool = generate.generate({"task": "DARP"}, Path("unused"), Path("unused"))
     assert pool["requests"]["0"]["energy_kwh"] == 1.0
 
 
 def test_generate_without_busline():
     """Skipping a busline retains general filters and records disabled bus filters."""
-    cfg = generate.load_config(None)
+    cfg = generate.load_config("DARP")
     assert cfg["places"] == []
     assert next(param["value"] for param in cfg["parameters"]
                 if param["name"] == "min_distance") == 100
@@ -274,19 +268,16 @@ def test_generate_without_busline():
         output = StringIO()
         with patch.object(generate, "available_buslines", return_value=[]), patch.object(
             generate, "available_graphs", return_value=["Esch"]
-        ), patch("builtins.input", return_value="0"), patch.object(
+        ), patch.object(
             generate, "graph_dir", return_value=area_dir
         ), patch.object(generate, "generate", return_value=pool
         ), patch.object(generate, "create_request_dir",
-                        side_effect=lambda busline_name, graph_name: create_request_dir(
-                            busline_name, graph_name, data_dir / "requests")), patch.object(
-            sys, "argv", ["generate.py", "--map", "Esch"]
+                        side_effect=lambda task, graph_name: create_request_dir(
+                            task, graph_name, data_dir / "requests")), patch.object(
+            sys, "argv", ["generate.py", "DARP", "--map", "Esch"]
         ), redirect_stdout(output):
             generate.main()
-        assert "No available buslines." in output.getvalue()
-        assert "0. Skip" in output.getvalue()
-        assert "bus-related filters disabled" in output.getvalue()
-        instance_dir = data_dir / "requests/no_bus_Esch_0001"
+        instance_dir = data_dir / "requests/darp_Esch_0001"
         meta = json.loads(request_path("metadata", instance_dir).read_text())
         assert meta["busline"] is None
         assert meta["bus_filters_enabled"] is False
@@ -334,7 +325,7 @@ def test_demand_time_window():
     """Departure times stay in one day; request appearance may be earlier."""
     assert generate.clock_seconds("07:30") == 27000
     assert generate.clock_seconds("23:59:59") == 86399
-    defaults = generate.load_config(None)
+    defaults = generate.load_config("DARP")
     assert defaults["attributes"]["lt_prebooked"]["pdf"] == [
         defaults["distributions"]["lt_prebooked"]]
     for value in ("24:00", "12:60", "7:30", "12:00:60", "12"):
@@ -357,7 +348,7 @@ def test_demand_time_window():
                                        changed, count=1, flags=re.MULTILINE))
             with patch.object(generate, "CFG_PATH", cfg_path):
                 try:
-                    generate.load_config(None)
+                    generate.load_config("DARP")
                 except ValueError:
                     pass
                 else:
@@ -367,7 +358,7 @@ def test_demand_time_window():
         cfg_path.write_text(re.sub(r'^demand_start = .*$', 'demand_start = "01:30"',
                                    changed, count=1, flags=re.MULTILINE))
         with patch.object(generate, "CFG_PATH", cfg_path):
-            cfg = generate.load_config(None)
+            cfg = generate.load_config("DARP")
     assert (cfg["demand_start_s"], cfg["simulation_end_s"]) == (5400, 7200)
     cfg["requests"] = 3
     drive = nx.DiGraph()
@@ -406,7 +397,7 @@ def test_request_distributions_from_toml():
         cfg_path = Path(directory) / "request_gen.toml"
         cfg_path.write_text(source)
         with patch.object(generate, "CFG_PATH", cfg_path):
-            cfg = generate.load_config(None)
+            cfg = generate.load_config("DARP")
     assert cfg["attributes"]["lt_dynamic"]["pdf"] == [
         {"type": "uniform", "loc": 60, "scale": 120}]
     assert cfg["distributions"]["dynamic_time_stamp"] == {
@@ -424,7 +415,7 @@ def test_event_time_distribution_requires_poisson():
         cfg_path.write_text(source)
         with patch.object(generate, "CFG_PATH", cfg_path):
             try:
-                generate.load_config(None)
+                generate.load_config("DARP")
             except ValueError as exc:
                 assert "event-time distribution must be poisson" in str(exc)
             else:
@@ -433,7 +424,7 @@ def test_event_time_distribution_requires_poisson():
 
 def test_poisson_arrival_windows():
     """Each Poisson event stream has a variable count and ordered times."""
-    cfg = generate.load_config(None)
+    cfg = generate.load_config("DARP")
     flags, times = generate.sample_arrivals(cfg)
     dynamic = [int(time) for flag, time in zip(flags, times) if not flag]
     prebooked = [int(time) for flag, time in zip(flags, times) if flag]
@@ -457,7 +448,7 @@ def test_distance_distribution_from_request_config():
         cfg_path = Path(directory) / "request_gen.toml"
         cfg_path.write_text(source)
         with patch.object(generate, "CFG_PATH", cfg_path):
-            cfg = generate.load_config(None)
+            cfg = generate.load_config("DARP")
     assert cfg["distributions"]["radial_distance"] == {
         "type": "normal", "loc": 900, "scale": 100}
     assert "pdf" not in cfg["method_pois"]

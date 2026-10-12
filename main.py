@@ -37,11 +37,17 @@ def main():
     area.add_argument("map")
     area.add_argument("--busline")
     demand = commands.add_parser("generate-demand")
+    demand.add_argument("task", choices=("DARP", "SFBS"))
     demand.add_argument("--map", required=True)
     demand.add_argument("--busline")
     demand.add_argument("--debug", action="store_true")
     commands.add_parser("visualize")
     args = parser.parse_args()
+    if args.command == "generate-demand":
+        if args.task == "SFBS" and not args.busline:
+            demand.error("SFBS requires --busline")
+        if args.task == "DARP" and args.busline:
+            demand.error("DARP does not use --busline")
     if args.command == "visualize":
         serve_visualizer()
         return
@@ -50,7 +56,7 @@ def main():
         if args.busline:
             step_args.extend(["--busline", args.busline])
     else:
-        step_args = ["--map", args.map]
+        step_args = [args.task, "--map", args.map]
         if args.busline:
             step_args.extend(["--busline", args.busline])
         if args.debug:

@@ -46,10 +46,12 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
             "temperature_case": attributes["temperature_case"],
             "vehicle": profiles[attributes["profile"]],
         }
-    operations["darp"]["detour_factor"] = config["darp"]["attribute"]["detour_factor"]
+    for mode in ("darp", "sfbs"):
+        operations[mode]["detour_factor"] = config[mode]["attribute"]["detour_factor"]
     pool_path = write_json(request_path("pool", instance_dir), pool, compact=True)
     operations_path = write_json(request_path("operations", instance_dir), operations)
     meta = {
+        "task": cfg["task"],
         "busline": busline_name,
         "graph": graph_name,
         "generator": "REQreate._generate_single_data_impl + configured time sampler",
@@ -71,14 +73,14 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
         "network_input": "GeoJSON service area and saved OSM drive/walk graphs",
         "vehicle_speed_mps": cfg["vehicle_speed_mps"],
         "detour_factor": cfg["detour_factor"],
-        "travel_time_method": "Directed road distance / DARP vehicle_speed",
+        "travel_time_method": f"Directed road distance / {cfg['task']} vehicle_speed",
         "spatial_sampling": (
             "REQreate method_pois: POI-density zones and radial trip distances, "
             "followed by area, minimum-distance, and positive-travel-time filters"
             + (", plus walking-access, walking-dominance, and scheduled-bus feasibility filters"
-               if busline_name is not None else "")
+               if cfg["task"] == "SFBS" else "")
         ),
-        "bus_filters_enabled": busline_name is not None,
+        "bus_filters_enabled": cfg["task"] == "SFBS",
         "poi_count": len(json.loads(poi_path.read_text())["features"]),
         "distance_method": "Directed OSM shortest path weighted by length in metres",
         "inputs_sha256": {

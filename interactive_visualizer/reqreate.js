@@ -24,7 +24,6 @@ let req_by_id = new Map();
 let selected_req = null;
 let demand_bounds = null;
 let walking_stops = [];
-let energy_segments = new Map();
 let graph_nodes = new Map();
 let graph_kind = '';
 
@@ -77,6 +76,7 @@ function draw_saved_nodes() {
   all_snap_layer.clearLayers();
   if (!graph_kind) return;
   for (const req of visible_reqs) {
+    if (is_sfbs(req)) continue;
     for (const [endpoint, label, color] of [['origin', 'Pickup', '#1769a3'], ['destination', 'Dropoff', '#ac4b35']]) {
       const id = req[`${endpoint}node_${graph_kind}`];
       const xy = graph_nodes.get(String(id));
@@ -90,7 +90,7 @@ function draw_saved_nodes() {
 
 function show_saved_nodes(req) {
   snap_layer.clearLayers();
-  if (!graph_kind) return;
+  if (!graph_kind || is_sfbs(req)) return;
   for (const [endpoint, label, color] of [['origin', 'Pickup', '#1769a3'], ['destination', 'Dropoff', '#ac4b35']]) {
     const id = req[`${endpoint}node_${graph_kind}`];
     const xy = graph_nodes.get(String(id));
@@ -101,52 +101,29 @@ function show_saved_nodes(req) {
   }
 }
 
-/** Use the nearest loaded bus stop for an estimated straight-line walking link. */
-function nearest_walk_stop(xy) {
-  let nearest = walking_stops[0];
-  let nearest_distance_m = walk_distance_m(xy, nearest);
-  for (const stop of walking_stops.slice(1)) {
-    const distance_m = walk_distance_m(xy, stop);
-    if (distance_m < nearest_distance_m) {
-      nearest = stop;
-      nearest_distance_m = distance_m;
-    }
-  }
-  return nearest;
-}
-
-/** Pick the walk-access pair with the shortest combined straight-line distance on a forward pattern. */
+/** Find a route pattern containing the saved SFBS boarding and alighting stops. */
 function estimated_bus_trip(req) {
-  const origin_distance = new Map(walking_stops.map((stop) => [stop.name, walk_distance_m(req.origin, stop)]));
-  const destination_distance = new Map(walking_stops.map((stop) => [stop.name, walk_distance_m(req.destination, stop)]));
-  let best = null;
   for (const patterns of busline_patterns.values()) {
     for (const pattern of patterns) {
-      for (let boarding_index = 0; boarding_index < pattern.stop_ids.length - 1; boarding_index++) {
-        for (let alighting_index = boarding_index + 1; alighting_index < pattern.stop_ids.length; alighting_index++) {
-          const boarding_name = `Stop_${pattern.stop_ids[boarding_index]}`;
-          const alighting_name = `Stop_${pattern.stop_ids[alighting_index]}`;
-          if (!origin_distance.has(boarding_name) || !destination_distance.has(alighting_name)) continue;
-          const distance_m = origin_distance.get(boarding_name) + destination_distance.get(alighting_name);
-          if (!best || distance_m < best.distance_m) {
-            best = { pattern, boarding_index, alighting_index, boarding_name, alighting_name, distance_m };
-          }
-        }
-      }
+      const boarding_index = pattern.stop_ids.indexOf(req.boarding_stop_id);
+      const alighting_index = pattern.stop_ids.indexOf(req.alighting_stop_id, boarding_index + 1);
+      if (boarding_index >= 0 && alighting_index > boarding_index)
+        return { pattern, boarding_index, alighting_index };
     }
   }
-  return best;
+  return null;
 }
 
-/** Use the shortest forward bus trip when available, otherwise the nearest stops. */
+function is_sfbs(req) {
+  return 'boarding_stop_id' in req && 'alighting_stop_id' in req;
+}
+
+/** SFBS uses its saved stop pair; DARP has no bus access stops. */
 function walk_access(req) {
-  const trip = estimated_bus_trip(req);
-  const boarding = trip
-    ? walking_stops.find((stop) => stop.name === trip.boarding_name)
-    : nearest_walk_stop(req.origin);
-  const alighting = trip
-    ? walking_stops.find((stop) => stop.name === trip.alighting_name)
-    : nearest_walk_stop(req.destination);
+  if (!is_sfbs(req)) return { trip: null, boarding: null, alighting: null };
+  const boarding = walking_stops.find((stop) => stop.name === `Stop_${req.boarding_stop_id}`);
+  const alighting = walking_stops.find((stop) => stop.name === `Stop_${req.alighting_stop_id}`);
+  const trip = boarding && alighting ? estimated_bus_trip(req) : null;
   return { trip, boarding, alighting };
 }
 
@@ -160,30 +137,10 @@ function walk_distance_m(xy, stop) {
   return 2 * 6371000 * Math.asin(Math.sqrt(haversine));
 }
 
-/** Sum bus vehicle energy across the selected pattern's directed stop segments. */
-function req_energy_kwh(trip) {
-  if (!trip || !energy_segments.size) return null;
-  let energy_kwh = 0;
-  for (let index = trip.boarding_index; index < trip.alighting_index; index++) {
-    const segment_kwh = energy_segments.get(`${trip.pattern.pattern_id}|${index}`);
-    if (segment_kwh === undefined) return null;
-    energy_kwh += segment_kwh;
-  }
-  return energy_kwh;
-}
-
 function load_energy(data, file_name) {
   if (data.schema_version !== 2 || !Array.isArray(data.segments) ||
       data.segments.some((segment) => !Number.isFinite(segment.energy_kwh))) {
     throw new Error('Choose a schema-version-2 bus energy JSON with segment energy_kwh.');
-  }
-  energy_segments = new Map();
-  const segments_by_pattern = new Map();
-  for (const segment of data.segments) {
-    if (!segments_by_pattern.has(segment.pattern_id)) segments_by_pattern.set(segment.pattern_id, []);
-    const segments = segments_by_pattern.get(segment.pattern_id);
-    energy_segments.set(`${segment.pattern_id}|${segments.length}`, segment.energy_kwh);
-    segments.push(segment);
   }
   $('energy-name').textContent = file_name;
   $('energy-status').textContent = data.status;
@@ -199,11 +156,9 @@ function update_walking_stops() {
   show_initial_req();
 }
 
-/** Fill the panel as soon as the three inputs needed for an estimate are ready. */
+/** Show a request as soon as its saved data is loaded. */
 function show_initial_req() {
-  if (!selected_req && reqs.length && walking_stops.length && busline_patterns.size && energy_segments.size) {
-    show_req(reqs[0], false);
-  }
+  if (!selected_req && reqs.length) show_req(reqs[0], false);
 }
 
 function walk_stop_label(stop) {
@@ -224,7 +179,9 @@ function coord_key(xy) {
 }
 
 function place_label(req, endpoint) {
-  return `Node ${req[`${endpoint}node_drive`]}`;
+  if (!is_sfbs(req)) return `Node ${req[`${endpoint}node_drive`]}`;
+  const id = req[endpoint === 'origin' ? 'boarding_stop_id' : 'alighting_stop_id'];
+  return `${endpoint === 'origin' ? 'Board' : 'Alight'} at ${walk_stop_label({ name: `Stop_${id}` })}`;
 }
 
 function draw_req_timeline(req) {
@@ -264,11 +221,17 @@ function read_reqs(data) {
   }
   return Object.entries(data.requests).map(([key, req]) => {
     if (!Number.isInteger(req.reqid) || Number(key) !== req.reqid || ![0, 1].includes(req.is_prebooked) ||
+        ('energy_kwh' in req && !Number.isFinite(req.energy_kwh)) ||
         !['origin', 'destination'].every((endpoint) => Array.isArray(req[endpoint]) &&
           req[endpoint].length === 2 && req[endpoint].every(Number.isFinite)) ||
-        !['originnode_drive', 'destinationnode_drive', 'earliest_departure', 'latest_arrival', 'time_stamp', 'lead_time',
+        !['earliest_departure', 'latest_arrival', 'time_stamp', 'lead_time',
           'direct_distance', 'direct_travel_time'].every((field) => Number.isFinite(req[field]))) {
       throw new Error(`Request ${key} does not match the REQreate output format.`);
+    }
+    if (('boarding_stop_id' in req) !== ('alighting_stop_id' in req) || (is_sfbs(req)
+      ? !['boarding_stop_id', 'alighting_stop_id'].every((field) => typeof req[field] === 'string' && req[field])
+      : !['originnode_drive', 'destinationnode_drive'].every((field) => Number.isFinite(req[field])))) {
+      throw new Error(`Request ${key} has invalid task endpoints.`);
     }
     const window_fields = ['pickup_from', 'pickup_to', 'dropoff_from', 'dropoff_to', 'service_time'];
     if (window_fields.some((field) => field in req) &&
@@ -357,52 +320,54 @@ function show_req(req, fit_map = true) {
     .addTo(sel_layer);
   let walk_details = '';
   let trip = null;
-  let energy_kwh = null;
+  const energy_kwh = Number.isFinite(req.energy_kwh) ? req.energy_kwh : null;
   const bounds = [req.origin, req.destination];
-  if (walking_stops.length) {
+  if (is_sfbs(req) && walking_stops.length) {
     const access = walk_access(req);
     trip = access.trip;
     const { boarding, alighting } = access;
-    const boarding_distance_m = walk_distance_m(req.origin, boarding);
-    const alighting_distance_m = walk_distance_m(req.destination, alighting);
-    const boarding_xy = [boarding.lat, boarding.lon];
-    const alighting_xy = [alighting.lat, alighting.lon];
-    L.polyline([req.origin, boarding_xy], { color: '#ba4f79', weight: 4, dashArray: '4 6' })
-      .bindPopup(`Estimated walk to ${walk_stop_label(boarding)}: ${Math.round(boarding_distance_m)} m straight line`)
-      .addTo(sel_layer);
-    L.polyline([alighting_xy, req.destination], { color: '#ba4f79', weight: 4, dashArray: '4 6' })
-      .bindPopup(`Estimated walk from ${walk_stop_label(alighting)}: ${Math.round(alighting_distance_m)} m straight line`)
-      .addTo(sel_layer);
-    if (trip) {
-      const stops = new Map(walking_stops.map((stop) => [stop.name, stop]));
-      const ride_xy = trip.pattern.stop_ids.slice(trip.boarding_index, trip.alighting_index + 1)
-        .map((id) => stops.get(`Stop_${id}`)).map((stop) => [stop.lat, stop.lon]);
-      L.polyline(ride_xy, { color: '#246b59', weight: 5, opacity: .85 })
-        .bindPopup('Estimated bus ride between the selected stops').addTo(sel_layer);
+    if (boarding && alighting) {
+      const boarding_distance_m = walk_distance_m(req.origin, boarding);
+      const alighting_distance_m = walk_distance_m(req.destination, alighting);
+      const boarding_xy = [boarding.lat, boarding.lon];
+      const alighting_xy = [alighting.lat, alighting.lon];
+      for (const [stop, label, fillColor] of [[boarding, 'Board', '#1769a3'], [alighting, 'Alight', '#ac4b35']]) {
+        L.circleMarker([stop.lat, stop.lon], { radius: 9, color: '#fff', weight: 2, fillColor, fillOpacity: 1 })
+          .bindPopup(`${label} · saved bus stop ${stop.name.slice(5)} · request #${req.reqid}`).addTo(sel_layer);
+      }
+      L.polyline([req.origin, boarding_xy], { color: '#ba4f79', weight: 4, dashArray: '4 6' })
+        .bindPopup(`Estimated walk to ${walk_stop_label(boarding)}: ${Math.round(boarding_distance_m)} m straight line`)
+        .addTo(sel_layer);
+      L.polyline([alighting_xy, req.destination], { color: '#ba4f79', weight: 4, dashArray: '4 6' })
+        .bindPopup(`Estimated walk from ${walk_stop_label(alighting)}: ${Math.round(alighting_distance_m)} m straight line`)
+        .addTo(sel_layer);
+      if (trip) {
+        const stops = new Map(walking_stops.map((stop) => [stop.name, stop]));
+        const ride_xy = trip.pattern.stop_ids.slice(trip.boarding_index, trip.alighting_index + 1)
+          .map((id) => stops.get(`Stop_${id}`)).map((stop) => [stop.lat, stop.lon]);
+        L.polyline(ride_xy, { color: '#246b59', weight: 5, opacity: .85 })
+          .bindPopup('Estimated bus ride between the selected stops').addTo(sel_layer);
+      }
+      bounds.push(boarding_xy, alighting_xy);
+      walk_details = `\nEstimated walk: ${Math.round(boarding_distance_m)} m to ${walk_stop_label(boarding)}; ` +
+        `${Math.round(alighting_distance_m)} m from ${walk_stop_label(alighting)} (straight line)`;
+      if (trip) walk_details += `\nEstimated route: ${trip.pattern.label} · ` +
+        `${walk_stop_label(boarding)} → ${walk_stop_label(alighting)}`;
     }
-    bounds.push(boarding_xy, alighting_xy);
-    walk_details = `\nEstimated walk: ${Math.round(boarding_distance_m)} m to ${walk_stop_label(boarding)}; ` +
-      `${Math.round(alighting_distance_m)} m from ${walk_stop_label(alighting)} (straight line)`;
-    if (trip) walk_details += `\nEstimated route: ${trip.pattern.label} · ` +
-      `${walk_stop_label(boarding)} → ${walk_stop_label(alighting)}`;
-    energy_kwh = req_energy_kwh(trip);
-    if (energy_segments.size) walk_details += `\nEstimated bus trip energy: ${energy_kwh === null ? 'unavailable' : `${energy_kwh.toFixed(2)} kWh`}`;
   }
   $('energy-request').textContent = `Request #${req.reqid}`;
   $('selected-energy').textContent = energy_kwh === null ? '—' : energy_kwh.toFixed(2);
-  $('selected-energy-note').textContent = !energy_segments.size ? 'Load the bus energy JSON to calculate this value.' :
-    !trip ? 'No forward bus route matches this request.' :
-    energy_kwh === null ? 'No energy segment matches this estimated bus trip.' :
-    'Vehicle energy over the estimated boarding-to-alighting interval.';
+  $('selected-energy-note').textContent = energy_kwh === null ? 'This request has no saved energy_kwh value.' :
+    'Saved energy estimate for this request.';
   $('req-details').hidden = false;
   $('req-details').textContent =
-    `Request #${req.reqid} · ${req.is_prebooked ? 'Pre-booked' : 'Dynamic'}\n` +
+    `${is_sfbs(req) ? 'SFBS' : 'DARP'} request #${req.reqid} · ${req.is_prebooked ? 'Pre-booked' : 'Dynamic'}\n` +
     `${place_label(req, 'origin')} → ${place_label(req, 'destination')}\n` +
     `Earliest departure ${sec_label(req.earliest_departure)} · Latest arrival ${sec_label(req.latest_arrival)}\n` +
     `Booked ${sec_label(req.time_stamp)} · Lead ${Math.round(req.lead_time / 60)} min\n` +
     `Direct distance ${(req.direct_distance / 1000).toFixed(1)} km · ` +
     `Direct travel ${Math.round(req.direct_travel_time / 60)} min` +
-    (graph_kind ? `\n${graph_kind} pickup node ${req[`originnode_${graph_kind}`] ?? 'unavailable'} · ` +
+    (!is_sfbs(req) && graph_kind ? `\n${graph_kind} pickup node ${req[`originnode_${graph_kind}`] ?? 'unavailable'} · ` +
       `dropoff node ${req[`destinationnode_${graph_kind}`] ?? 'unavailable'}` : '') + walk_details;
   draw_req_timeline(req);
   if (fit_map) map.fitBounds(L.latLngBounds(bounds).pad(.35), { maxZoom: 14 });
@@ -427,7 +392,7 @@ function draw_list() {
     main.textContent = `#${req.reqid}  ${place_label(req, 'origin')} → ${place_label(req, 'destination')}`;
     const time = document.createElement('span');
     time.className = 'req-time';
-    const energy_kwh = walking_stops.length ? req_energy_kwh(estimated_bus_trip(req)) : null;
+    const energy_kwh = Number.isFinite(req.energy_kwh) ? req.energy_kwh : null;
     time.textContent = `${sec_label(req.earliest_departure)}${energy_kwh === null ? '' : ` · ${energy_kwh.toFixed(2)} kWh`}`;
     button.append(type, main, time);
     button.addEventListener('click', () => show_req(req));
@@ -447,11 +412,11 @@ function request_point_popup(stop) {
   const popup = document.createElement('div');
   popup.className = 'request-point-popup';
   const title = document.createElement('strong');
-  title.textContent = `Node ${stop.node} · ${stop.endpoints.length} request${stop.endpoints.length === 1 ? '' : 's'}`;
+  title.textContent = `${stop.node == null ? 'Passenger location' : `Node ${stop.node}`} · ${stop.endpoints.length} request${stop.endpoints.length === 1 ? '' : 's'}`;
   popup.append(title);
   for (const { req, endpoint } of stop.endpoints) {
-    const trip = walking_stops.length ? estimated_bus_trip(req) : null;
-    const energy_kwh = req_energy_kwh(trip);
+    const trip = is_sfbs(req) && walking_stops.length ? walk_access(req).trip : null;
+    const energy_kwh = Number.isFinite(req.energy_kwh) ? req.energy_kwh : null;
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = `#${req.reqid} · ${endpoint}\n` +
@@ -481,7 +446,7 @@ function draw_map() {
     for (const endpoint of ['origin', 'destination']) {
       const xy = req[endpoint];
       const key = coord_key(xy);
-      if (!stops.has(key)) stops.set(key, { xy, node: req[`${endpoint}node_drive`], board: 0, alight: 0, endpoints: [] });
+      if (!stops.has(key)) stops.set(key, { xy, node: is_sfbs(req) ? null : req[`${endpoint}node_drive`], board: 0, alight: 0, endpoints: [] });
       const stop = stops.get(key);
       stop[endpoint === 'origin' ? 'board' : 'alight']++;
       stop.endpoints.push({ req, endpoint });
@@ -500,7 +465,9 @@ function draw_map() {
   }
   if ($('walks-check').checked && walking_stops.length) {
     for (const req of visible_reqs) {
+      if (!is_sfbs(req)) continue;
       const { boarding, alighting } = walk_access(req);
+      if (!boarding || !alighting) continue;
       L.polyline([req.origin, [boarding.lat, boarding.lon]], { color: '#ba4f79', weight: 2, opacity: .35, dashArray: '4 6' })
         .on('click', () => show_req(req)).addTo(walk_layer);
       L.polyline([[alighting.lat, alighting.lon], req.destination], { color: '#ba4f79', weight: 2, opacity: .35, dashArray: '4 6' })
@@ -528,7 +495,7 @@ function draw_map() {
     $('req-timeline').hidden = true;
     $('energy-request').textContent = 'No request selected';
     $('selected-energy').textContent = '—';
-    $('selected-energy-note').textContent = 'Select a request to see its bus trip energy.';
+    $('selected-energy-note').textContent = 'Select a request to see its saved energy.';
   }
 }
 
@@ -550,7 +517,7 @@ function load_reqs(data, file_name) {
   $('fit-button').disabled = false;
   $('file-name').textContent = file_name;
   $('file-error').hidden = true;
-  $('map-title').textContent = 'REQreate raw requests';
+  $('map-title').textContent = `${reqs[0] && is_sfbs(reqs[0]) ? 'SFBS' : 'DARP'} requests`;
   draw_map();
   show_initial_req();
   map.fitBounds(demand_bounds.pad(.12));

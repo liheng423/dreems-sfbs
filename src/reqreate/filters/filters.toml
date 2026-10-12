@@ -1,9 +1,21 @@
-# Thresholds used by the request filters for any bus route.
+# DARP uses road-trip filters without a scheduled bus route.
+[darp]
+max_walking_distance_m = 1500
+walking_speed_mps = 1.4
+
+[[darp.parameters]]
+name = "min_distance"
+type = "integer"
+value = 100
+length_unit = "m"
+
+# SFBS also checks stop access, walking dominance, and the bus timetable.
+[sfbs]
 max_walking_distance_m = 1500
 walking_speed_mps = 1.4
 
 # REQreate also uses this parameter to retry short trips during sampling.
-[[parameters]]
+[[sfbs.parameters]]
 name = "min_distance"
 type = "integer"
 value = 100

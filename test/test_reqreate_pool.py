@@ -28,7 +28,7 @@ def main():
     filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text())
     pool = read_json(POOL_PATH)
     meta = read_json(META_PATH)
-    params = {param["name"]: param["value"] for param in filter_cfg["parameters"]}
+    params = {param["name"]: param["value"] for param in filter_cfg["sfbs"]["parameters"]}
     params["min_early_departure"] = meta.get("demand_start_s", meta["simulation_start_s"])
     params["max_early_departure"] = meta["simulation_end_s"]
     reqs = pool["requests"]

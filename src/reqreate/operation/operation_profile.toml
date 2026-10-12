@@ -14,6 +14,7 @@ end = "13:00:00"
 [sfbs.attribute]
 num_of_vehicles = 6
 vehicle_speed = 6.111111111111111 # 22 km/h converted to m/s
+detour_factor = 1.5
 
 # Illustrative choice; Route 550's vehicle type is unverified.
 profile = "evobus_396_nmc_na_hybrid"

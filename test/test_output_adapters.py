@@ -33,9 +33,9 @@ def test_output_layout():
         assert available_graphs(graphs_dir) == ["550"]
         assert area_dir.parent == graphs_dir
 
-        first = create_request_dir("605", "550", requests_dir)
-        second = create_request_dir("605", "550", requests_dir)
-        assert (first.name, second.name) == ("605_550_0001", "605_550_0002")
+        first = create_request_dir("SFBS", "550", requests_dir)
+        second = create_request_dir("SFBS", "550", requests_dir)
+        assert (first.name, second.name) == ("sfbs_550_0001", "sfbs_550_0002")
         for number, instance_dir in enumerate((first, second), 1):
             for name in REQUEST_FILES:
                 write_json(request_path(name, instance_dir), {"run": number})

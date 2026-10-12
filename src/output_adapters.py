@@ -75,11 +75,11 @@ def available_graphs(graphs_dir=GRAPHS_DIR):
                                           for name in GRAPH_FILES)]
 
 
-def create_request_dir(busline_name, graph_name, requests_dir=REQUESTS_DIR):
-    """Reserve a new, numbered request instance for the selected inputs."""
+def create_request_dir(task, graph_name, requests_dir=REQUESTS_DIR):
+    """Reserve a numbered request directory for the task and map."""
     requests_dir.mkdir(parents=True, exist_ok=True)
     for number in count(1):
-        directory = requests_dir / f"{busline_name}_{graph_name}_{number:04d}"
+        directory = requests_dir / f"{task.lower()}_{graph_name}_{number:04d}"
         try:
             directory.mkdir()
         except FileExistsError:

@@ -47,6 +47,7 @@ REQUEST_OUTPUT_FIELDS = {
     "boarding_stop_id", "alighting_stop_id", "boarding_walk_distance_m",
     "alighting_walk_distance_m",
 }
+SFBS_OUTPUT_FIELDS = REQUEST_OUTPUT_FIELDS - {"originnode_drive", "destinationnode_drive"}
 
 
 def clock_seconds(value):
@@ -153,22 +154,30 @@ def set_request_times(req, prebooked, time, cfg):
     req["latest_arrival"] = req["dropoff_to"]
 
 
-def load_config(busline_name):
-    """Load demand settings and optional route stop data."""
+def load_config(task, busline_name=None):
+    """Load the selected task's demand, operation, and filter settings."""
+    if task not in ("DARP", "SFBS"):
+        raise ValueError("task must be DARP or SFBS")
+    if task == "SFBS" and not busline_name:
+        raise ValueError("SFBS requires --busline")
+    if task == "DARP" and busline_name:
+        raise ValueError("DARP does not use --busline")
     cfg = tomllib.loads(CFG_PATH.read_text())
     cfg.update(tomllib.loads(MAPS_CFG_PATH.read_text()))
-    operation_cfg = tomllib.loads(OPERATION_CFG_PATH.read_text())["darp"]["attribute"]
+    cfg["task"] = task
+    cfg["request_filters"] = REQUEST_FILTERS if task == "SFBS" else BASE_REQUEST_FILTERS
+    operation_cfg = tomllib.loads(OPERATION_CFG_PATH.read_text())[task.lower()]["attribute"]
     cfg["vehicle_speed_mps"] = operation_cfg["vehicle_speed"]
     cfg["detour_factor"] = operation_cfg["detour_factor"]
     if cfg["detour_factor"] < 1:
         raise ValueError("detour_factor must be at least 1")
-    filter_cfg = tomllib.loads(FILTERS_PATH.read_text())
+    filter_cfg = tomllib.loads(FILTERS_PATH.read_text())[task.lower()]
     cfg["max_walking_distance_m"] = filter_cfg["max_walking_distance_m"]
     cfg["walking_speed_mps"] = filter_cfg["walking_speed_mps"]
     cfg["parameters"] = list(filter_cfg["parameters"])
     cfg["busline_name"] = busline_name
     cfg["places"] = []
-    if busline_name is not None:
+    if task == "SFBS":
         route_dir = busline_dir(busline_name)
         cfg["places"] = json.loads(busline_path("stops", route_dir).read_text())
     times = cfg["simulation"]
@@ -203,7 +212,7 @@ def prepare_network(cfg, area_path, poi_path):
     net = build_area_net(area_path, cfg["places"], cfg["max_walking_distance_m"])
     net.vehicle_speed_mps = cfg["vehicle_speed_mps"]
     net.radial_direction = start, span
-    if cfg["busline_name"] is not None:
+    if cfg["task"] == "SFBS":
         net.route_departures = index_route_departures(
             json.loads(busline_path("businfo", busline_dir(cfg["busline_name"])).read_text())
         )
@@ -253,16 +262,14 @@ def generate_candidates(cfg, net):
 
 def filter_requests(cfg, net, reqs):
     """Keep feasible trips and attach scheduled bus stops when applicable."""
-    request_filters = REQUEST_FILTERS if cfg["busline_name"] is not None else BASE_REQUEST_FILTERS
     reqs = {
         req_id: req for req_id, req in reqs.items()
         if cfg["demand_start_s"] <= req["earliest_departure"] <= cfg["simulation_end_s"]
         and req["latest_arrival"] <= cfg["simulation_end_s"]
         and (not req["is_prebooked"] or req["time_stamp"] < cfg["simulation_start_s"])
-        and passes_filters(req, request_filters, net, cfg)
+        and passes_filters(req, cfg["request_filters"], net, cfg)
     }
-    if cfg["busline_name"] is not None:
-        stops = {stop["name"].removeprefix("Stop_"): stop for stop in cfg["places"]}
+    if cfg["task"] == "SFBS":
         for req in reqs.values():
             req.update(select_scheduled_bus_stops(req, net, cfg))
             for role in ("boarding", "alighting"):
@@ -271,29 +278,19 @@ def filter_requests(cfg, net, reqs):
     return {"num_data:": len(reqs), "requests": reqs}
 
 
-def choose_source(label, names):
-    """Ask which numbered busline to use, or let the user skip it."""
-    if not names:
-        print(f"No available {label}s.")
-    else:
-        print(f"Available {label}s:")
-    for number, name in enumerate(names, 1):
-        print(f"  {number}. {name}")
-    print("  0. Skip (no busline; bus filters disabled)")
-    number = int(input(f"Choose {label} number: "))
-    if not 0 <= number <= len(names):
-        raise ValueError(f"Invalid {label} number: {number}")
-    return names[number - 1] if number else None
-
-
 def main():
-    """Generate a request instance on the selected map and busline."""
+    """Generate a DARP or SFBS request instance on the selected map."""
     global DEBUG
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("task", choices=("DARP", "SFBS"))
     parser.add_argument("--map", required=True, help="Saved service-area map name")
-    parser.add_argument("--busline", help="Route to use; prompts for one when omitted")
+    parser.add_argument("--busline", help="Required for SFBS; unavailable for DARP")
     parser.add_argument("--debug", action="store_true", help="Include both sampled lead-time fields")
     args = parser.parse_args()
+    if args.task == "SFBS" and not args.busline:
+        parser.error("SFBS requires --busline")
+    if args.task == "DARP" and args.busline:
+        parser.error("DARP does not use --busline")
     DEBUG = args.debug
     graph_names = available_graphs()
     if args.map not in graph_names:
@@ -303,15 +300,14 @@ def main():
                        if not graph_path(name, area_dir).is_file()]
             parser.error(f"Map {args.map!r} is missing {', '.join(missing)}; save it with select-area")
         parser.error(f"Map {args.map!r} is unavailable; choose from: {', '.join(graph_names)}")
-    busline_names = available_buslines()
-    if args.busline and args.busline not in busline_names:
-        parser.error(f"Busline {args.busline!r} is unavailable; choose from: {', '.join(busline_names)}")
+    if args.task == "SFBS":
+        busline_names = available_buslines()
+        if args.busline not in busline_names:
+            parser.error(f"Busline {args.busline!r} is unavailable; choose from: {', '.join(busline_names)}")
     graph_name = args.map
-    busline_name = args.busline if args.busline else choose_source("busline", busline_names)
-    if busline_name is None:
-        print("No busline selected; bus-related filters disabled.")
+    busline_name = args.busline
     try:
-        cfg = load_config(busline_name)
+        cfg = load_config(args.task, busline_name)
     except ValueError as exc:
         parser.error(str(exc))
     route_dir = busline_dir(busline_name) if busline_name is not None else None
@@ -319,7 +315,7 @@ def main():
     area_path = graph_path("area", area_dir)
     poi_path = graph_path("pois", area_dir)
     pool = generate(cfg, area_path, poi_path)
-    instance_dir = create_request_dir(busline_name or "darp", graph_name)
+    instance_dir = create_request_dir(cfg["task"], graph_name)
     pool_path = write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
                            instance_dir, pool)
     print(f"Wrote {len(pool['requests'])} REQreate requests to {pool_path}")

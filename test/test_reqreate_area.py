@@ -30,7 +30,7 @@ def main():
     polygon = shape(json.loads(area_path.read_text())["geometry"])
     graph = ox.load_graphml(area_path.with_name("drive.graphml"))
     walk = ox.load_graphml(area_path.with_name("walk.graphml"))
-    filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text())
+    filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text())["sfbs"]
     stops = json.loads(busline_path("stops", busline_dir(meta["busline"])).read_text())
     stop_ids = {stop["name"].removeprefix("Stop_") for stop in stops}
     walk_routes = walk.to_undirected()

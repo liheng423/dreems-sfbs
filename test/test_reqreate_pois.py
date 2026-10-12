@@ -14,7 +14,7 @@ from utils.walking_distance import WalkingDistance
 
 
 def main():
-    cfg = generate.load_config("550")
+    cfg = generate.load_config("SFBS", "550")
     cfg["distributions"]["dynamic_time_stamp"]["rate_per_hour"] = 0.625
     cfg["distributions"]["prebooked_earliest_departure"]["rate_per_hour"] = 0.625
     area_path = graph_path("area", graph_dir("550"))
