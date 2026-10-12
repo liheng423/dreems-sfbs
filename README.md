@@ -49,6 +49,8 @@ python main.py generate-demand --map 550 --requests 200
 
 `--map` selects a saved map in `data/graphs/`; `550` is only the example map name. Without `--busline <route>`, the command lists available buslines and offers `0. Skip`, even when no buslines are available. Skipping keeps the area, minimum driving distance, and positive travel time filters; it disables only bus stop walking and scheduled-bus filters. Output uses `no_bus` in directory names and records `null` for the busline in metadata. Omit `--requests` to use the 20,000 candidate default. Each run creates a new directory such as `data/requests/550_550_0001/` with `raw_requests.json` and `raw_requests_metadata.json`. POIs are saved with the map, so request generation makes no Overpass call. Area selection requires OSM access. Existing maps need `pois.json` before generating requests. See the REQreate installation limitation above before starting generation.
 
+Set `simulation.start`, `simulation.demand_start`, and `simulation.end` in [`src/reqreate/request_gen.toml`](src/reqreate/request_gen.toml), using `HH:MM` or `HH:MM:SS`. The simulation window currently begins at 04:45, while passenger departures start at 06:00. Requests whose latest arrival exceeds the end are excluded. REQreate calculates request appearance (`time_stamp`) as earliest departure minus lead time. Prebooked requests can appear on the previous day, represented by a negative `time_stamp`; their appearance time does not exclude them. The TOML controls the request distributions and lead times. Effective times are saved in request metadata. The selected busline still supplies its timetable and bus filters, but does not override these times.
+
 To calculate Route 550's optional bus energy after saving the drive graph, run:
 
 ```bash
@@ -85,7 +87,7 @@ The request explorer lists available folders from the local server. A selected r
 
 | File | Main settings or contents |
 | --- | --- |
-| [`src/reqreate/request_gen.toml`](src/reqreate/request_gen.toml) | Seed, candidate count, time distributions, and request attributes. |
+| [`src/reqreate/request_gen.toml`](src/reqreate/request_gen.toml) | Seed, candidate count, simulation window, request distributions, and sampled radial distance and direction. |
 | [`src/reqreate/maps/map_config.toml`](src/reqreate/maps/map_config.toml) | POI tags and spatial sampling grid. |
 | [`src/reqreate/filters/filters.toml`](src/reqreate/filters/filters.toml) | Maximum walk distance, walk speed, and minimum trip distance. |
 | [`src/busline/energy.toml`](src/busline/energy.toml) | Bus profile and temperature case for the illustrative energy calculation. |

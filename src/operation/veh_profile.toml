@@ -113,3 +113,16 @@ heating_strategy = "electric"
 sample_buses = 1
 reference_kwh_per_km = 0.91
 relative_increase_pct = { at_0_c = 71, at_9_c = 43 }
+
+# Rawsuns supplies the battery system, not an identified shuttle vehicle.
+# 16 passengers and 0.4 kWh/km are scenario assumptions supplied by the user;
+# the consumption rate has no specified temperature or measured adjustment.
+# Battery: https://www.rawsuns.com/electric-propulsion/battery-packs/battery-pack-for-6-meters-electric-shuttle-bus/
+[profiles.shuttle_6m_rawsuns_64_8]
+manufacturer = "Unspecified"
+battery_system = "Rawsuns RDSLI64.8-432"
+battery_capacity_kwh = 64.8
+battery_type = "NMC"
+bus_type = "shuttle"
+passenger_capacity = 16
+reference_kwh_per_km = 0.4

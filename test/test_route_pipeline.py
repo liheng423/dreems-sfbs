@@ -4,6 +4,7 @@ import json
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
+import re
 import subprocess
 import sys
 from tempfile import TemporaryDirectory
@@ -84,7 +85,10 @@ def test_route_pipeline():
             cfg = generate.load_config("605")
         assert cfg["busline_name"] == "605"
         assert cfg["places"] == stops
-        assert cfg["attributes"]["earliest_departure"]["pdf"][0]["loc"] == 22200
+        assert cfg["simulation_start_s"] == 17100
+        assert cfg["simulation_end_s"] == 86399
+        assert cfg["attributes"]["earliest_departure"]["pdf"][0]["loc"] == (
+            cfg["demand_start_s"] + cfg["simulation_end_s"]) / 2
 
         graph = nx.MultiDiGraph(crs="epsg:4326")
         graph.add_node(1, x=6.10, y=49.50)
@@ -127,6 +131,8 @@ def test_route_pipeline():
         assert request_path("pool", requests_dir / "605_550_0002").is_file()
         meta = json.loads(request_path("metadata", instance_dir).read_text())
         assert (meta["candidate_count"], meta["busline"], meta["graph"]) == (2, "605", "550")
+        assert (meta["simulation_start_s"], meta["simulation_end_s"],
+                meta["demand_start_s"]) == (17100, 86399, cfg["demand_start_s"])
         assert {path.relative_to(instance_dir).as_posix() for path in instance_dir.rglob("*")
                 if path.is_file()} == {
             "raw_requests.json", "raw_requests_metadata.json",
@@ -157,9 +163,12 @@ def test_generate_without_busline():
     """Skipping a busline retains general filters and records disabled bus filters."""
     cfg = generate.load_config(None)
     assert cfg["places"] == []
-    assert cfg["parameters"][0]["value"] == 17100
+    assert next(param["value"] for param in cfg["parameters"]
+                if param["name"] == "min_early_departure") == cfg["demand_start_s"]
+    assert cfg["simulation_end_s"] == 86399
     valid_req = {"reqid": 0, "origin": [0.5, 0.5], "destination": [0.7, 0.7],
-                 "direct_distance": 200, "direct_travel_time": 30}
+                 "direct_distance": 200, "direct_travel_time": 30,
+                 "latest_arrival": 7200, "time_stamp": 0}
     short_req = valid_req | {"reqid": 1, "direct_distance": 50}
     with patch.object(generate, "build_area_net", return_value=SimpleNamespace(
         polygon=box(0, 0, 1, 1)
@@ -206,6 +215,117 @@ def test_generate_without_busline():
         assert json.loads(request_path("pool", instance_dir).read_text()) == pool
 
 
+def test_demand_time_window():
+    """Departure times stay in one day; request appearance may be earlier."""
+    assert generate.clock_seconds("07:30") == 27000
+    assert generate.clock_seconds("23:59:59") == 86399
+    defaults = generate.load_config(None)
+    assert defaults["attributes"]["lt_prebooked"]["pdf"] == [
+        defaults["distributions"]["lt_prebooked"]]
+    for value in ("24:00", "12:60", "7:30", "12:00:60", "12"):
+        try:
+            generate.clock_seconds(value)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"accepted invalid clock time {value}")
+    source = generate.CFG_PATH.read_text()
+    with TemporaryDirectory() as directory:
+        cfg_path = Path(directory) / "request_gen.toml"
+        for start, end, demand in (("01:00", "01:00", "01:00"),
+                                   ("02:00", "01:00", "02:00"),
+                                   ("01:00", "02:00", "00:50"),
+                                   ("01:00", "02:00", "02:00")):
+            changed = source.replace('start = "04:45"', f'start = "{start}"')
+            changed = changed.replace('end = "23:59:59"', f'end = "{end}"')
+            cfg_path.write_text(re.sub(r'^demand_start = .*$', f'demand_start = "{demand}"',
+                                       changed, count=1, flags=re.MULTILINE))
+            with patch.object(generate, "CFG_PATH", cfg_path):
+                try:
+                    generate.load_config(None)
+                except ValueError:
+                    pass
+                else:
+                    raise AssertionError("accepted invalid time window")
+        changed = source.replace('start = "04:45"', 'start = "01:00"')
+        changed = changed.replace('end = "23:59:59"', 'end = "02:00"')
+        cfg_path.write_text(re.sub(r'^demand_start = .*$', 'demand_start = "01:30"',
+                                   changed, count=1, flags=re.MULTILINE))
+        with patch.object(generate, "CFG_PATH", cfg_path):
+            cfg = generate.load_config(None)
+    assert [param["value"] for param in cfg["parameters"]
+            if param["name"] in ("min_early_departure", "max_early_departure")] == [5400, 7200]
+    assert cfg["attributes"]["earliest_departure"]["pdf"][0] == {
+        "type": "normal", "loc": 6300, "scale": 300,
+    }
+    assert cfg["demand_start_s"] == 5400
+    cfg["requests"] = 3
+    early = {"reqid": 0, "origin": [0.5, 0.5], "destination": [0.7, 0.7],
+             "direct_distance": 200, "direct_travel_time": 30, "time_stamp": -3600,
+             "latest_arrival": 7100}
+    on_time = early | {"reqid": 1, "time_stamp": 3000}
+    late_arrival = on_time | {"reqid": 2, "latest_arrival": 7201}
+    with patch.object(generate, "build_area_net", return_value=SimpleNamespace(
+        polygon=box(0, 0, 1, 1)
+    )), patch.object(generate, "load_pois", return_value=[]), patch.object(
+        generate, "set_poi_zones"
+    ), patch.object(generate, "_generate_single_data_impl",
+                    side_effect=[early, on_time, late_arrival]):
+        pool = generate.generate(cfg, Path("unused"), Path("unused"))
+    assert pool["requests"] == {"0": early, "1": on_time}
+
+
+def test_request_distributions_from_toml():
+    """Changing TOML distributions changes the REQreate field definitions."""
+    source = generate.CFG_PATH.read_text()
+    source = re.sub(r'^lt_dynamic = .*$',
+                    'lt_dynamic = { type = "uniform", loc = 60, scale = 120 }',
+                    source, count=1, flags=re.MULTILINE)
+    source = re.sub(r'^earliest_departure = .*$',
+                    'earliest_departure = { type = "uniform" }',
+                    source, count=1, flags=re.MULTILINE)
+    with TemporaryDirectory() as directory:
+        cfg_path = Path(directory) / "request_gen.toml"
+        cfg_path.write_text(source)
+        with patch.object(generate, "CFG_PATH", cfg_path):
+            cfg = generate.load_config(None)
+    assert cfg["attributes"]["lt_dynamic"]["pdf"] == [
+        {"type": "uniform", "loc": 60, "scale": 120}]
+    assert cfg["attributes"]["earliest_departure"]["pdf"] == [
+        {"type": "uniform", "loc": cfg["demand_start_s"],
+         "scale": cfg["simulation_end_s"] - cfg["demand_start_s"]}]
+
+
+def test_distance_distribution_from_request_config():
+    """The demand distance sampler uses the distribution from request_gen.toml."""
+    source = generate.CFG_PATH.read_text()
+    source = re.sub(r'^radial_distance = .*$',
+                    'radial_distance = { type = "normal", loc = 900, scale = 100 }',
+                    source, count=1, flags=re.MULTILINE)
+    with TemporaryDirectory() as directory:
+        cfg_path = Path(directory) / "request_gen.toml"
+        cfg_path.write_text(source)
+        with patch.object(generate, "CFG_PATH", cfg_path):
+            cfg = generate.load_config(None)
+    assert cfg["distributions"]["radial_distance"] == {
+        "type": "normal", "loc": 900, "scale": 100}
+    assert "pdf" not in cfg["method_pois"]
+    cfg["requests"] = 1
+    req = {"time_stamp": 0, "latest_arrival": 18000}
+    with patch.object(generate, "build_area_net", return_value=SimpleNamespace()), patch.object(
+        generate, "load_pois", return_value=[]
+    ), patch.object(generate, "set_poi_zones"), patch.object(
+        generate, "passes_filters", return_value=True
+    ), patch.object(generate.norm, "rvs", return_value=950) as sample_distance, patch.object(
+        generate.uniform, "rvs", side_effect=AssertionError("uniform distance sampled")
+    ), patch.object(generate, "_generate_single_data_impl", return_value=req) as sample_request:
+        pool = generate.generate(cfg, Path("unused"), Path("unused"))
+    sample_distance.assert_called_once_with(loc=900, scale=100)
+    assert sample_request.call_args.args[6:12] == (950, "origin", "destination",
+                                                    "normal", 900, 100)
+    assert pool["requests"] == {"0": req}
+
+
 def test_select_area_command():
     """A map name does not have to match the optional busline name."""
     with patch.object(sys, "argv", ["main.py", "select-area", "test", "--busline", "550"]), patch.object(
@@ -222,4 +342,7 @@ if __name__ == "__main__":
     test_route_pipeline()
     test_generate_demand_command()
     test_generate_without_busline()
+    test_demand_time_window()
+    test_request_distributions_from_toml()
+    test_distance_distribution_from_request_config()
     test_select_area_command()

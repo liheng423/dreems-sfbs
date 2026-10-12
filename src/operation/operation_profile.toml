@@ -1,0 +1,19 @@
+[darp.attribute]
+vehicle_speed = 6.111111111111111 # 22 km/h converted to m/s
+service_time = {type = "uniform", loc = 30, scale = 0 } # fixed to 30 seconds
+detour_factor = 1.5
+num_of_vehicles = 6
+
+[darp.operation]
+
+start = "7:00:00"
+end = "13:00:00"
+
+[sfbs.attribute]
+num_of_vehicles = 6
+vehicle_speed = 6.111111111111111 # 22 km/h converted to m/s
+
+[sfbs.operation]
+
+start = "7:00:00"
+end = "13:00:00"

@@ -45,7 +45,7 @@ def main():
         with patch.object(WalkingDistance, "within_limit", return_value=False) as walkable:
             rejected = generate.generate(cfg, area_path, poi_path)
         assert rejected == {"num_data:": 0, "requests": {}}
-        assert walkable.call_count == cfg["requests"]
+        assert 0 < walkable.call_count <= cfg["requests"]
     print("Validated saved-map POIs and REQreate zone-density sampling")
 
 

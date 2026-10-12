@@ -33,6 +33,10 @@ Source: Sammy Jablonski, Benedikt Tepe, Yuqing Zhao, and Andreas Jossen, “Anal
 
 Table 1 calls the capacity column “Passenger Capacity”; it does not distinguish seated from standing places. Electric-only groups have only 1–2 buses and no reported 30 °C increase.
 
+## Electric shuttle scenario
+
+`shuttle_6m_rawsuns_64_8` represents a 6 m electric shuttle with the [Rawsuns RDSLI64.8-432 battery system](https://www.rawsuns.com/electric-propulsion/battery-packs/battery-pack-for-6-meters-electric-shuttle-bus/). The source specifies 64.8 kWh and an RNCM cell; the vehicle manufacturer is unidentified. Passenger capacity (16) and energy consumption (0.4 kWh/km, chosen from 0.30–0.45 kWh/km) are scenario inputs. This rate has no specified 20–22 °C reference temperature or temperature adjustments, so only use it with the unadjusted `reference_20_22_c` setting in the current energy calculator.
+
 ## Conditions that are not model coefficients
 
 | Finding | Conditions and limits | Treatment |

@@ -9,11 +9,8 @@ shop = true
 tourism = ["attraction", "gallery", "hotel", "museum", "zoo"]
 
 [method_pois]
-locations = ["origin", "destination"]
 rows = 50
 columns = 50
 
-[method_pois.pdf]
-type = "uniform"
-loc = 500
-scale = 14500
+[locations]
+depot = { "name" = "Depot Sales-Lentz Bascharage", "lat" = 49.568613, "lon" = 5.922762 }

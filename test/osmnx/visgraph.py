@@ -22,7 +22,7 @@ map_dir = graph_dir(args.map)
 
 graph = ox.load_graphml(graph_path("drive_graph", map_dir))
 intersections = [data for _, data in graph.nodes(data=True) if data["street_count"] >= 3]
-config = tomllib.loads((root / "src/reqreate/request_gen.toml").read_text())
+config = tomllib.loads((root / "src/reqreate/maps/map_config.toml").read_text())
 area = json.loads(graph_path("area", map_dir).read_text())
 boundary = area["geometry"]["coordinates"][0]
 min_lon, min_lat = map(min, zip(*boundary))

@@ -19,6 +19,7 @@ class AreaNetwork(Network):
 
     # build_area_net attaches the precomputed stop-access distances.
     walking_distance: WalkingDistance
+    radial_direction = (0, 360)
 
     def _get_random_coord(self, polygon, seed_coord):
         """Sample a seeded random point inside the given polygon."""
@@ -33,8 +34,9 @@ class AreaNetwork(Network):
         """Sample at a radius in metres inside the polygon, or return (-1, -1)."""
         rng = np.random.default_rng(seed_coord)
         radius_km = float(np.asarray(radius).item()) / 1000
+        start, span = self.radial_direction
         for _ in range(1000):
-            bearing = rng.uniform(0, 2 * math.pi)
+            bearing = rng.uniform(math.radians(start), math.radians(start + span))
             lat_start = math.radians(lat)
             lon_start = math.radians(lon)
             angular_distance = radius_km / 6378.1
