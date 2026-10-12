@@ -45,7 +45,8 @@ REQUEST_OUTPUT_FIELDS = {
     "latest_arrival", "origin", "destination", "originnode_drive",
     "destinationnode_drive", "direct_distance", "direct_travel_time", "energy_kwh",
     "boarding_stop_id", "alighting_stop_id", "boarding_walk_distance_m",
-    "alighting_walk_distance_m",
+    "alighting_walk_distance_m", "origin_drive_point", "destination_drive_point",
+    "boarding_stop_point", "alighting_stop_point",
 }
 SFBS_OUTPUT_FIELDS = REQUEST_OUTPUT_FIELDS - {"originnode_drive", "destinationnode_drive"}
 
@@ -270,11 +271,35 @@ def filter_requests(cfg, net, reqs):
         and passes_filters(req, cfg["request_filters"], net, cfg)
     }
     if cfg["task"] == "SFBS":
+        stops = {stop["name"].removeprefix("Stop_"): stop for stop in cfg["places"]}
         for req in reqs.values():
             req.update(select_scheduled_bus_stops(req, net, cfg))
             for role in ("boarding", "alighting"):
                 stop = stops[req[f"{role}_stop_id"]]
                 req[f"{role}_stop_point"] = [stop["lat"], stop["lon"]]
+    return reqs
+
+
+def generate(cfg, area_path, poi_path):
+    """Generate, filter, and annotate requests for the selected service area."""
+    net = prepare_network(cfg, area_path, poi_path)
+    reqs = filter_requests(cfg, net, generate_candidates(cfg, net))
+    operation = tomllib.loads(OPERATION_CFG_PATH.read_text())[cfg["task"].lower()]["attribute"]
+    profiles = tomllib.loads(VEHICLE_CFG_PATH.read_text())["profiles"]
+    energy_rate = consumption_kwh_per_km({"scenario": operation, "profiles": profiles})
+    fields = SFBS_OUTPUT_FIELDS if cfg["task"] == "SFBS" else REQUEST_OUTPUT_FIELDS
+    for req in reqs.values():
+        for role in ("origin", "destination"):
+            node = req.get(f"{role}node_drive")
+            if node is not None:
+                point = net.G_drive.nodes[node]
+                req[f"{role}_drive_point"] = [point["y"], point["x"]]
+        if "direct_distance" in req:
+            req["energy_kwh"] = req["direct_distance"] / 1000 * energy_rate
+        if not DEBUG:
+            for key in list(req):
+                if key not in fields:
+                    del req[key]
     return {"num_data:": len(reqs), "requests": reqs}
 
 

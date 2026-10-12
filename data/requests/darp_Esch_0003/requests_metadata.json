@@ -1,0 +1,53 @@
+{
+  "task": "DARP",
+  "busline": null,
+  "graph": "Esch",
+  "generator": "REQreate._generate_single_data_impl + configured time sampler",
+  "python_version": "3.12.15",
+  "package_versions": {
+    "reqreate": "0.1.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "osmnx": "2.1.1",
+    "networkx": "3.7"
+  },
+  "seed": 42,
+  "candidate_count": 115,
+  "mean_candidate_count": 100.0,
+  "prebooked_probability": 0.5,
+  "dynamic_time_stamp_distribution": {
+    "type": "poisson",
+    "rate_per_hour": 12.5
+  },
+  "prebooked_earliest_departure_distribution": {
+    "type": "poisson",
+    "rate_per_hour": 12.5
+  },
+  "request_count": 95,
+  "simulation_start_s": 28800,
+  "simulation_end_s": 43200,
+  "demand_start_s": 28800,
+  "network_input": "GeoJSON service area and saved OSM drive/walk graphs",
+  "vehicle_speed_mps": 6.111111111111111,
+  "detour_factor": 1.5,
+  "travel_time_method": "Directed road distance / DARP vehicle_speed",
+  "spatial_sampling": "REQreate method_pois: POI-density zones and radial trip distances, followed by area, minimum-distance, and positive-travel-time filters",
+  "bus_filters_enabled": false,
+  "poi_count": 824,
+  "distance_method": "Directed OSM shortest path weighted by length in metres",
+  "inputs_sha256": {
+    "src/reqreate/request_gen.toml": "35088b59ed6523febcb0ae8c0f9456868f6893d8e6fc9447823acc58762d2297",
+    "src/reqreate/maps/map_config.toml": "fd41fd72b4f16042cab62c545766ab834797f56a9b085e466a23a9b1b2502c99",
+    "src/reqreate/filters/filters.toml": "a0332086397193b6f1195b8fd6e2995ed21a647162af665f243b564402706501",
+    "src/reqreate/operation/operation_profile.toml": "4b9e64a1bd48c78bb854897f9126f613d02993575f42c79a42581eaed72523ee",
+    "src/reqreate/operation/veh_profile.toml": "abf5f6b5e8861234716ce0e38b8fff0f6b7862dd87757fb41109848000c42598",
+    "data/graphs/Esch/service_area.geojson": "592a75fe4a25602f82d6b912ba236c45ffbdf8708ce824122804e6e271076188",
+    "data/graphs/Esch/drive.graphml": "320e77edb59c7d6f2192848e570099b86652c6dcb3b554cc54a93833d4ae320c",
+    "data/graphs/Esch/walk.graphml": "481d9d392f05516db77f1c330d473b0ad3540a0d0abec06d3164e976999d3030",
+    "data/graphs/Esch/pois.json": "41695fa940cedfc7fe3ab14572662c73a1e2fd948c93107e642e9a0954540c49",
+    "data/graphs/Esch/depot.json": "1e4ccc9f01c2d644fc229eb537f91595d3489af648091925ff23a0b0b9cd2d8f"
+  },
+  "pool_sha256": "662801e476fe314820355b868d01aa990fe114a94a2e32784dbf67b1984e2e19",
+  "operations_sha256": "92c338b662ff9a7b951831a139cb7b6c6154aeb829e7f4600873f4b0d4ce89f3"
+}
