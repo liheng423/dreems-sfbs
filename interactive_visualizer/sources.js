@@ -30,9 +30,16 @@ $('request-folder').addEventListener('change', async (event) => {
   const folder = event.target.value;
   if (!folder) return;
   try {
-    const pool = await folder_json('requests', folder, 'raw_requests.json');
+    let file = 'requests.json';
+    let pool;
+    try {
+      pool = await folder_json('requests', folder, file);
+    } catch {
+      file = 'raw_requests.json';
+      pool = await folder_json('requests', folder, file);
+    }
     if (event.target.value !== folder) return;
-    load_reqs(pool, `data/requests/${folder}/raw_requests.json`);
+    load_reqs(pool, `data/requests/${folder}/${file}`);
   } catch (error) {
     show_source_error('file-error', error);
   }

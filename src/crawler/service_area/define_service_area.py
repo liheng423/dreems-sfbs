@@ -23,6 +23,7 @@ sys.path.insert(0, str(ROOT))
 
 from src.output_adapters import (BUSLINES_DIR, busline_dir, busline_path, graph_dir,
                                  graph_path, write_area, write_json)
+from src.reqreate.utils.graph_utils import GraphNodeIndex
 
 PAGE_PATH = Path(__file__).with_name("service_area.html")
 MAPS_CFG_PATH = ROOT / "src/reqreate/maps/map_config.toml"
@@ -46,7 +47,8 @@ def save_area(geometry, out_dir):
     if polygon.geom_type != "Polygon" or not polygon.is_valid or polygon.is_empty:
         raise ValueError("Select a valid rectangle or polygon")
 
-    tags = tomllib.loads(MAPS_CFG_PATH.read_text())["poi_tags"]
+    map_config = tomllib.loads(MAPS_CFG_PATH.read_text())
+    tags = map_config["poi_tags"]
     # OSMnx appends /interpreter to these API base URLs.
     for overpass_url in OVERPASS_URLS:
         ox.settings.overpass_url = overpass_url
@@ -76,7 +78,20 @@ def save_area(geometry, out_dir):
         raise ValueError("No OSM POIs in the service area")
     write_area(mapping(polygon), graphs, out_dir)
     write_json(graph_path("pois", out_dir), {"features": pois})
+    save_depot(graphs["drive"], out_dir, map_config["locations"]["depot"])
     return out_dir
+
+
+def save_depot(graph, out_dir, depot):
+    """Save the configured depot and its nearest drive graph node."""
+    snapped = GraphNodeIndex(graph).nearest(depot["lat"], depot["lon"])
+    write_json(graph_path("depot", out_dir), {
+        "name": depot["name"],
+        "original_point": [depot["lat"], depot["lon"]],
+        "drive_node_id": snapped["node_id"],
+        "drive_point": snapped["point"],
+        "snap_distance_m": snapped["distance_m"],
+    })
 
 
 def render_page(map_name, busline_name=None, buslines_dir=BUSLINES_DIR):
@@ -109,7 +124,7 @@ class Handler(BaseHTTPRequestHandler):
         geometry = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         try:
             out_dir = save_area(geometry, graph_dir(self.map_name))
-            message, status = f"Saved boundary, drive/walk graphs, and POIs to {out_dir}", 200
+            message, status = f"Saved boundary, drive/walk graphs, POIs, and depot to {out_dir}", 200
         except Exception as error:
             message, status = str(error), 500
         self.send_response(status)

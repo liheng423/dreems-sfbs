@@ -41,6 +41,10 @@ def test_output_layout():
                 write_json(request_path(name, instance_dir), {"run": number})
             assert {path.name for path in instance_dir.iterdir()} == set(REQUEST_FILES.values())
         assert request_path("pool", first).read_text() != request_path("pool", second).read_text()
+        legacy = requests_dir / "legacy"
+        legacy.mkdir()
+        (legacy / "raw_requests.json").write_text("{}")
+        assert request_path("pool", legacy).name == "raw_requests.json"
 
 
 if __name__ == "__main__":

@@ -68,17 +68,23 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, 'sources.js'), 'utf8'), con
   await request.listeners.change({ target: request });
   assert.equal(loaded[0][0], 'requests');
   assert.match(loaded[0][1], /data\/requests\/550_550_0001\/raw_requests\.json/);
+  const fetch_old = context.fetch;
+  context.fetch = async (url) => url.endsWith('/new_run/requests.json')
+    ? { ok: true, json: async () => ({ 'num_data:': 0, requests: {} }) } : fetch_old(url);
+  request.value = 'new_run';
+  await request.listeners.change({ target: request });
+  assert.match(loaded[1][1], /data\/requests\/new_run\/requests\.json/);
 
   const graph = element('graph-folder');
   graph.value = '550';
   await graph.listeners.change({ target: graph });
-  assert.match(loaded[1][1], /data\/graphs\/550\/pois\.json/);
+  assert.match(loaded[2][1], /data\/graphs\/550\/pois\.json/);
   assert.match(element('graph-name').textContent, /data\/graphs\/550\/service_area\.geojson/);
 
   const busline = element('busline-folder');
   busline.value = '550';
   await busline.listeners.change({ target: busline });
-  assert.deepEqual(loaded.slice(2).map(([kind]) => kind), ['stops', 'businfo', 'energy']);
+  assert.deepEqual(loaded.slice(3).map(([kind]) => kind), ['stops', 'businfo', 'energy']);
   busline.value = '605';
   await busline.listeners.change({ target: busline });
   assert.ok(removed.length);

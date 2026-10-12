@@ -1,5 +1,6 @@
 """Exercise a non-550 route through GTFS, stop places, and demand settings."""
 
+import hashlib
 import json
 from contextlib import redirect_stdout
 from io import StringIO
@@ -85,8 +86,8 @@ def test_route_pipeline():
             cfg = generate.load_config("605")
         assert cfg["busline_name"] == "605"
         assert cfg["places"] == stops
-        assert cfg["simulation_start_s"] == 17100
-        assert cfg["simulation_end_s"] == 86399
+        assert cfg["simulation_start_s"] == 28800
+        assert cfg["simulation_end_s"] == 43200
         assert cfg["attributes"]["earliest_departure"]["pdf"][0]["loc"] == (
             cfg["demand_start_s"] + cfg["simulation_end_s"]) / 2
 
@@ -132,11 +133,19 @@ def test_route_pipeline():
         meta = json.loads(request_path("metadata", instance_dir).read_text())
         assert (meta["candidate_count"], meta["busline"], meta["graph"]) == (2, "605", "550")
         assert (meta["simulation_start_s"], meta["simulation_end_s"],
-                meta["demand_start_s"]) == (17100, 86399, cfg["demand_start_s"])
+                meta["demand_start_s"]) == (28800, 43200, cfg["demand_start_s"])
         assert {path.relative_to(instance_dir).as_posix() for path in instance_dir.rglob("*")
                 if path.is_file()} == {
-            "raw_requests.json", "raw_requests_metadata.json",
+            "requests.json", "operations.json", "requests_metadata.json",
         }
+        operations = json.loads(request_path("operations", instance_dir).read_text())
+        assert operations["darp"]["start_time"] == "7:00:00"
+        assert operations["darp"]["average_speed_mps"] == 6.111111111111111
+        assert operations["sfbs"]["vehicle_count"] == 6
+        assert operations["sfbs"]["vehicle_type"] == "evobus_396_nmc_na_hybrid"
+        assert operations["sfbs"]["vehicle"]["manufacturer"] == "Evobus eCitaro"
+        assert meta["operations_sha256"] == hashlib.sha256(
+            request_path("operations", instance_dir).read_bytes()).hexdigest()
 
 
 def test_generate_demand_command():
@@ -165,13 +174,17 @@ def test_generate_without_busline():
     assert cfg["places"] == []
     assert next(param["value"] for param in cfg["parameters"]
                 if param["name"] == "min_early_departure") == cfg["demand_start_s"]
-    assert cfg["simulation_end_s"] == 86399
+    assert cfg["simulation_end_s"] == 43200
+    drive = nx.DiGraph()
+    drive.add_node(1, x=0.51, y=0.52)
+    drive.add_node(2, x=0.71, y=0.72)
     valid_req = {"reqid": 0, "origin": [0.5, 0.5], "destination": [0.7, 0.7],
+                 "originnode_drive": 1, "destinationnode_drive": 2,
                  "direct_distance": 200, "direct_travel_time": 30,
                  "latest_arrival": 7200, "time_stamp": 0}
     short_req = valid_req | {"reqid": 1, "direct_distance": 50}
     with patch.object(generate, "build_area_net", return_value=SimpleNamespace(
-        polygon=box(0, 0, 1, 1)
+        polygon=box(0, 0, 1, 1), G_drive=drive
     )), patch.object(
         generate, "load_pois", return_value=[[49.5, 6.1]]
     ), patch.object(generate, "set_poi_zones"), patch.object(
@@ -182,6 +195,8 @@ def test_generate_without_busline():
         cfg["requests"] = 2
         pool = generate.generate(cfg, Path("unused"), Path("unused"))
     assert pool == {"num_data:": 1, "requests": {"0": valid_req}}
+    assert valid_req["origin_drive_point"] == [0.52, 0.51]
+    assert valid_req["destination_drive_point"] == [0.72, 0.71]
 
     with TemporaryDirectory() as directory:
         data_dir = Path(directory)
@@ -192,6 +207,7 @@ def test_generate_without_busline():
             graph_path(name, area_dir).write_text(name)
         poi_path = graph_path("pois", area_dir)
         write_json(poi_path, {"features": []})
+        write_json(graph_path("depot", area_dir), {"original_point": [49.5, 6.1]})
         output = StringIO()
         with patch.object(generate, "available_buslines", return_value=[]), patch.object(
             generate, "available_graphs", return_value=["Esch"]
@@ -213,6 +229,42 @@ def test_generate_without_busline():
         assert meta["bus_filters_enabled"] is False
         assert all("buslines" not in path for path in meta["inputs_sha256"])
         assert json.loads(request_path("pool", instance_dir).read_text()) == pool
+        assert request_path("operations", instance_dir).is_file()
+
+
+def test_generate_with_busline_saves_stop_points():
+    cfg = {
+        "requests": 1, "seed": 42, "busline_name": "550",
+        "places": json.loads(busline_path("stops", busline_dir("550")).read_text()),
+        "max_walking_distance_m": 1000, "simulation_end_s": 43200,
+        "distributions": {"radial_direction": {"type": "uniform", "loc": 0, "scale": 360},
+                          "radial_distance": {"type": "uniform", "loc": 500, "scale": 0}},
+        "attributes": {"origin": {}, "destination": {}, "time_stamp": {}},
+        "parameters": [], "method_pois": {"rows": 1, "columns": 1},
+    }
+    drive = nx.DiGraph()
+    drive.add_node(1, x=6.1, y=49.5)
+    drive.add_node(2, x=6.2, y=49.6)
+    stops = cfg["places"][:2]
+    req = {"reqid": 0, "originnode_drive": 1, "destinationnode_drive": 2,
+           "latest_arrival": cfg["simulation_end_s"]}
+    selection = {"boarding_stop_id": stops[0]["name"].removeprefix("Stop_"),
+                 "alighting_stop_id": stops[1]["name"].removeprefix("Stop_")}
+    with patch.object(generate, "build_area_net", return_value=SimpleNamespace(
+        G_drive=drive
+    )), patch.object(generate, "index_route_departures", return_value={}), patch.object(
+        generate, "load_pois", return_value=[]
+    ), patch.object(generate, "set_poi_zones"), patch.object(
+        generate, "passes_filters", return_value=True
+    ), patch.object(generate, "_generate_single_data_impl", return_value=req), patch.object(
+        generate, "select_scheduled_bus_stops", return_value=selection
+    ):
+        pool = generate.generate(cfg, Path("unused"), Path("unused"))
+    saved = pool["requests"]["0"]
+    assert saved["origin_drive_point"] == [49.5, 6.1]
+    assert saved["destination_drive_point"] == [49.6, 6.2]
+    assert saved["boarding_stop_point"] == [stops[0]["lat"], stops[0]["lon"]]
+    assert saved["alighting_stop_point"] == [stops[1]["lat"], stops[1]["lon"]]
 
 
 def test_demand_time_window():
@@ -236,8 +288,8 @@ def test_demand_time_window():
                                    ("02:00", "01:00", "02:00"),
                                    ("01:00", "02:00", "00:50"),
                                    ("01:00", "02:00", "02:00")):
-            changed = source.replace('start = "04:45"', f'start = "{start}"')
-            changed = changed.replace('end = "23:59:59"', f'end = "{end}"')
+            changed = source.replace('start = "08:00:00"', f'start = "{start}"')
+            changed = changed.replace('end = "12:00:00"', f'end = "{end}"')
             cfg_path.write_text(re.sub(r'^demand_start = .*$', f'demand_start = "{demand}"',
                                        changed, count=1, flags=re.MULTILINE))
             with patch.object(generate, "CFG_PATH", cfg_path):
@@ -247,8 +299,8 @@ def test_demand_time_window():
                     pass
                 else:
                     raise AssertionError("accepted invalid time window")
-        changed = source.replace('start = "04:45"', 'start = "01:00"')
-        changed = changed.replace('end = "23:59:59"', 'end = "02:00"')
+        changed = source.replace('start = "08:00:00"', 'start = "01:00"')
+        changed = changed.replace('end = "12:00:00"', 'end = "02:00"')
         cfg_path.write_text(re.sub(r'^demand_start = .*$', 'demand_start = "01:30"',
                                    changed, count=1, flags=re.MULTILINE))
         with patch.object(generate, "CFG_PATH", cfg_path):
@@ -260,19 +312,25 @@ def test_demand_time_window():
     }
     assert cfg["demand_start_s"] == 5400
     cfg["requests"] = 3
+    drive = nx.DiGraph()
+    drive.add_node(1, x=0.51, y=0.52)
+    drive.add_node(2, x=0.71, y=0.72)
     early = {"reqid": 0, "origin": [0.5, 0.5], "destination": [0.7, 0.7],
+             "originnode_drive": 1, "destinationnode_drive": 2,
              "direct_distance": 200, "direct_travel_time": 30, "time_stamp": -3600,
              "latest_arrival": 7100}
     on_time = early | {"reqid": 1, "time_stamp": 3000}
     late_arrival = on_time | {"reqid": 2, "latest_arrival": 7201}
     with patch.object(generate, "build_area_net", return_value=SimpleNamespace(
-        polygon=box(0, 0, 1, 1)
+        polygon=box(0, 0, 1, 1), G_drive=drive
     )), patch.object(generate, "load_pois", return_value=[]), patch.object(
         generate, "set_poi_zones"
     ), patch.object(generate, "_generate_single_data_impl",
                     side_effect=[early, on_time, late_arrival]):
         pool = generate.generate(cfg, Path("unused"), Path("unused"))
     assert pool["requests"] == {"0": early, "1": on_time}
+    assert all(req["origin_drive_point"] == [0.52, 0.51]
+               for req in pool["requests"].values())
 
 
 def test_request_distributions_from_toml():
@@ -311,8 +369,12 @@ def test_distance_distribution_from_request_config():
         "type": "normal", "loc": 900, "scale": 100}
     assert "pdf" not in cfg["method_pois"]
     cfg["requests"] = 1
-    req = {"time_stamp": 0, "latest_arrival": 18000}
-    with patch.object(generate, "build_area_net", return_value=SimpleNamespace()), patch.object(
+    req = {"time_stamp": 0, "latest_arrival": 18000,
+           "originnode_drive": 1, "destinationnode_drive": 2}
+    drive = nx.DiGraph()
+    drive.add_node(1, x=6.1, y=49.5)
+    drive.add_node(2, x=6.2, y=49.6)
+    with patch.object(generate, "build_area_net", return_value=SimpleNamespace(G_drive=drive)), patch.object(
         generate, "load_pois", return_value=[]
     ), patch.object(generate, "set_poi_zones"), patch.object(
         generate, "passes_filters", return_value=True
@@ -324,6 +386,7 @@ def test_distance_distribution_from_request_config():
     assert sample_request.call_args.args[6:12] == (950, "origin", "destination",
                                                     "normal", 900, 100)
     assert pool["requests"] == {"0": req}
+    assert req["origin_drive_point"] == [49.5, 6.1]
 
 
 def test_select_area_command():
@@ -342,6 +405,7 @@ if __name__ == "__main__":
     test_route_pipeline()
     test_generate_demand_command()
     test_generate_without_busline()
+    test_generate_with_busline_saves_stop_points()
     test_demand_time_window()
     test_request_distributions_from_toml()
     test_distance_distribution_from_request_config()

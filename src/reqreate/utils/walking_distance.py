@@ -1,9 +1,9 @@
 """Filter generated requests by walking access to bus stops."""
 
 import networkx as nx
-import numpy as np
 import osmnx as ox
-from sklearn.neighbors import BallTree
+
+from src.reqreate.utils.graph_utils import GraphNodeIndex
 
 
 class WalkingDistance:
@@ -16,11 +16,12 @@ class WalkingDistance:
         self.stop_distances = {}
         routes = self.graph.copy()
         source = "Bus stops"
+        self.index = GraphNodeIndex(graph)
         for stop in stops:
-            node = ox.nearest_nodes(graph, stop["lon"], stop["lat"])
-            walk_node = graph.nodes[node]
+            snapped = self.index.nearest(stop["lat"], stop["lon"])
+            node = snapped["node_id"]
             connector = ox.distance.great_circle(stop["lat"], stop["lon"],
-                                                 walk_node["y"], walk_node["x"])
+                                                 *snapped["point"])
             routes.add_edge(source, node, length=connector)
             stop_id = stop["name"].removeprefix("Stop_")
             self.stop_distances[stop_id] = (
@@ -28,18 +29,11 @@ class WalkingDistance:
                 nx.single_source_dijkstra_path_length(self.graph, node, weight="length"),
             )
         self.distances = nx.single_source_dijkstra_path_length(routes, source, weight="length")
-        self.nodes = list(graph)
-        self.tree = BallTree(np.deg2rad([
-            (graph.nodes[node]["y"], graph.nodes[node]["x"])
-            for node in self.nodes
-        ]), metric="haversine")
 
     def nearest_node(self, point):
         """Return the nearest walking node and its straight-line distance in metres."""
-        connectors, indices = self.tree.query(np.deg2rad([[point.y, point.x]]), k=1)
-        node = self.nodes[indices[0, 0]]
-        connector = connectors[0, 0] * ox.distance.EARTH_RADIUS_M
-        return node, connector
+        snapped = self.index.nearest(point.y, point.x)
+        return snapped["node_id"], snapped["distance_m"]
 
     def distance_to_nearest_stop(self, point):
         """Return the shortest walk to any stop, including endpoint connectors."""

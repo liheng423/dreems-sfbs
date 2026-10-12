@@ -15,6 +15,7 @@ from shapely.geometry import Point, shape
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.output_adapters import busline_dir, busline_path, graph_dir, graph_path, request_path
+from src.reqreate.utils.graph_utils import nearest_graph_point
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -35,10 +36,10 @@ def main():
     walk_routes = walk.to_undirected()
     source = "Route 550 stops"
     for stop in stops:
-        node = ox.nearest_nodes(walk, stop["lon"], stop["lat"])
-        walk_node = walk.nodes[node]
+        snapped = nearest_graph_point(walk, stop["lat"], stop["lon"])
+        node = snapped["node_id"]
         connector = ox.distance.great_circle(stop["lat"], stop["lon"],
-                                             walk_node["y"], walk_node["x"])
+                                             *snapped["point"])
         walk_routes.add_edge(source, node, length=connector)
     walk_distances = nx.single_source_dijkstra_path_length(walk_routes, source,
                                                             weight="length")
@@ -65,8 +66,8 @@ def main():
             assert req[name + "node_drive"] in graph
             node = req[name + "node_walk"]
             assert node in walk
-            walk_node = walk.nodes[node]
-            connector = ox.distance.great_circle(lat, lon, walk_node["y"], walk_node["x"])
+            walk_point = nearest_graph_point(walk, node_id=node)["point"]
+            connector = ox.distance.great_circle(lat, lon, *walk_point)
             assert walk_distances[node] + connector < filter_cfg["max_walking_distance_m"]
         assert req["direct_distance"] >= filter_cfg["parameters"][0]["value"]
         assert req["direct_travel_time"] == int(req["direct_distance"] / 5.56) > 0

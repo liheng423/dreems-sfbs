@@ -29,6 +29,7 @@ from maps.pois import load_pois, set_poi_zones
 from adapters.pool_output import write_pool
 from src.output_adapters import (GRAPH_FILES, available_buslines, available_graphs, busline_dir,
                                  busline_path, create_request_dir, graph_dir, graph_path)
+from src.reqreate.utils.graph_utils import nearest_graph_point
 
 
 CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
@@ -170,9 +171,18 @@ def generate(cfg, area_path, poi_path):
         if req["latest_arrival"] <= cfg["simulation_end_s"]
         and passes_filters(req, request_filters, net, cfg)
     }
+    for req in reqs.values():
+        for endpoint in ("origin", "destination"):
+            req[f"{endpoint}_drive_point"] = nearest_graph_point(
+                net.G_drive, node_id=req[f"{endpoint}node_drive"]
+            )["point"]
     if cfg["busline_name"] is not None:
+        stops = {stop["name"].removeprefix("Stop_"): stop for stop in cfg["places"]}
         for req in reqs.values():
             req.update(select_scheduled_bus_stops(req, net, cfg))
+            for role in ("boarding", "alighting"):
+                stop = stops[req[f"{role}_stop_id"]]
+                req[f"{role}_stop_point"] = [stop["lat"], stop["lon"]]
     return {"num_data:": len(reqs), "requests": reqs}
 
 
@@ -227,7 +237,7 @@ def main():
     instance_dir = create_request_dir(busline_name or "no_bus", graph_name)
     pool_path = write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
                            instance_dir, pool)
-    print(f"Wrote {len(pool['requests'])} raw REQreate requests to {pool_path}")
+    print(f"Wrote {len(pool['requests'])} REQreate requests to {pool_path}")
 
 
 if __name__ == "__main__":

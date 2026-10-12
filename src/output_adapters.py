@@ -21,10 +21,12 @@ GRAPH_FILES = {
     "drive_graph": "drive.graphml",
     "walk_graph": "walk.graphml",
     "pois": "pois.json",
+    "depot": "depot.json",
 }
 REQUEST_FILES = {
-    "pool": "raw_requests.json",
-    "metadata": "raw_requests_metadata.json",
+    "pool": "requests.json",
+    "metadata": "requests_metadata.json",
+    "operations": "operations.json",
 }
 
 
@@ -52,7 +54,9 @@ def graph_path(name, directory):
 
 def request_path(name, directory):
     """Resolve a request artifact within one generated instance."""
-    return directory / REQUEST_FILES[name]
+    path = directory / REQUEST_FILES[name]
+    legacy = directory / f"raw_{REQUEST_FILES[name]}"
+    return legacy if name != "operations" and not path.exists() and legacy.exists() else path
 
 
 def available_buslines(buslines_dir=BUSLINES_DIR):

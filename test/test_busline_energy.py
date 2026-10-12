@@ -12,14 +12,16 @@ import networkx as nx
 import osmnx as ox
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src/busline"))
+sys.path.insert(0, str(ROOT / "src/operation"))
 import energy
 from energy import estimate_busline_energy
 
 
 def test_paper_rate_and_same_node_distance():
-    with (ROOT / "src/busline/energy.toml").open("rb") as file:
+    with (ROOT / "src/operation/veh_profile.toml").open("rb") as file:
         config = tomllib.load(file)
+    with (ROOT / "src/operation/operation_profile.toml").open("rb") as file:
+        config["scenario"] = tomllib.load(file)["sfbs"]["attribute"]
     graph = nx.MultiDiGraph(crs="epsg:4326")
     graph.add_node(1, x=6.0, y=49.0)
     graph.add_node(2, x=6.01, y=49.0)
@@ -41,6 +43,11 @@ def test_paper_rate_and_same_node_distance():
     assert second["distance_m"] > 0
     assert math.isclose(second["energy_kwh"], second["distance_m"] / 1000 * 0.87)
 
+    config["scenario"]["profile"] = "shuttle_6m_rawsuns_64_8"
+    shuttle, _ = estimate_busline_energy(graph, businfo, config)
+    assert math.isclose(shuttle["energy_kwh"], 0.4)
+
+    config["scenario"]["profile"] = "evobus_396_nmc_na_hybrid"
     config["scenario"]["temperature_case"] = "at_9_c"
     warmer, _ = estimate_busline_energy(graph, businfo, config)
     assert math.isclose(warmer["energy_kwh"], 0.87 * 1.29)

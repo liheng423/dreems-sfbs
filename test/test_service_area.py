@@ -16,6 +16,7 @@ from shapely.geometry import Point, shape
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.output_adapters import graph_path
+from src.reqreate.utils.graph_utils import GraphNodeIndex, nearest_graph_point
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "src/crawler/service_area/define_service_area.py"
@@ -37,6 +38,11 @@ def test_save_area():
     graph.add_node(1, x=6.2, y=49.5)
     graph.add_node(2, x=6.21, y=49.51)
     graph.add_edge(1, 2, length=100)
+    assert nearest_graph_point(graph, 49.5001, 6.2001) == {
+        "node_id": 1, "point": [49.5, 6.2]}
+    assert nearest_graph_point(graph, node_id=2) == {
+        "node_id": 2, "point": [49.51, 6.21]}
+    assert GraphNodeIndex(graph).nearest(49.5001, 6.2001)["node_id"] == 1
     geometry = {"type": "Polygon", "coordinates": [[
         [6.2, 49.5], [6.21, 49.5], [6.205, 49.51], [6.2, 49.5]
     ]]}
@@ -51,6 +57,11 @@ def test_save_area():
         assert out_dir == graph_dir
         assert graph_path("drive_graph", graph_dir).is_file()
         assert graph_path("walk_graph", graph_dir).is_file()
+        depot = json.loads(graph_path("depot", graph_dir).read_text())
+        assert depot["original_point"] == [49.568613, 5.922762]
+        node = graph.nodes[depot["drive_node_id"]]
+        assert depot["drive_point"] == [node["y"], node["x"]]
+        assert depot["snap_distance_m"] > 0
         assert json.loads(graph_path("pois", graph_dir).read_text())["features"][0]["tags"] == {"amenity": "cafe"}
         assert fetch.call_args.kwargs["tags"]["amenity"]
         assert all(call.args[0].equals(shape(geometry)) for call in download.call_args_list)

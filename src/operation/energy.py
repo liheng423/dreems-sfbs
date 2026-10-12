@@ -1,8 +1,4 @@
-"""Estimate stop-to-stop electric bus energy from measured fleet rates.
-
-The rates come from Jablonski et al., NEIS 2023, Table 1. See README.md for
-the fleet and temperature conditions under which those rates were measured.
-"""
+"""Estimate stop-to-stop electric bus energy from selected vehicle rates."""
 
 import argparse
 import json
@@ -15,15 +11,16 @@ import osmnx as ox
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.output_adapters import busline_dir, busline_path, graph_dir, graph_path, write_json
+from src.reqreate.utils.graph_utils import GraphNodeIndex
 
 
 def estimate_busline_energy(graph: nx.MultiDiGraph, businfo: dict, config: dict) -> list[dict]:
     """Return energy for each consecutive pair in every directed bus pattern.
 
-    ``businfo`` is the selected route's GTFS timetable; ``config`` is parsed
-    ``energy.toml``. Energy is road distance in km times the selected
-    paper profile's median kWh/km, adjusted only at temperature cases directly
-    reported in Table 1. It is a fleet-rate estimate, not a route measurement.
+    ``businfo`` is the selected route's GTFS timetable; ``config`` combines
+    the operation scenario and vehicle profiles. Energy is road distance in km
+    times the selected profile's kWh/km, adjusted only when that profile has
+    a rate for the chosen temperature case. It is not a route measurement.
     Two stops snapping to one simplified graph node use their straight-line
     distance as a marked lower bound.
     """
@@ -35,8 +32,9 @@ def estimate_busline_energy(graph: nx.MultiDiGraph, businfo: dict, config: dict)
     consumption_kwh_per_km = profile["reference_kwh_per_km"] * (1 + increase_pct / 100)
 
     stops = {stop["stop_id"]: stop for stop in businfo["stops"]}
+    index = GraphNodeIndex(graph)
     stop_nodes = {
-        stop_id: ox.distance.nearest_nodes(graph, stop["stop_lon"], stop["stop_lat"])
+        stop_id: index.nearest(stop["stop_lat"], stop["stop_lon"])["node_id"]
         for stop_id, stop in stops.items()
     }
     segments = []
@@ -73,9 +71,10 @@ def main():
     parser.add_argument("--route", required=True)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
-    config_path = Path(__file__).with_name("energy.toml")
-    with config_path.open("rb") as file:
+    with Path(__file__).with_name("veh_profile.toml").open("rb") as file:
         config = tomllib.load(file)
+    with Path(__file__).with_name("operation_profile.toml").open("rb") as file:
+        config["scenario"] = tomllib.load(file)["sfbs"]["attribute"]
     route_dir = busline_dir(args.route)
     drive_path = graph_path("drive_graph", graph_dir(args.route))
     businfo = json.loads(busline_path("businfo", route_dir).read_text())
@@ -86,14 +85,13 @@ def main():
         "sources": {
             "businfo": str(busline_path("businfo", route_dir).relative_to(root)),
             "road_graph": str(drive_path.relative_to(root)),
-            "energy_config": "src/busline/energy.toml",
-            "paper": ".ref/papers/Analysis_and_Characterization_of_the_Energy_Consumption_in_an_Electric_Bus_Fleet.pdf",
-            "paper_location": "Table 1, printed page 256",
+            "vehicle_profiles": "src/operation/veh_profile.toml",
+            "operation_profile": "src/operation/operation_profile.toml",
         },
         "scenario": config["scenario"],
         "profile": config["profiles"][config["scenario"]["profile"]],
-        "status": f"Illustrative paper profile; actual Route {args.route} bus model and ambient temperature are unverified.",
-        "method": "Directed shortest road path distance times measured profile kWh/km at selected paper temperature case. Same-node stop pairs use marked straight-line lower bounds.",
+        "status": f"Illustrative vehicle profile; actual Route {args.route} bus model and ambient temperature are unverified.",
+        "method": "Directed shortest road path distance times selected profile kWh/km. Same-node stop pairs use marked straight-line lower bounds.",
         "segments": segments,
     }
     write_json(busline_path("energy", route_dir), result)

@@ -1,8 +1,4 @@
 # Jablonski et al., NEIS 2023, Table 1 (paper details in README.md).
-# This is an explicit illustrative scenario; Route 550's vehicle type is unverified.
-[scenario]
-profile = "evobus_396_nmc_na_hybrid"
-temperature_case = "reference_20_22_c"
 
 [profiles.evobus_243_nmc_na_hybrid]
 manufacturer = "Evobus eCitaro"

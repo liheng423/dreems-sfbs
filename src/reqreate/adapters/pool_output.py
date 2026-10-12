@@ -5,6 +5,7 @@ from importlib import metadata
 import json
 import platform
 from pathlib import Path
+import tomllib
 
 from src.output_adapters import busline_path, graph_path, request_path, write_json
 
@@ -13,6 +14,8 @@ ROOT = Path(__file__).resolve().parents[3]
 CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
 MAPS_CFG_PATH = ROOT / "src/reqreate/maps/map_config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
+OPERATIONS_PATH = ROOT / "src/operation/operation_profile.toml"
+VEHICLES_PATH = ROOT / "src/operation/veh_profile.toml"
 
 
 def sha256(path):
@@ -24,11 +27,31 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
                instance_dir, pool):
     """Write the request pool and provenance metadata; return the pool path."""
     poi_path = graph_path("pois", area_dir)
-    in_paths = [CFG_PATH, MAPS_CFG_PATH, FILTERS_PATH]
+    in_paths = [CFG_PATH, MAPS_CFG_PATH, FILTERS_PATH, OPERATIONS_PATH, VEHICLES_PATH]
     if busline_name is not None:
         in_paths.extend(busline_path(name, route_dir) for name in ("stops", "businfo"))
-    in_paths.extend(graph_path(name, area_dir) for name in ("area", "drive_graph", "walk_graph", "pois"))
+    in_paths.extend(graph_path(name, area_dir) for name in ("area", "drive_graph", "walk_graph", "pois", "depot"))
+    config = tomllib.loads(OPERATIONS_PATH.read_text())
+    profiles = tomllib.loads(VEHICLES_PATH.read_text())["profiles"]
+    operations = {}
+    for mode in ("darp", "sfbs"):
+        attributes = config[mode]["attribute"]
+        timing = config[mode]["operation"]
+        operations[mode] = {
+            "start_time": timing["start"],
+            "end_time": timing["end"],
+            "average_speed_mps": attributes["vehicle_speed"],
+            "vehicle_count": attributes["num_of_vehicles"],
+        }
+    operations["darp"]["detour_factor"] = config["darp"]["attribute"]["detour_factor"]
+    sfbs = config["sfbs"]["attribute"]
+    operations["sfbs"].update({
+        "vehicle_type": sfbs["profile"],
+        "temperature_case": sfbs["temperature_case"],
+        "vehicle": profiles[sfbs["profile"]],
+    })
     pool_path = write_json(request_path("pool", instance_dir), pool, compact=True)
+    operations_path = write_json(request_path("operations", instance_dir), operations)
     meta = {
         "busline": busline_name,
         "graph": graph_name,
@@ -61,6 +84,7 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
             for path in in_paths
         },
         "pool_sha256": sha256(pool_path),
+        "operations_sha256": sha256(operations_path),
     }
     write_json(request_path("metadata", instance_dir), meta)
     return pool_path
