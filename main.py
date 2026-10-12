@@ -39,7 +39,7 @@ def main():
     demand = commands.add_parser("generate-demand")
     demand.add_argument("--map", required=True)
     demand.add_argument("--busline")
-    demand.add_argument("--requests", type=int)
+    demand.add_argument("--debug", action="store_true")
     commands.add_parser("visualize")
     args = parser.parse_args()
     if args.command == "visualize":
@@ -53,8 +53,8 @@ def main():
         step_args = ["--map", args.map]
         if args.busline:
             step_args.extend(["--busline", args.busline])
-        if args.requests is not None:
-            step_args.extend(["--requests", str(args.requests)])
+        if args.debug:
+            step_args.append("--debug")
     subprocess.run([sys.executable, str(COMMANDS[args.command]), *step_args], check=True)
 
 

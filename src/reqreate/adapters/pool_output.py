@@ -14,8 +14,8 @@ ROOT = Path(__file__).resolve().parents[3]
 CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
 MAPS_CFG_PATH = ROOT / "src/reqreate/maps/map_config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
-OPERATIONS_PATH = ROOT / "src/operation/operation_profile.toml"
-VEHICLES_PATH = ROOT / "src/operation/veh_profile.toml"
+OPERATIONS_PATH = ROOT / "src/reqreate/operation/operation_profile.toml"
+VEHICLES_PATH = ROOT / "src/reqreate/operation/veh_profile.toml"
 
 
 def sha256(path):

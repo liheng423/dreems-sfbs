@@ -88,8 +88,7 @@ def test_route_pipeline():
         assert cfg["places"] == stops
         assert cfg["simulation_start_s"] == 28800
         assert cfg["simulation_end_s"] == 43200
-        assert cfg["attributes"]["earliest_departure"]["pdf"][0]["loc"] == (
-            cfg["demand_start_s"] + cfg["simulation_end_s"]) / 2
+        assert cfg["requests"] == 100
 
         graph = nx.MultiDiGraph(crs="epsg:4326")
         graph.add_node(1, x=6.10, y=49.50)
@@ -118,11 +117,11 @@ def test_route_pipeline():
             side_effect=lambda busline_name, graph_name: create_request_dir(
                 busline_name, graph_name, requests_dir),
         ), patch.object(sys, "argv", ["generate.py", "--map", "550",
-                                       "--busline", "605", "--requests", "2"]):
+                                       "--busline", "605"]):
             generate.main()
             prompt.assert_not_called()
             prompt.return_value = "1"
-            sys.argv[:] = ["generate.py", "--map", "550", "--requests", "2"]
+            sys.argv[:] = ["generate.py", "--map", "550"]
             generate.main()
         prompt.assert_called_once_with("Choose busline number: ")
         assert sample.call_args.args[0]["busline_name"] == "605"
@@ -131,12 +130,12 @@ def test_route_pipeline():
         assert request_path("pool", instance_dir).is_file()
         assert request_path("pool", requests_dir / "605_550_0002").is_file()
         meta = json.loads(request_path("metadata", instance_dir).read_text())
-        assert (meta["candidate_count"], meta["busline"], meta["graph"]) == (2, "605", "550")
-        assert (meta["mean_candidate_count"], meta["prebooked_probability"]) == (2, 0.5)
+        assert (meta["candidate_count"], meta["busline"], meta["graph"]) == (100, "605", "550")
+        assert (meta["mean_candidate_count"], meta["prebooked_probability"]) == (100, 0.5)
         assert meta["dynamic_time_stamp_distribution"] == {
-            "type": "poisson", "rate_per_hour": 0.25}
+            "type": "poisson", "rate_per_hour": 12.5}
         assert meta["prebooked_earliest_departure_distribution"] == {
-            "type": "poisson", "rate_per_hour": 0.25}
+            "type": "poisson", "rate_per_hour": 12.5}
         assert (meta["simulation_start_s"], meta["simulation_end_s"],
                 meta["demand_start_s"]) == (28800, 43200, cfg["demand_start_s"])
         assert {path.relative_to(instance_dir).as_posix() for path in instance_dir.rglob("*")
@@ -156,13 +155,13 @@ def test_route_pipeline():
 def test_generate_demand_command():
     """The public command forwards the requested map and optional busline."""
     with patch.object(sys, "argv", ["main.py", "generate-demand", "--map", "550",
-                                   "--busline", "605", "--requests", "2"]), patch.object(
+                                   "--busline", "605"]), patch.object(
         project_main.subprocess, "run"
     ) as run:
         project_main.main()
     run.assert_called_once_with([
         sys.executable, str(project_main.COMMANDS["generate-demand"]),
-        "--map", "550", "--busline", "605", "--requests", "2",
+        "--map", "550", "--busline", "605",
     ], check=True)
     with patch.object(sys, "argv", ["main.py", "generate-demand", "--map", "550"]), patch.object(
         project_main.subprocess, "run"
@@ -171,6 +170,38 @@ def test_generate_demand_command():
     run.assert_called_once_with([
         sys.executable, str(project_main.COMMANDS["generate-demand"]), "--map", "550",
     ], check=True)
+    with patch.object(sys, "argv", ["main.py", "generate-demand", "--map", "550", "--debug"]), patch.object(
+        project_main.subprocess, "run"
+    ) as run:
+        project_main.main()
+    run.assert_called_once_with([
+        sys.executable, str(project_main.COMMANDS["generate-demand"]),
+        "--map", "550", "--debug",
+    ], check=True)
+
+
+def test_debug_lead_time_fields():
+    """Normal output keeps downstream fields; debug exposes REQreate internals."""
+    def candidates(*_):
+        return {"0": {"is_prebooked": 0, "lt_dynamic": 300,
+                      "lt_prebooked": 36000, "lead_time": 300,
+                      "origin": [49.5, 6.1], "originnode_drive": 1,
+                      "originx": 6.1, "originzone": 2,
+                      "originnode_walk": 3, "seed_location": 42,
+                      "origin_drive_point": [49.5, 6.1],
+                      "boarding_stop_id": "A"}}
+
+    with patch.object(generate, "prepare_network"), patch.object(
+        generate, "generate_candidates", side_effect=candidates
+    ), patch.object(generate, "filter_requests", side_effect=lambda _, __, reqs: reqs):
+        with patch.object(generate, "DEBUG", False):
+            ordinary = generate.generate({}, Path("unused"), Path("unused"))["requests"]["0"]
+        with patch.object(generate, "DEBUG", True):
+            debug = generate.generate({}, Path("unused"), Path("unused"))["requests"]["0"]
+    assert ordinary == {"is_prebooked": 0, "lead_time": 300,
+                        "origin": [49.5, 6.1], "originnode_drive": 1,
+                        "boarding_stop_id": "A"}
+    assert debug == candidates()["0"]
 
 
 def test_generate_without_busline():
@@ -178,7 +209,7 @@ def test_generate_without_busline():
     cfg = generate.load_config(None)
     assert cfg["places"] == []
     assert next(param["value"] for param in cfg["parameters"]
-                if param["name"] == "min_early_departure") == cfg["demand_start_s"]
+                if param["name"] == "min_distance") == 100
     assert cfg["simulation_end_s"] == 43200
     drive = nx.DiGraph()
     drive.add_node(1, x=0.51, y=0.52)
@@ -186,8 +217,9 @@ def test_generate_without_busline():
     valid_req = {"reqid": 0, "origin": [0.5, 0.5], "destination": [0.7, 0.7],
                  "originnode_drive": 1, "destinationnode_drive": 2,
                  "direct_distance": 200, "direct_travel_time": 30,
-                 "latest_arrival": 7200, "time_stamp": 0}
-    short_req = valid_req | {"reqid": 1, "direct_distance": 50}
+                 "is_prebooked": 0, "lead_time": 0}
+    short_req = valid_req | {"reqid": 1, "direct_distance": 50,
+                             "is_prebooked": 1, "lead_time": 36000}
     with patch.object(generate, "build_area_net", return_value=SimpleNamespace(
         polygon=box(0, 0, 1, 1), G_drive=drive
     )), patch.object(
@@ -202,8 +234,8 @@ def test_generate_without_busline():
         cfg["requests"] = 2
         pool = generate.generate(cfg, Path("unused"), Path("unused"))
     assert pool == {"num_data:": 1, "requests": {"0": valid_req}}
-    assert valid_req["origin_drive_point"] == [0.52, 0.51]
-    assert valid_req["destination_drive_point"] == [0.72, 0.71]
+    assert "origin_drive_point" not in valid_req
+    assert "destination_drive_point" not in valid_req
 
     with TemporaryDirectory() as directory:
         data_dir = Path(directory)
@@ -224,7 +256,7 @@ def test_generate_without_busline():
         ), patch.object(generate, "create_request_dir",
                         side_effect=lambda busline_name, graph_name: create_request_dir(
                             busline_name, graph_name, data_dir / "requests")), patch.object(
-            sys, "argv", ["generate.py", "--map", "Esch", "--requests", "2"]
+            sys, "argv", ["generate.py", "--map", "Esch"]
         ), redirect_stdout(output):
             generate.main()
         assert "No available buslines." in output.getvalue()
@@ -378,7 +410,6 @@ def test_event_time_distribution_requires_poisson():
 def test_poisson_arrival_windows():
     """Each Poisson event stream has a variable count and ordered times."""
     cfg = generate.load_config(None)
-    generate.set_expected_requests(cfg, 1000)
     flags, times = generate.sample_arrivals(cfg)
     dynamic = [int(time) for flag, time in zip(flags, times) if not flag]
     prebooked = [int(time) for flag, time in zip(flags, times) if flag]
@@ -386,8 +417,9 @@ def test_poisson_arrival_windows():
     assert prebooked == sorted(prebooked)
     assert all(cfg["simulation_start_s"] <= time < cfg["simulation_end_s"] for time in dynamic)
     assert all(cfg["demand_start_s"] <= time < cfg["simulation_end_s"] for time in prebooked)
-    assert 400 < len(dynamic) < 600 and 400 < len(prebooked) < 600
-    generate.set_expected_requests(cfg, 0)
+    assert 30 < len(dynamic) < 70 and 30 < len(prebooked) < 70
+    cfg["distributions"]["dynamic_time_stamp"]["rate_per_hour"] = 0
+    cfg["distributions"]["prebooked_earliest_departure"]["rate_per_hour"] = 0
     assert len(generate.sample_arrivals(cfg)[0]) == 0
 
 

@@ -29,7 +29,6 @@ from maps.pois import load_pois, set_poi_zones
 from adapters.pool_output import write_pool
 from src.output_adapters import (GRAPH_FILES, available_buslines, available_graphs, busline_dir,
                                  busline_path, create_request_dir, graph_dir, graph_path)
-from src.reqreate.utils.graph_utils import nearest_graph_point
 
 
 CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
@@ -37,6 +36,14 @@ MAPS_CFG_PATH = ROOT / "src/reqreate/maps/map_config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
 OPERATION_CFG_PATH = ROOT / "src/reqreate/operation/operation_profile.toml"
 DAY_END_S = 86399
+DEBUG = False
+REQUEST_OUTPUT_FIELDS = {
+    "reqid", "is_prebooked", "lead_time", "time_stamp", "earliest_departure",
+    "latest_arrival", "origin", "destination", "originnode_drive",
+    "destinationnode_drive", "direct_distance", "direct_travel_time",
+    "boarding_stop_id", "alighting_stop_id", "boarding_walk_distance_m",
+    "alighting_walk_distance_m",
+}
 
 
 def clock_seconds(value):
@@ -164,16 +171,6 @@ def load_config(busline_name):
     return cfg
 
 
-def set_expected_requests(cfg, count):
-    """Scale both configured event rates for the --requests override."""
-    if count < 0 or (count and not cfg["requests"]):
-        raise ValueError("--requests requires a nonnegative count and nonzero configured rates")
-    scale = count / cfg["requests"] if cfg["requests"] else 1
-    for name in ("dynamic_time_stamp", "prebooked_earliest_departure"):
-        cfg["distributions"][name]["rate_per_hour"] *= scale
-    cfg["requests"] = count
-
-
 def prepare_network(cfg, area_path, poi_path):
     """Load the service area, route timetable, and POI sampling zones."""
     direction = cfg["distributions"]["radial_direction"]
@@ -241,11 +238,6 @@ def filter_requests(cfg, net, reqs):
         and (not req["is_prebooked"] or req["time_stamp"] < cfg["simulation_start_s"])
         and passes_filters(req, request_filters, net, cfg)
     }
-    for req in reqs.values():
-        for endpoint in ("origin", "destination"):
-            req[f"{endpoint}_drive_point"] = nearest_graph_point(
-                net.G_drive, node_id=req[f"{endpoint}node_drive"]
-            )["point"]
     if cfg["busline_name"] is not None:
         stops = {stop["name"].removeprefix("Stop_"): stop for stop in cfg["places"]}
         for req in reqs.values():
@@ -273,11 +265,13 @@ def choose_source(label, names):
 
 def main():
     """Generate a request instance on the selected map and busline."""
+    global DEBUG
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--map", required=True, help="Saved service-area map name")
     parser.add_argument("--busline", help="Route to use; prompts for one when omitted")
-    parser.add_argument("--requests", type=int, help="Override the expected candidate count")
+    parser.add_argument("--debug", action="store_true", help="Include both sampled lead-time fields")
     args = parser.parse_args()
+    DEBUG = args.debug
     graph_names = available_graphs()
     if args.map not in graph_names:
         area_dir = graph_dir(args.map)
@@ -297,17 +291,12 @@ def main():
         cfg = load_config(busline_name)
     except ValueError as exc:
         parser.error(str(exc))
-    if args.requests is not None:
-        try:
-            set_expected_requests(cfg, args.requests)
-        except ValueError as exc:
-            parser.error(str(exc))
     route_dir = busline_dir(busline_name) if busline_name is not None else None
     area_dir = graph_dir(graph_name)
     area_path = graph_path("area", area_dir)
     poi_path = graph_path("pois", area_dir)
     pool = generate(cfg, area_path, poi_path)
-    instance_dir = create_request_dir(busline_name or "no_bus", graph_name)
+    instance_dir = create_request_dir(busline_name or "darp", graph_name)
     pool_path = write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
                            instance_dir, pool)
     print(f"Wrote {len(pool['requests'])} REQreate requests to {pool_path}")
