@@ -42,14 +42,11 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
             "end_time": timing["end"],
             "average_speed_mps": attributes["vehicle_speed"],
             "vehicle_count": attributes["num_of_vehicles"],
+            "vehicle_type": attributes["profile"],
+            "temperature_case": attributes["temperature_case"],
+            "vehicle": profiles[attributes["profile"]],
         }
     operations["darp"]["detour_factor"] = config["darp"]["attribute"]["detour_factor"]
-    sfbs = config["sfbs"]["attribute"]
-    operations["sfbs"].update({
-        "vehicle_type": sfbs["profile"],
-        "temperature_case": sfbs["temperature_case"],
-        "vehicle": profiles[sfbs["profile"]],
-    })
     pool_path = write_json(request_path("pool", instance_dir), pool, compact=True)
     operations_path = write_json(request_path("operations", instance_dir), operations)
     meta = {

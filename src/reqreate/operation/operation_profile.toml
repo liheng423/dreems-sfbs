@@ -4,7 +4,8 @@ detour_factor = 1.5
 num_of_vehicles = 6
 pickup_timewindow = { type = "uniform", loc = 900, scale = 0 } # 15 min
 dropoff_timewindow = { type = "uniform", loc = 900, scale = 0 } # 15 min
-
+profile = "evobus_396_nmc_na_hybrid"
+temperature_case = "reference_20_22_c"
 [darp.operation]
 
 start = "7:00:00"

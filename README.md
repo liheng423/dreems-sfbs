@@ -96,7 +96,8 @@ The request explorer lists available folders from the local server. A selected r
 | [`src/operation/operation_profile.toml`](src/operation/operation_profile.toml) | Selected vehicle profile, temperature case, and operation settings. |
 | [`src/operation/veh_profile.toml`](src/operation/veh_profile.toml) | Vehicle parameters for the energy calculation. |
 | `data/requests/<busline>_<graph>_<number>/requests.json` | Request pool; `num_data:` is the retained count and `requests` is keyed by request ID. |
-| `data/requests/<busline>_<graph>_<number>/operations.json` | DARP and SFBS start/end times, `average_speed_mps`, `vehicle_count`, and the selected SFBS `vehicle_type` and vehicle profile. |
+| `data/requests/<busline>_<graph>_<number>/operations.json` | DARP and SFBS start/end times, `average_speed_mps`, `vehicle_count`, and each task's selected `vehicle_type` and vehicle profile. |
+| `data/requests/<busline>_<graph>_<number>/requests.json` | Each generated request includes `energy_kwh`, estimated from its directed road `direct_distance` and the DARP vehicle and temperature profile; walking distance is excluded. |
 | `data/requests/<busline>_<graph>_<number>/requests_metadata.json` | Selected busline and graph, package versions, seed, input hashes, and provenance. |
 
 Request coordinate arrays use latitude/longitude; GeoJSON uses longitude/latitude. Road and walking distances are metres, request times are seconds relative to the service day, and energy is kWh.

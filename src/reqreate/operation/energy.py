@@ -14,6 +14,16 @@ from src.output_adapters import busline_dir, busline_path, graph_dir, graph_path
 from src.reqreate.utils.graph_utils import GraphNodeIndex
 
 
+def consumption_kwh_per_km(config: dict) -> float:
+    """Return the selected vehicle's rate at the configured temperature."""
+    scenario = config["scenario"]
+    profile = config["profiles"][scenario["profile"]]
+    temperature_case = scenario["temperature_case"]
+    increase_pct = (0 if temperature_case == "reference_20_22_c"
+                    else profile["relative_increase_pct"][temperature_case])
+    return profile["reference_kwh_per_km"] * (1 + increase_pct / 100)
+
+
 def estimate_busline_energy(graph: nx.MultiDiGraph, businfo: dict, config: dict) -> list[dict]:
     """Return energy for each consecutive pair in every directed bus pattern.
 
@@ -24,12 +34,7 @@ def estimate_busline_energy(graph: nx.MultiDiGraph, businfo: dict, config: dict)
     Two stops snapping to one simplified graph node use their straight-line
     distance as a marked lower bound.
     """
-    scenario = config["scenario"]
-    profile = config["profiles"][scenario["profile"]]
-    temperature_case = scenario["temperature_case"]
-    increase_pct = (0 if temperature_case == "reference_20_22_c"
-                    else profile["relative_increase_pct"][temperature_case])
-    consumption_kwh_per_km = profile["reference_kwh_per_km"] * (1 + increase_pct / 100)
+    rate = consumption_kwh_per_km(config)
 
     stops = {stop["stop_id"]: stop for stop in businfo["stops"]}
     index = GraphNodeIndex(graph)
@@ -60,7 +65,7 @@ def estimate_busline_energy(graph: nx.MultiDiGraph, businfo: dict, config: dict)
                 "destination_name": stops[destination]["stop_name"],
                 "distance_m": distance_m,
                 "distance_source": distance_source,
-                "energy_kwh": distance_m / 1000 * consumption_kwh_per_km,
+                "energy_kwh": distance_m / 1000 * rate,
             })
     return segments
 

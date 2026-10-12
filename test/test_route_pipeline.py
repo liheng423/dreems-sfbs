@@ -145,6 +145,8 @@ def test_route_pipeline():
         operations = json.loads(request_path("operations", instance_dir).read_text())
         assert operations["darp"]["start_time"] == "7:00:00"
         assert operations["darp"]["average_speed_mps"] == 6.111111111111111
+        assert operations["darp"]["vehicle_type"] == "evobus_396_nmc_na_hybrid"
+        assert operations["darp"]["vehicle"]["manufacturer"] == "Evobus eCitaro"
         assert operations["sfbs"]["vehicle_count"] == 6
         assert operations["sfbs"]["vehicle_type"] == "evobus_396_nmc_na_hybrid"
         assert operations["sfbs"]["vehicle"]["manufacturer"] == "Evobus eCitaro"
@@ -202,6 +204,28 @@ def test_debug_lead_time_fields():
                         "origin": [49.5, 6.1], "originnode_drive": 1,
                         "boarding_stop_id": "A"}
     assert debug == candidates()["0"]
+
+
+def test_generated_request_energy_uses_driving_distance_and_selected_vehicle():
+    """Energy follows the TOML vehicle rate and excludes walking distance."""
+    req = {"reqid": 0, "direct_distance": 1000, "boarding_walk_distance_m": 400,
+           "alighting_walk_distance_m": 300}
+    with TemporaryDirectory() as directory:
+        operation_path = Path(directory) / "operation.toml"
+        operation_path.write_text('[darp.attribute]\nprofile = "bus"\ntemperature_case = "at_9_c"\n'
+                                  '[sfbs.attribute]\nprofile = "semi_flex_bus"\n'
+                                  'temperature_case = "reference_20_22_c"\n')
+        vehicle_path = Path(directory) / "vehicles.toml"
+        vehicle_path.write_text('[profiles.bus]\nreference_kwh_per_km = 0.8\n'
+                                'relative_increase_pct = { at_9_c = 25 }\n'
+                                '[profiles.semi_flex_bus]\nreference_kwh_per_km = 2.0\n')
+        with patch.object(generate, "prepare_network"), patch.object(
+            generate, "generate_candidates", return_value={"0": req}
+        ), patch.object(generate, "filter_requests", side_effect=lambda _, __, requests: requests), patch.object(
+            generate, "OPERATION_CFG_PATH", operation_path
+        ), patch.object(generate, "VEHICLE_CFG_PATH", vehicle_path):
+            pool = generate.generate({}, Path("unused"), Path("unused"))
+    assert pool["requests"]["0"]["energy_kwh"] == 1.0
 
 
 def test_generate_without_busline():

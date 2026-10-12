@@ -27,6 +27,7 @@ from filters.filters import (BASE_REQUEST_FILTERS, REQUEST_FILTERS, passes_filte
 from filters.route_schedule import index_route_departures
 from maps.pois import load_pois, set_poi_zones
 from adapters.pool_output import write_pool
+from src.reqreate.operation.energy import consumption_kwh_per_km
 from src.output_adapters import (GRAPH_FILES, available_buslines, available_graphs, busline_dir,
                                  busline_path, create_request_dir, graph_dir, graph_path)
 
@@ -35,12 +36,13 @@ CFG_PATH = ROOT / "src/reqreate/request_gen.toml"
 MAPS_CFG_PATH = ROOT / "src/reqreate/maps/map_config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
 OPERATION_CFG_PATH = ROOT / "src/reqreate/operation/operation_profile.toml"
+VEHICLE_CFG_PATH = ROOT / "src/reqreate/operation/veh_profile.toml"
 DAY_END_S = 86399
 DEBUG = False
 REQUEST_OUTPUT_FIELDS = {
     "reqid", "is_prebooked", "lead_time", "time_stamp", "earliest_departure",
     "latest_arrival", "origin", "destination", "originnode_drive",
-    "destinationnode_drive", "direct_distance", "direct_travel_time",
+    "destinationnode_drive", "direct_distance", "direct_travel_time", "energy_kwh",
     "boarding_stop_id", "alighting_stop_id", "boarding_walk_distance_m",
     "alighting_walk_distance_m",
 }
