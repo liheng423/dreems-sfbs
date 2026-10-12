@@ -66,6 +66,16 @@ assert.ok(vm.runInContext('flow_layer.layers.length', context) > 0);
 vm.runInContext('show_req(reqs.find((req) => req.is_prebooked))', context);
 assert.match(elements.get('req-details').textContent, /-3d|\-2d|\-1d/);
 assert.match(elements.get('req-details').textContent, /Direct distance/);
+assert.match(elements.get('req-timeline').innerHTML, /windows are absent/);
+context.windowReq = { ...vm.runInContext('selected_req', context), pickup_from: 36000,
+  pickup_to: 36900, dropoff_from: 37500, dropoff_to: 38400, service_time: 30,
+  earliest_departure: 36000, latest_arrival: 38400 };
+vm.runInContext('draw_req_timeline(windowReq)', context);
+assert.match(elements.get('req-timeline').innerHTML, /Pickup window.*10:00–10:15/s);
+assert.match(elements.get('req-timeline').innerHTML, /Dropoff window.*10:25–10:40/s);
+assert.match(elements.get('req-timeline').innerHTML, /Boarding and alighting service: 30 s/);
+context.newPool = { 'num_data:': 1, requests: { [context.windowReq.reqid]: context.windowReq } };
+assert.equal(vm.runInContext('read_reqs(newPool).length', context), 1);
 assert.match(elements.get('selected-energy-note').textContent, /Load the bus energy JSON/);
 const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'stops.json'), 'utf8'));
 const businfo = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'businfo.json'), 'utf8'));
@@ -102,4 +112,35 @@ const shared = vm.runInContext(`request_point_popup({node: 1, endpoints: [
 assert.equal(shared.children.length, 3);
 shared.children[2].listeners.click();
 assert.equal(elements.get('energy-request').textContent, `Request #${vm.runInContext('reqs[1].reqid', context)}`);
+
+const first = Object.values(data.requests)[0];
+const xmlItem = (attrs, children = [], textContent = '') => ({
+  getAttribute(name) { return attrs[name]; }, textContent,
+  getElementsByTagNameNS(name, tag) { return tag === 'data' ? children : []; }
+});
+const graphXml = {
+  getElementsByTagName() { return []; },
+  getElementsByTagNameNS(name, tag) {
+    if (tag === 'key') return [
+      xmlItem({ id: 'x', 'attr.name': 'x' }), xmlItem({ id: 'y', 'attr.name': 'y' }),
+      xmlItem({ id: 'g', 'attr.name': 'geometry' })
+    ];
+    if (tag === 'node') return [
+      xmlItem({ id: String(first.originnode_drive) }, [xmlItem({ key: 'x' }, [], '6.1'), xmlItem({ key: 'y' }, [], '49.5')]),
+      xmlItem({ id: String(first.destinationnode_drive) }, [xmlItem({ key: 'x' }, [], '6.2'), xmlItem({ key: 'y' }, [], '49.6')])
+    ];
+    if (tag === 'edge') return [xmlItem({ source: String(first.originnode_drive), target: String(first.destinationnode_drive) },
+      [xmlItem({ key: 'g' }, [], 'LINESTRING (6.1 49.5, 6.15 49.55, 6.2 49.6)')])];
+    return [];
+  }
+};
+context.graphXml = graphXml;
+vm.runInContext('load_graphml(graphXml, "drive", "drive.graphml"); show_req(reqs[0], false)', context);
+assert.equal(vm.runInContext('network_layer.layers.length', context), 3);
+assert.equal(vm.runInContext('all_snap_layer.layers.length', context), Object.values(data.requests)
+  .flatMap((req) => [req.originnode_drive, req.destinationnode_drive])
+  .filter((id) => id === first.originnode_drive || id === first.destinationnode_drive).length);
+assert.equal(vm.runInContext('snap_layer.layers.length', context), 4);
+assert.match(elements.get('graph-file-name').textContent, /2 nodes · 1 edges/);
+assert.match(elements.get('req-details').textContent, /drive pickup node/);
 console.log('REQreate viewer checks passed.');

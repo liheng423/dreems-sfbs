@@ -12,6 +12,9 @@ const flow_layer = L.layerGroup().addTo(map);
 const walk_layer = L.layerGroup().addTo(map);
 const poi_layer = L.layerGroup().addTo(map);
 const sel_layer = L.layerGroup().addTo(map);
+const network_layer = L.layerGroup().addTo(map);
+const all_snap_layer = L.layerGroup().addTo(map);
+const snap_layer = L.layerGroup().addTo(map);
 const book_colors = { 0: '#e69247', 1: '#496cb1' };
 const poi_colors = { amenity: '#b95750', shop: '#815ab2', leisure: '#308d6a', tourism: '#cf832f', office: '#4e83a8', building: '#6c797b' };
 const $ = (id) => document.getElementById(id);
@@ -22,6 +25,81 @@ let selected_req = null;
 let demand_bounds = null;
 let walking_stops = [];
 let energy_segments = new Map();
+let graph_nodes = new Map();
+let graph_kind = '';
+
+/** Read OSMnx GraphML coordinates and edge geometry without another dependency. */
+function read_graphml(xml) {
+  if (xml.getElementsByTagName('parsererror').length) throw new Error('Invalid GraphML XML.');
+  const elements = (name) => [...xml.getElementsByTagNameNS('*', name)];
+  const keys = new Map(elements('key').map((key) => [key.getAttribute('id'), key.getAttribute('attr.name')]));
+  const data = (element) => new Map([...element.getElementsByTagNameNS('*', 'data')]
+    .map((item) => [keys.get(item.getAttribute('key')), item.textContent]));
+  const nodes = new Map();
+  for (const node of elements('node')) {
+    const attributes = data(node);
+    const lat = Number(attributes.get('y'));
+    const lon = Number(attributes.get('x'));
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) throw new Error(`GraphML node ${node.getAttribute('id')} has no coordinates.`);
+    nodes.set(node.getAttribute('id'), [lat, lon]);
+  }
+  if (!nodes.size) throw new Error('GraphML has no nodes.');
+  const edges = [];
+  for (const edge of elements('edge')) {
+    const from = nodes.get(edge.getAttribute('source'));
+    const to = nodes.get(edge.getAttribute('target'));
+    if (!from || !to) continue;
+    const geometry = data(edge).get('geometry');
+    const points = geometry?.match(/^LINESTRING \((.*)\)$/)?.[1]
+      .split(/\s*,\s*/).map((pair) => pair.trim().split(/\s+/).map(Number).reverse());
+    edges.push(points?.every((point) => point.length === 2 && point.every(Number.isFinite)) ? points : [from, to]);
+  }
+  return { nodes, edges };
+}
+
+function load_graphml(xml, kind, file_name) {
+  const graph = read_graphml(xml);
+  network_layer.clearLayers();
+  graph_nodes = graph.nodes;
+  graph_kind = kind;
+  if (graph.edges.length) L.polyline(graph.edges, { color: '#607e78', weight: 1.5, opacity: .5, interactive: false }).addTo(network_layer);
+  for (const [id, xy] of graph.nodes) {
+    L.circleMarker(xy, { radius: 2.5, color: '#315d54', weight: 1, fillColor: '#cce4dc', fillOpacity: .85 })
+      .bindPopup(`${kind} graph node ${id}`).addTo(network_layer);
+  }
+  $('graph-file-name').textContent = `${file_name} · ${graph.nodes.size} nodes · ${graph.edges.length} edges`;
+  draw_saved_nodes();
+  if (selected_req) show_req(selected_req, false);
+  else if (!reqs.length) map.fitBounds(L.latLngBounds([...graph.nodes.values()]));
+}
+
+function draw_saved_nodes() {
+  all_snap_layer.clearLayers();
+  if (!graph_kind) return;
+  for (const req of visible_reqs) {
+    for (const [endpoint, label, color] of [['origin', 'Pickup', '#1769a3'], ['destination', 'Dropoff', '#ac4b35']]) {
+      const id = req[`${endpoint}node_${graph_kind}`];
+      const xy = graph_nodes.get(String(id));
+      if (!xy) continue;
+      L.circleMarker(xy, { radius: 4, color: '#fff', weight: 1, fillColor: color, fillOpacity: .85 })
+        .bindPopup(`${label} · ${graph_kind} node ${id} · request #${req.reqid}`)
+        .on('click', () => show_req(req, false)).addTo(all_snap_layer);
+    }
+  }
+}
+
+function show_saved_nodes(req) {
+  snap_layer.clearLayers();
+  if (!graph_kind) return;
+  for (const [endpoint, label, color] of [['origin', 'Pickup', '#1769a3'], ['destination', 'Dropoff', '#ac4b35']]) {
+    const id = req[`${endpoint}node_${graph_kind}`];
+    const xy = graph_nodes.get(String(id));
+    if (!xy) continue;
+    L.polyline([req[endpoint], xy], { color, weight: 2, dashArray: '3 5' }).addTo(snap_layer);
+    L.circleMarker(xy, { radius: 8, color: '#fff', weight: 2, fillColor: color, fillOpacity: 1 })
+      .bindPopup(`${label} · ${graph_kind} node ${id} · request #${req.reqid}`).addTo(snap_layer);
+  }
+}
 
 /** Use the nearest loaded bus stop for an estimated straight-line walking link. */
 function nearest_walk_stop(xy) {
@@ -149,6 +227,35 @@ function place_label(req, endpoint) {
   return `Node ${req[`${endpoint}node_drive`]}`;
 }
 
+function draw_req_timeline(req) {
+  const timeline = $('req-timeline');
+  timeline.hidden = false;
+  if (req.pickup_from === undefined) {
+    timeline.innerHTML = `<h3>Request timeline</h3><div class="timeline-track" role="img" aria-label="Order placed ${sec_label(req.time_stamp)}; earliest departure ${sec_label(req.earliest_departure)}; latest arrival ${sec_label(req.latest_arrival)}"><span class="timeline-order"></span></div>
+      <div class="timeline-axis"><span>Order placed<br><strong>${sec_label(req.time_stamp)}</strong></span><span>Latest arrival<br><strong>${sec_label(req.latest_arrival)}</strong></span></div>
+      <p>Pickup and dropoff windows are absent from this saved instance. Regenerate demand to include them.</p>`;
+    return;
+  }
+  const { time_stamp: booked, pickup_from, pickup_to, dropoff_from, dropoff_to, service_time } = req;
+  const broken = pickup_from - booked > 3 * (dropoff_to - pickup_from);
+  const position = (second) => broken && second > pickup_from
+    ? 28 + 72 * (second - pickup_from) / (dropoff_to - pickup_from)
+    : broken ? 28 * (second - booked) / (pickup_from - booked)
+      : 100 * (second - booked) / (dropoff_to - booked);
+  timeline.innerHTML = `
+    <h3>Request timeline</h3>
+    <div class="timeline-track" role="img" aria-label="Order placed ${sec_label(booked)}. Pickup allowed ${sec_label(pickup_from)} to ${sec_label(pickup_to)}. Dropoff allowed ${sec_label(dropoff_from)} to ${sec_label(dropoff_to)}. Boarding and alighting service ${service_time} seconds each.">
+      <span class="timeline-order"></span>
+      <span class="timeline-pickup" style="left:${position(pickup_from)}%;width:${position(pickup_to) - position(pickup_from)}%"></span>
+      <span class="timeline-dropoff" style="left:${position(dropoff_from)}%;width:${position(dropoff_to) - position(dropoff_from)}%"></span>
+      ${broken ? '<span class="timeline-break" aria-hidden="true">//</span>' : ''}
+    </div>
+    <div class="timeline-axis"><span>Order placed<br><strong>${sec_label(booked)}</strong></span><span>Latest dropoff<br><strong>${sec_label(dropoff_to)}</strong></span></div>
+    <div class="timeline-window"><i class="timeline-key pickup"></i><span>Pickup window</span><strong>${sec_label(pickup_from)}–${sec_label(pickup_to)}</strong></div>
+    <div class="timeline-window"><i class="timeline-key dropoff"></i><span>Dropoff window</span><strong>${sec_label(dropoff_from)}–${sec_label(dropoff_to)}</strong></div>
+    <p>Boarding and alighting service: ${service_time} s each, within their windows.${broken ? ' // marks a compressed booking lead interval.' : ''}</p>`;
+}
+
 /** Keep only the fields this view uses and check the REQreate file boundary. */
 function read_reqs(data) {
   if (!data.requests || !Number.isInteger(data['num_data:']) ||
@@ -162,6 +269,15 @@ function read_reqs(data) {
         !['originnode_drive', 'destinationnode_drive', 'earliest_departure', 'latest_arrival', 'time_stamp', 'lead_time',
           'direct_distance', 'direct_travel_time'].every((field) => Number.isFinite(req[field]))) {
       throw new Error(`Request ${key} does not match the REQreate output format.`);
+    }
+    const window_fields = ['pickup_from', 'pickup_to', 'dropoff_from', 'dropoff_to', 'service_time'];
+    if (window_fields.some((field) => field in req) &&
+        (!window_fields.every((field) => Number.isFinite(req[field])) ||
+          req.pickup_from !== req.earliest_departure || req.dropoff_to !== req.latest_arrival ||
+          req.pickup_from > req.pickup_to || req.dropoff_from > req.dropoff_to ||
+          req.service_time < 0 || req.pickup_to - req.pickup_from < req.service_time ||
+          req.dropoff_to - req.dropoff_from < req.service_time)) {
+      throw new Error(`Request ${key} has invalid pickup or dropoff windows.`);
     }
     return req;
   });
@@ -232,6 +348,7 @@ function load_pois(data, file_name) {
 function show_req(req, fit_map = true) {
   selected_req = req;
   sel_layer.clearLayers();
+  show_saved_nodes(req);
   const color = book_colors[req.is_prebooked];
   L.polyline([req.origin, req.destination], { color, weight: 4, dashArray: '7 6' }).addTo(sel_layer);
   L.circleMarker(req.origin, { radius: 8, color: '#fff', weight: 2, fillColor: color, fillOpacity: 1, interactive: false })
@@ -284,7 +401,10 @@ function show_req(req, fit_map = true) {
     `Earliest departure ${sec_label(req.earliest_departure)} · Latest arrival ${sec_label(req.latest_arrival)}\n` +
     `Booked ${sec_label(req.time_stamp)} · Lead ${Math.round(req.lead_time / 60)} min\n` +
     `Direct distance ${(req.direct_distance / 1000).toFixed(1)} km · ` +
-    `Direct travel ${Math.round(req.direct_travel_time / 60)} min` + walk_details;
+    `Direct travel ${Math.round(req.direct_travel_time / 60)} min` +
+    (graph_kind ? `\n${graph_kind} pickup node ${req[`originnode_${graph_kind}`] ?? 'unavailable'} · ` +
+      `dropoff node ${req[`destinationnode_${graph_kind}`] ?? 'unavailable'}` : '') + walk_details;
+  draw_req_timeline(req);
   if (fit_map) map.fitBounds(L.latLngBounds(bounds).pad(.35), { maxZoom: 14 });
   document.querySelectorAll('.req-item').forEach((button) =>
     button.classList.toggle('active', Number(button.dataset.reqId) === req.reqid));
@@ -348,11 +468,13 @@ function draw_map() {
   flow_layer.clearLayers();
   walk_layer.clearLayers();
   sel_layer.clearLayers();
+  snap_layer.clearLayers();
   if (!reqs.length) return;
   const until_sec = Number($('time-range').value);
   visible_reqs = reqs.filter((req) =>
     $(req.is_prebooked ? 'prebooked-check' : 'dynamic-check').checked &&
     req.earliest_departure <= until_sec);
+  draw_saved_nodes();
   const stops = new Map();
   const pairs = new Map();
   for (const req of visible_reqs) {
@@ -403,6 +525,7 @@ function draw_map() {
   else {
     selected_req = null;
     $('req-details').hidden = true;
+    $('req-timeline').hidden = true;
     $('energy-request').textContent = 'No request selected';
     $('selected-energy').textContent = '—';
     $('selected-energy-note').textContent = 'Select a request to see its bus trip energy.';

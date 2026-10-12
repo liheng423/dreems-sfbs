@@ -23,6 +23,7 @@
         <div class="energy-value"><strong id="selected-energy">—</strong><span>kWh · bus trip estimate</span></div>
         <p id="selected-energy-note" class="hint">Select a request to see its bus trip energy.</p>
         <div id="req-details" class="req-details" hidden></div>
+        <div id="req-timeline" class="req-timeline" hidden></div>
       </section>
 
       <section aria-labelledby="file-heading">
@@ -36,10 +37,14 @@
       </section>
 
       <section aria-labelledby="graph-heading">
-        <div class="section-heading"><h2 id="graph-heading">Service area</h2><span>02</span></div>
+        <div class="section-heading"><h2 id="graph-heading">Service area and road graph</h2><span>02</span></div>
         <label class="field-label" for="graph-folder">data/graphs/</label>
         <select id="graph-folder"><option value="">Choose a graph folder</option></select>
+        <label class="field-label graph-type-label" for="graph-type">GraphML network</label>
+        <select id="graph-type"><option value="drive">Drive</option><option value="walk">Walk</option><option value="">Hide network</option></select>
         <p id="graph-name" class="file-name"></p>
+        <p id="graph-file-name" class="file-name"></p>
+        <p class="hint">Click a graph node for its ID. Saved pickup and dropoff nodes appear when the request file has IDs for this network; selecting a request highlights its nodes.</p>
         <p id="graph-error" class="error" role="alert" hidden></p>
       </section>
 
@@ -98,7 +103,7 @@
     <div class="map-shell">
       <div id="map" aria-label="Interactive map of requests, points of interest, routes, and service areas"></div>
       <div class="map-title"><span id="map-kicker">LUXEMBOURG / REQUEST VIEW</span><strong id="map-title">Choose a request folder</strong></div>
-      <div class="map-legend"><span><i class="circle-key"></i> Request endpoints</span><span><i class="line-key"></i> OD flows</span><span><i class="poi-key"></i> POIs (colors by type)</span><span><i class="graph-key"></i> Service area</span><span><i class="busline-key"></i> Busline route and stops</span><span><i class="walk-key"></i> Estimated walk</span></div>
+      <div class="map-legend"><span><i class="circle-key"></i> Request endpoints</span><span><i class="node-key"></i> Graph nodes</span><span><i class="snap-key"></i> Saved pickup/dropoff nodes</span><span><i class="line-key"></i> OD flows</span><span><i class="poi-key"></i> POIs (colors by type)</span><span><i class="graph-key"></i> Service area</span><span><i class="busline-key"></i> Busline route and stops</span><span><i class="walk-key"></i> Estimated walk</span></div>
       <button id="fit-button" class="fit-button" type="button" disabled>Fit demand ↗</button>
     </div>
   </main>

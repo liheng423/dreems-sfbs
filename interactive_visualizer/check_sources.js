@@ -10,7 +10,7 @@ const loaded = [];
 const removed = [];
 function element(id) {
   if (!elements.has(id)) elements.set(id, {
-    value: '', options: [], listeners: {},
+    value: id === 'graph-type' ? 'drive' : '', options: [], listeners: {},
     add(option) { this.options.push(option); },
     addEventListener(name, listener) { this.listeners[name] = listener; }
   });
@@ -21,7 +21,7 @@ const context = vm.createContext({
   Option: function Option(name, value) { return { name, value }; },
   DOMParser: class {
     parseFromString(html) {
-      return { querySelectorAll() {
+      return { xml: html, querySelectorAll() {
         return [...html.matchAll(/href="([^"]+)"/g)].map((match) => ({ getAttribute: () => match[1] }));
       } };
     }
@@ -35,9 +35,13 @@ const context = vm.createContext({
         .map((entry) => `<a href="${entry.name}/">${entry.name}/</a>`).join('');
       return { ok: true, text: async () => links };
     }
-    return { ok: true, json: async () => JSON.parse(fs.readFileSync(file_path, 'utf8')) };
+    return { ok: true, json: async () => JSON.parse(fs.readFileSync(file_path, 'utf8')),
+      text: async () => fs.readFileSync(file_path, 'utf8') };
   },
   map: { removeLayer(layer) { removed.push(layer); }, fitBounds() {} },
+  network_layer: { clearLayers() {} }, all_snap_layer: { clearLayers() {} }, snap_layer: { clearLayers() {} },
+  graph_nodes: new Map(), graph_kind: '', selected_req: null, show_req() {},
+  load_graphml(xml, kind, name) { loaded.push(['graphml', name, kind]); assert.match(xml.xml, /<graphml /); },
   L: { geoJSON() { return { addTo() { return this; }, getBounds() { return {}; } }; } },
   reqs: [],
   busline_layers: new Map(),
@@ -80,11 +84,15 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, 'sources.js'), 'utf8'), con
   await graph.listeners.change({ target: graph });
   assert.match(loaded[2][1], /data\/graphs\/550\/pois\.json/);
   assert.match(element('graph-name').textContent, /data\/graphs\/550\/service_area\.geojson/);
+  assert.ok(loaded.some(([kind, name]) => kind === 'graphml' && name.endsWith('/550/drive.graphml')));
+  element('graph-type').value = 'walk';
+  await element('graph-type').listeners.change();
+  assert.ok(loaded.some(([kind, name]) => kind === 'graphml' && name.endsWith('/550/walk.graphml')));
 
   const busline = element('busline-folder');
   busline.value = '550';
   await busline.listeners.change({ target: busline });
-  assert.deepEqual(loaded.slice(3).map(([kind]) => kind), ['stops', 'businfo', 'energy']);
+  assert.deepEqual(loaded.slice(5).map(([kind]) => kind), ['stops', 'businfo', 'energy']);
   busline.value = '605';
   await busline.listeners.change({ target: busline });
   assert.ok(removed.length);

@@ -81,9 +81,11 @@ The GTFS and OSRM crawlers access external services unless given a local GTFS ZI
 
 | Page | Input | What it shows |
 | --- | --- | --- |
-| [Request explorer](interactive_visualizer/index.html) | Selected folders under `data/requests/`, `data/graphs/`, and `data/buslines/` | Request locations, booking and time filters, origin–destination flows, service area, walking links, and estimated bus energy. |
+| [Request explorer](interactive_visualizer/index.html) | Selected folders under `data/requests/`, `data/graphs/`, and `data/buslines/` | Request locations, booking and time filters, origin–destination flows, service area, drive/walk GraphML nodes, saved pickup/dropoff nodes, walking links, and estimated bus energy. |
 
-The request explorer lists available folders from the local server. A selected request folder supplies `requests.json` (or `raw_requests.json` for an older run); a graph folder supplies `service_area.geojson` and `pois.json`; a busline folder supplies `stops.json`, `businfo.json`, and optional `energy.json`. Click a request point to see its estimated route and bus energy; shared locations list each request. It uses Leaflet and online OSM map tiles.
+The request explorer lists available folders from the local server. A selected request folder supplies `requests.json` (or `raw_requests.json` for an older run); a graph folder supplies `service_area.geojson`, `pois.json`, and the selected `drive.graphml` or `walk.graphml`; a busline folder supplies `stops.json`, `businfo.json`, and optional `energy.json`. Click a graph node to see its ID. Saved pickup and dropoff nodes appear for visible requests; selecting one request highlights its nodes and the links from its coordinates. Click a request point to see its estimated route and bus energy; shared locations list each request. It uses Leaflet and online OSM map tiles.
+
+New request instances save `pickup_from`/`pickup_to`, `dropoff_from`/`dropoff_to`, and `service_time` in seconds. Each window bounds the full stop operation: boarding or alighting must finish by its upper bound. The configured service time applies at each stop. `latest_arrival` equals `dropoff_to`; the detour factor sets the allowance after the pickup window for the ride and dropoff service. The request timeline draws both permitted windows on one axis; old saved pools without these fields show that the windows are unavailable.
 
 ## Configuration and outputs
 

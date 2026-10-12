@@ -7,6 +7,7 @@ before the raw request pool is saved.
 
 import argparse
 import json
+from math import ceil
 from pathlib import Path
 import random
 import sys
@@ -122,16 +123,34 @@ def sample_arrivals(cfg):
     return prebooked, times
 
 
-def set_request_times(req, prebooked, time, detour_factor):
-    """Turn a request arrival or prebooked departure into all trip times."""
+def sample_duration(distribution):
+    """Sample a nonnegative whole-second duration from a uniform setting."""
+    if distribution["type"] != "uniform" or distribution["loc"] < 0 or distribution["scale"] < 0:
+        raise ValueError("time windows and service time need nonnegative uniform distributions")
+    if distribution["scale"] == 0:
+        return int(distribution["loc"])
+    return int(random.uniform(distribution["loc"], distribution["loc"] + distribution["scale"]))
+
+
+def set_request_times(req, prebooked, time, cfg):
+    """Add booking time, permitted stop-service windows, and the arrival deadline."""
     if prebooked:
         req["earliest_departure"] = int(time)
         req["time_stamp"] = req["earliest_departure"] - req["lead_time"]
     else:
         req["time_stamp"] = int(time)
         req["earliest_departure"] = req["time_stamp"] + req["lead_time"]
-    req["latest_arrival"] = int(req["earliest_departure"]
-                                + req["direct_travel_time"] * detour_factor)
+    distributions = cfg["distributions"]
+    req["service_time"] = sample_duration(distributions["service_time"])
+    req["pickup_from"] = req["earliest_departure"]
+    req["pickup_to"] = req["pickup_from"] + sample_duration(distributions["pickup_timewindow"])
+    dropoff_window = sample_duration(distributions["dropoff_timewindow"])
+    if req["service_time"] > min(req["pickup_to"] - req["pickup_from"], dropoff_window):
+        raise ValueError("service time must fit within both stop time windows")
+    max_ride_time = ceil(req["direct_travel_time"] * cfg["detour_factor"])
+    req["dropoff_to"] = req["pickup_to"] + max_ride_time + req["service_time"]
+    req["dropoff_from"] = req["dropoff_to"] - dropoff_window
+    req["latest_arrival"] = req["dropoff_to"]
 
 
 def load_config(busline_name):
@@ -141,6 +160,8 @@ def load_config(busline_name):
     operation_cfg = tomllib.loads(OPERATION_CFG_PATH.read_text())["darp"]["attribute"]
     cfg["vehicle_speed_mps"] = operation_cfg["vehicle_speed"]
     cfg["detour_factor"] = operation_cfg["detour_factor"]
+    if cfg["detour_factor"] < 1:
+        raise ValueError("detour_factor must be at least 1")
     filter_cfg = tomllib.loads(FILTERS_PATH.read_text())
     cfg["max_walking_distance_m"] = filter_cfg["max_walking_distance_m"]
     cfg["walking_speed_mps"] = filter_cfg["walking_speed_mps"]
@@ -225,7 +246,7 @@ def generate_candidates(cfg, net):
             "origin", "destination", pdf["type"], pdf["loc"], pdf["scale"], None,
             [], 0, [], count, pd.DataFrame(),
         )
-        set_request_times(req, bool(prebooked), times[req_idx], cfg["detour_factor"])
+        set_request_times(req, bool(prebooked), times[req_idx], cfg)
         reqs[str(req_idx)] = req
     return reqs
 

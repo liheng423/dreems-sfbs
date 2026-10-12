@@ -45,12 +45,33 @@ $('request-folder').addEventListener('change', async (event) => {
   }
 });
 
-/** Display the selected graph's boundary and POIs. */
+/** Display the selected GraphML network and its saved boundary and POIs. */
+async function load_selected_graphml(folder) {
+  network_layer.clearLayers();
+  all_snap_layer.clearLayers();
+  snap_layer.clearLayers();
+  graph_nodes = new Map();
+  graph_kind = '';
+  $('graph-file-name').textContent = '';
+  const kind = $('graph-type').value;
+  if (!folder || !kind) {
+    if (selected_req) show_req(selected_req, false);
+    return;
+  }
+  const file_name = `data/graphs/${folder}/${kind}.graphml`;
+  const response = await fetch(`../${file_name}`);
+  if (!response.ok) throw new Error(`Cannot load ${file_name}`);
+  const xml = new DOMParser().parseFromString(await response.text(), 'application/xml');
+  if ($('graph-folder').value !== folder || $('graph-type').value !== kind) return;
+  load_graphml(xml, kind, file_name);
+}
+
 $('graph-folder').addEventListener('change', async (event) => {
   const folder = event.target.value;
   if (graph_layer) map.removeLayer(graph_layer);
   graph_layer = null;
   $('graph-name').textContent = '';
+  await load_selected_graphml('');
   if (!folder) return;
   try {
     const [area, pois] = await Promise.all([
@@ -63,6 +84,16 @@ $('graph-folder').addEventListener('change', async (event) => {
     $('graph-name').textContent = `data/graphs/${folder}/service_area.geojson`;
     $('graph-error').hidden = true;
     if (!reqs.length) map.fitBounds(graph_layer.getBounds());
+    await load_selected_graphml(folder);
+  } catch (error) {
+    show_source_error('graph-error', error);
+  }
+});
+
+$('graph-type').addEventListener('change', async () => {
+  try {
+    await load_selected_graphml($('graph-folder').value);
+    $('graph-error').hidden = true;
   } catch (error) {
     show_source_error('graph-error', error);
   }
