@@ -1,19 +1,25 @@
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
-<title>Map __MAP__ service area</title>
+<title>Map __MAP__ operation and service areas</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
 <style>
-  body { margin: 0; font: 16px sans-serif; }
-  #toolbar { padding: 10px; display: flex; gap: 12px; align-items: center; }
-  #map { height: calc(100vh - 54px); }
+  body { margin: 0; height: 100vh; display: flex; flex-direction: column; font: 16px sans-serif; }
+  #toolbar { padding: 10px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  #map { flex: 1; min-height: 0; }
 </style>
 <div id="toolbar">
-  <span>Draw one rectangle or polygon around the service area, then save it.</span>
+  <label>Draw or edit:
+    <select id="area-kind">
+      <option value="operation">Operation area (roads and depot)</option>
+      <option value="service" disabled>Service area (requests and POIs)</option>
+    </select>
+  </label>
+  <span>Draw the operation area first. If the service area crosses it, use Edit layers to drag vertices inside.</span>
   <button id="save" disabled>Save area, road graphs, and POIs</button>
-  <span id="status"></span>
+  <span id="status" role="status"></span>
 </div>
 <div id="map"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -35,33 +41,134 @@
     map.setView([49.61, 6.13], 10);
   }
 
-  const selection = new L.FeatureGroup().addTo(map);
-  map.addControl(new L.Control.Draw({
-    edit: {featureGroup: selection},
-    draw: {polygon: true, rectangle: true, polyline: false, circle: false, marker: false, circlemarker: false}
-  }));
+  const areas = {
+    operation: new L.FeatureGroup().addTo(map),
+    service: new L.FeatureGroup().addTo(map)
+  };
+  const styles = {
+    operation: {color: '#d15b27', weight: 4, fillOpacity: .05},
+    service: {color: '#16845e', weight: 2, dashArray: '6 4', fillOpacity: .08}
+  };
+  const areaKind = document.querySelector('#area-kind');
+  const saveButton = document.querySelector('#save');
+  const status = document.querySelector('#status');
+  let serviceCustomized = false;
+  let drawControl;
+  let validating = false;
+  let selectionValid = false;
+  let validationNumber = 0;
+
+  function syncService() {
+    areas.service.clearLayers();
+    const operation = areas.operation.getLayers()[0];
+    if (operation) {
+      areas.service.addLayer(L.geoJSON(operation.toGeoJSON(), {style: styles.service}).getLayers()[0]);
+    }
+  }
+
+  function showDrawControl() {
+    if (drawControl) map.removeControl(drawControl);
+    drawControl = new L.Control.Draw({
+      edit: {featureGroup: areas[areaKind.value]},
+      draw: {polygon: true, rectangle: true, polyline: false, circle: false, marker: false, circlemarker: false}
+    });
+    map.addControl(drawControl);
+  }
+  areaKind.onchange = showDrawControl;
+  showDrawControl();
+
+  async function validSelection(operation, service) {
+    const response = await fetch('/validate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({operation_area: operation, service_area: service})
+    });
+    if (!response.ok) throw new Error(await response.text());
+  }
+
+  async function checkCurrent() {
+    const operation = areas.operation.getLayers()[0];
+    const service = areas.service.getLayers()[0];
+    const number = ++validationNumber;
+    if (!operation) {
+      validating = false;
+      selectionValid = false;
+      areaKind.disabled = false;
+      saveButton.disabled = true;
+      status.textContent = '';
+      return;
+    }
+    validating = true;
+    saveButton.disabled = true;
+    areaKind.disabled = true;
+    let error = null;
+    try {
+      await validSelection(operation.toGeoJSON().geometry, service.toGeoJSON().geometry);
+    } catch (caught) {
+      error = caught;
+    }
+    if (number !== validationNumber) return;
+    validating = false;
+    selectionValid = !error;
+    service.setStyle(selectionValid ? styles.service : {...styles.service, color: '#b00'});
+    status.textContent = error
+      ? error.message + (error.message.includes('service area must be inside')
+        ? ' — drag the service vertices inside the operation area.' : '')
+      : '';
+    areaKind.disabled = false;
+    areaKind.querySelector('[value="service"]').disabled = false;
+    saveButton.disabled = !selectionValid;
+  }
+
   map.on(L.Draw.Event.CREATED, event => {
-    selection.clearLayers();
-    selection.addLayer(event.layer);
-    document.querySelector('#save').disabled = false;
+    const kind = areaKind.value;
+    areas[kind].clearLayers();
+    event.layer.setStyle(styles[kind]);
+    areas[kind].addLayer(event.layer);
+    if (kind === 'service') serviceCustomized = true;
+    else if (!serviceCustomized) syncService();
+    checkCurrent();
   });
   map.on(L.Draw.Event.DELETED, () => {
-    document.querySelector('#save').disabled = selection.getLayers().length === 0;
+    if (areaKind.value === 'operation') {
+      areas.service.clearLayers();
+      serviceCustomized = false;
+      areaKind.querySelector('[value="service"]').disabled = true;
+      checkCurrent();
+    } else {
+      serviceCustomized = false;
+      syncService();
+      checkCurrent();
+    }
+  });
+  map.on(L.Draw.Event.EDITSTART, () => {
+    saveButton.disabled = true;
+  });
+  map.on(L.Draw.Event.EDITSTOP, () => {
+    if (!validating) saveButton.disabled = !selectionValid;
   });
   map.on(L.Draw.Event.EDITED, () => {
-    document.querySelector('#save').disabled = false;
+    const kind = areaKind.value;
+    if (kind === 'service') serviceCustomized = true;
+    else if (!serviceCustomized) syncService();
+    checkCurrent();
   });
-  document.querySelector('#save').onclick = async () => {
-    const geometry = selection.getLayers()[0].toGeoJSON().geometry;
-    const button = document.querySelector('#save');
-    const status = document.querySelector('#status');
+  saveButton.onclick = async () => {
+    const operation = areas.operation.getLayers()[0];
+    const service = areas.service.getLayers()[0] || operation;
+    if (!operation || !selectionValid) return;
+    const selectedAreas = {
+      operation_area: operation.toGeoJSON().geometry,
+      service_area: service.toGeoJSON().geometry
+    };
+    const button = saveButton;
     button.disabled = true;
     status.textContent = 'Downloading OSM roads and POIs; this may take several minutes…';
     try {
       const response = await fetch('/save', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(geometry)
+        body: JSON.stringify(selectedAreas)
       });
       status.textContent = await response.text();
       if (!response.ok) button.disabled = false;

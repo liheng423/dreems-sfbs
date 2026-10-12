@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Draw a named service area and save its OSM road graphs and POIs.
+"""Draw operation and service areas and save road graphs and POIs.
 
 Run with
 ``python main.py select-area test --busline 605``. The browser
-opens on a local map; draw one rectangle or polygon and click Save. The chosen
-boundary, OSMnx drive/walk GraphML files, and POIs go to ``data/graphs/<map>/``.
+opens on a local map; draw the operation area, optionally adjust the service
+area, and click Save. The service boundary, OSMnx drive/walk GraphML files,
+and POIs go to ``data/graphs/<map>/``.
 The road graphs come from current OpenStreetMap data, not the GTFS service date.
 """
 
@@ -34,18 +35,29 @@ OVERPASS_URLS = (
 )
 
 
-def save_area(geometry, out_dir):
-    """Download roads and POIs within the polygon, then save the map inputs."""
-    from shapely.geometry import mapping, shape
+def validate_areas(geometry, service_geometry=None):
+    """Return valid operation and service polygons with service contained."""
+    from shapely.geometry import shape
+
+    operation = shape(geometry)
+    service = shape(service_geometry) if service_geometry is not None else operation
+    for name, polygon in (("operation", operation), ("service", service)):
+        if polygon.geom_type != "Polygon" or not polygon.is_valid or polygon.is_empty:
+            raise ValueError(f"Select a valid {name} rectangle or polygon")
+    if not operation.covers(service):
+        raise ValueError("The service area must be inside the operation area")
+    return operation, service
+
+
+def save_area(geometry, out_dir, service_geometry=None):
+    """Download roads for the operation area and POIs for its service area."""
+    from shapely.geometry import mapping
 
     import osmnx as ox
     from osmnx._errors import ResponseStatusCodeError
 
+    operation, service = validate_areas(geometry, service_geometry)
     ox.settings.use_cache = False
-
-    polygon = shape(geometry)
-    if polygon.geom_type != "Polygon" or not polygon.is_valid or polygon.is_empty:
-        raise ValueError("Select a valid rectangle or polygon")
 
     map_config = tomllib.loads(MAPS_CFG_PATH.read_text())
     tags = map_config["poi_tags"]
@@ -53,9 +65,9 @@ def save_area(geometry, out_dir):
     for overpass_url in OVERPASS_URLS:
         ox.settings.overpass_url = overpass_url
         try:
-            graphs = {kind: ox.graph_from_polygon(polygon, network_type=kind, retain_all=True)
+            graphs = {kind: ox.graph_from_polygon(operation, network_type=kind, retain_all=True)
                       for kind in ("drive", "walk")}
-            features = ox.features_from_polygon(polygon, tags=tags)
+            features = ox.features_from_polygon(service, tags=tags)
             break
         except (RequestConnectionError, ResponseStatusCodeError):
             if overpass_url == OVERPASS_URLS[-1]:
@@ -64,7 +76,7 @@ def save_area(geometry, out_dir):
     pois = []
     for (osm_type, osm_id), feature in features.iterrows():
         point = feature.geometry.representative_point()
-        if polygon.contains(point):
+        if service.contains(point):
             pois.append({
                 "osm_type": osm_type,
                 "osm_id": int(osm_id),
@@ -76,7 +88,7 @@ def save_area(geometry, out_dir):
             })
     if not pois:
         raise ValueError("No OSM POIs in the service area")
-    write_area(mapping(polygon), graphs, out_dir)
+    write_area(mapping(service), graphs, out_dir)
     write_json(graph_path("pois", out_dir), {"features": pois})
     save_depot(graphs["drive"], out_dir, map_config["locations"]["depot"])
     return out_dir
@@ -121,10 +133,20 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(page)
 
     def do_POST(self):
-        geometry = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         try:
-            out_dir = save_area(geometry, graph_dir(self.map_name))
-            message, status = f"Saved boundary, drive/walk graphs, POIs, and depot to {out_dir}", 200
+            areas = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            operation = areas["operation_area"]
+            service = areas.get("service_area")
+            if self.path == "/validate":
+                validate_areas(operation, service)
+                message, status = "Area is valid", 200
+            elif self.path == "/save":
+                out_dir = save_area(operation, graph_dir(self.map_name), service)
+                message, status = f"Saved service area, operation-area road graphs, POIs, and depot to {out_dir}", 200
+            else:
+                message, status = "Unknown endpoint", 404
+        except ValueError as error:
+            message, status = str(error), 400
         except Exception as error:
             message, status = str(error), 500
         self.send_response(status)
@@ -151,7 +173,7 @@ def main():
 
     with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
         url = f"http://127.0.0.1:{server.server_port}/"
-        print(f"Select the service area at {url}", flush=True)
+        print(f"Select operation and service areas at {url}", flush=True)
         webbrowser.open(url)
         server.serve_forever()
 

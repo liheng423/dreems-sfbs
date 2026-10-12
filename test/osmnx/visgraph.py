@@ -1,4 +1,4 @@
-"""Save a selected map's drive arcs, intersections, and zone grid preview."""
+"""Save a selected map's drive arcs, graph vertices, and zone grid preview."""
 
 import argparse
 import json
@@ -21,7 +21,8 @@ args = parser.parse_args()
 map_dir = graph_dir(args.map)
 
 graph = ox.load_graphml(graph_path("drive_graph", map_dir))
-intersections = [data for _, data in graph.nodes(data=True) if data["street_count"] >= 3]
+vertices = [data for _, data in graph.nodes(data=True)]
+intersections = [node for node in vertices if node.get("street_count", 0) >= 3]
 config = tomllib.loads((root / "src/reqreate/maps/map_config.toml").read_text())
 area = json.loads(graph_path("area", map_dir).read_text())
 boundary = area["geometry"]["coordinates"][0]
@@ -50,9 +51,14 @@ horizontal_lines = ax.hlines(
 vertical_lines.set_clip_path(area_outline)
 horizontal_lines.set_clip_path(area_outline)
 ax.scatter(
+    [node["x"] for node in vertices],
+    [node["y"] for node in vertices],
+    s=8, color="#e69f00", zorder=3, label=f"Graph vertices ({len(vertices)})",
+)
+ax.scatter(
     [node["x"] for node in intersections],
     [node["y"] for node in intersections],
-    s=3, color="#d62728", zorder=3, label="Intersection vertex",
+    s=12, color="#d62728", zorder=4, label=f"Intersections ({len(intersections)})",
 )
 ax.legend(loc="upper left")
 preview_dir = root / "visualizations"

@@ -72,9 +72,9 @@ def test_route_pipeline():
         businfo = json.loads(busline_path("businfo", route_dir).read_text())
         stops = json.loads(busline_path("stops", route_dir).read_text())
         assert businfo["route"]["route_short_name"] == "605"
-        assert b"Map 605 service area" in render_page("605", buslines_dir=buslines_dir)
+        assert b"Map 605 operation and service areas" in render_page("605", buslines_dir=buslines_dir)
         named_page = render_page("test", "605", buslines_dir)
-        assert b"Map test service area" in named_page
+        assert b"Map test operation and service areas" in named_page
         assert b'"stop_name": "Start"' in named_page
         assert [stop["class"] for stop in stops] == ["mandatory", "optional", "mandatory"]
         assert businfo["operating_hours"] == {

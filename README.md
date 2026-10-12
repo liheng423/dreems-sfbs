@@ -9,7 +9,7 @@ This repository prepares synthetic passenger demand for Luxembourg bus routes, w
 | Path | Purpose |
 | --- | --- |
 | `src/crawler/busline/` | Extract a route's GTFS timetable and optionally query OSRM road distances. |
-| `src/crawler/service_area/` | Select a polygon and save OSM drive and walk graphs. |
+| `src/crawler/service_area/` | Select operation and service areas and save OSM drive and walk graphs. |
 | `src/reqreate/` | Configure, generate, filter, and save synthetic requests. |
 | `src/busline/` | Estimate bus route energy; see the [method notes](src/busline/README.md). |
 | `src/output_adapters.py` | Define the shared data paths and output filenames. |
@@ -41,7 +41,7 @@ python crawl_busline.py --route 550
 python main.py select-area 550
 ```
 
-The `select-area` argument names the saved map. For a separate map name, use `python main.py select-area test --busline 550` to display Route 550 stops, or omit `--busline` to draw without stops. In the browser page, draw a polygon and click **Save**. This writes `service_area.geojson`, `drive.graphml`, `walk.graphml`, `pois.json`, and `depot.json` under `data/graphs/<map>/`. The depot's source coordinate comes from `map_config.toml`; `depot.json` stores it and its nearest drive graph node. Stop the area-selection server with Ctrl+C after saving. To generate requests, run:
+The `select-area` argument names the saved map. For a separate map name, use `python main.py select-area test --busline 550` to display Route 550 stops, or omit `--busline` to draw without stops. In the browser page, draw the **operation area** first; the **service area** initially matches it and can be drawn or edited separately with the selector. If the service area extends outside the operation area, it stays visible in red so you can drag its vertices inside; **Save** remains disabled until it fits. Click **Save** to write `service_area.geojson`, `drive.graphml`, `walk.graphml`, `pois.json`, and `depot.json` under `data/graphs/<map>/`. Only the service boundary is saved: requests and POIs use it, while the road graphs cover the operation area, which may also contain the depot. The depot's source coordinate comes from `map_config.toml`; `depot.json` stores it and its nearest drive graph node. Stop the area-selection server with Ctrl+C after saving. To generate requests, run:
 
 ```bash
 python main.py generate-demand --map 550 --requests 200
@@ -72,7 +72,7 @@ Choose folders from `data/requests/`, `data/graphs/`, and `data/buslines/` in th
 ## Data pipeline
 
 1. `crawl_busline.py --route <route>` extracts the route's stops, patterns, and trips from GTFS into `data/buslines/<route>/businfo.json` and `stops.json`. Its default archive and service date are 1 and 6 October 2026, respectively; use `--gtfs-url` or `--gtfs-zip` and `--service-date` to select other inputs.
-2. `main.py select-area <map> [--busline <route>]` shows optional route stops and saves the drawn boundary, OSM drive/walk graphs, and POIs in `data/graphs/<map>/`.
+2. `main.py select-area <map> [--busline <route>]` shows optional route stops and saves the service boundary, operation-area OSM drive/walk graphs, and service-area POIs in `data/graphs/<map>/`.
 3. `main.py generate-demand --map <map> [--busline <route>]` samples requests using the saved map and POIs, applies area and trip filters, adds bus filters when a busline is selected, and saves a numbered request instance with metadata.
 
 The GTFS and OSRM crawlers access external services unless given a local GTFS ZIP or routing server. The area selector also needs OSM access.

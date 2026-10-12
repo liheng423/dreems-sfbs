@@ -1,6 +1,7 @@
 """Check that a drawn polygon becomes reusable GeoJSON and GraphML files."""
 
 import importlib.util
+from io import BytesIO
 import json
 from pathlib import Path
 import sys
@@ -69,6 +70,72 @@ def test_save_area():
         assert [call.kwargs["network_type"] for call in download.call_args_list] == ["drive", "walk"]
 
 
+def test_distinct_operation_and_service_areas():
+    operation = {"type": "Polygon", "coordinates": [[
+        [6.1, 49.4], [6.3, 49.4], [6.3, 49.6], [6.1, 49.6], [6.1, 49.4]
+    ]]}
+    service = {"type": "Polygon", "coordinates": [[
+        [6.2, 49.5], [6.21, 49.5], [6.205, 49.51], [6.2, 49.5]
+    ]]}
+    graph = nx.MultiDiGraph()
+    graph.graph["crs"] = "epsg:4326"
+    graph.add_node(1, x=6.2, y=49.5)
+    pois = pd.DataFrame({
+        "geometry": [Point(6.205, 49.502), Point(6.25, 49.55)],
+        "name": ["Inside", "Outside service"],
+        "amenity": ["cafe", "cafe"],
+    }, index=pd.MultiIndex.from_tuples([("node", 1), ("node", 2)]))
+    with TemporaryDirectory() as tmp, patch.object(
+        ox, "graph_from_polygon", return_value=graph
+    ) as download, patch.object(
+        ox, "features_from_polygon", return_value=pois
+    ) as fetch:
+        out_dir = Path(tmp)
+        service_area.save_area(operation, out_dir, service)
+        assert json.loads(graph_path("area", out_dir).read_text())["geometry"] == service
+        assert all(call.args[0].equals(shape(operation)) for call in download.call_args_list)
+        assert fetch.call_args.args[0].equals(shape(service))
+        assert [poi["name"] for poi in json.loads(graph_path("pois", out_dir).read_text())["features"]] == ["Inside"]
+
+    outside = {"type": "Polygon", "coordinates": [[
+        [6.4, 49.4], [6.5, 49.4], [6.5, 49.5], [6.4, 49.4]
+    ]]}
+    with TemporaryDirectory() as tmp, patch.object(ox, "graph_from_polygon") as download:
+        try:
+            service_area.save_area(operation, Path(tmp), outside)
+        except ValueError as error:
+            assert "inside the operation area" in str(error)
+        else:
+            raise AssertionError("Service area outside operation area was accepted")
+        download.assert_not_called()
+
+
+def test_validate_endpoint_does_not_download_graphs():
+    operation = {"type": "Polygon", "coordinates": [[
+        [0, 0], [2, 0], [2, 2], [0, 2], [0, 0]
+    ]]}
+    inside = {"type": "Polygon", "coordinates": [[
+        [0.5, 0.5], [1, 0.5], [1, 1], [0.5, 0.5]
+    ]]}
+    outside = {"type": "Polygon", "coordinates": [[
+        [2, 2], [3, 2], [3, 3], [2, 2]
+    ]]}
+    with patch.object(ox, "graph_from_polygon") as download:
+        for service, expected in ((inside, 200), (outside, 400)):
+            body = json.dumps({"operation_area": operation, "service_area": service}).encode()
+            handler = object.__new__(service_area.Handler)
+            handler.path = "/validate"
+            handler.headers = {"Content-Length": str(len(body))}
+            handler.rfile = BytesIO(body)
+            handler.wfile = BytesIO()
+            with patch.object(handler, "send_response") as response, patch.object(
+                handler, "send_header"
+            ), patch.object(handler, "end_headers"):
+                handler.do_POST()
+            response.assert_called_once_with(expected)
+        download.assert_not_called()
+
+
 def test_save_area_tries_another_overpass_server():
     graph = nx.MultiDiGraph()
     graph.graph["crs"] = "epsg:4326"
@@ -104,11 +171,14 @@ def test_save_area_tries_another_overpass_server():
 def test_area_map_without_busline():
     with TemporaryDirectory() as tmp:
         page = service_area.render_page("test", buslines_dir=Path(tmp))
-    assert b"Map test service area" in page
+    assert b"Map test operation and service areas" in page
     assert b"const stops = [];" in page
+    assert b"operation_area" in page and b"service_area" in page
 
 
 if __name__ == "__main__":
     test_save_area()
+    test_distinct_operation_and_service_areas()
+    test_validate_endpoint_does_not_download_graphs()
     test_save_area_tries_another_overpass_server()
     test_area_map_without_busline()
