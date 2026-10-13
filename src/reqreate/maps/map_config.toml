@@ -1,12 +1,15 @@
 # Map and POI sampling settings. File locations live in output_adapters.py.
 
 [poi_tags]
-amenity = ["arts_centre", "bar", "cafe", "cinema", "clinic", "college", "community_centre", "dentist", "doctors", "fast_food", "hospital", "kindergarten", "library", "marketplace", "nursing_home", "pub", "restaurant", "school", "social_facility", "theatre", "townhall", "university"]
+amenity = ["arts_centre", "bank", "bar", "cafe", "childcare", "cinema", "clinic", "college", "community_centre", "courthouse", "dentist", "doctors", "fast_food", "hospital", "kindergarten", "library", "marketplace", "nursing_home", "pharmacy", "place_of_worship", "police", "post_office", "pub", "restaurant", "school", "social_facility", "theatre", "townhall", "university"]
 building = ["commercial", "hotel", "office", "retail", "stadium", "supermarket", "train_station"]
-leisure = ["fitness_centre", "park", "sports_centre", "stadium", "swimming_pool"]
+leisure = ["fitness_centre", "park", "pitch", "playground", "sports_centre", "stadium", "swimming_pool"]
+healthcare = ["clinic", "dentist", "doctor", "hospital", "laboratory", "pharmacy", "physiotherapist"]
+historic = ["archaeological_site", "castle", "church", "fort", "monument"]
 office = true
+railway = ["halt", "station", "tram_stop"]
 shop = true
-tourism = ["attraction", "gallery", "hotel", "museum", "zoo"]
+tourism = ["apartment", "artwork", "attraction", "camp_site", "caravan_site", "chalet", "gallery", "guest_house", "hostel", "hotel", "museum", "picnic_site", "viewpoint", "zoo"]
 
 [method_pois]
 rows = 50

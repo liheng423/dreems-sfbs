@@ -4,46 +4,16 @@
     "end_time": "13:00:00",
     "average_speed_mps": 6.111111111111111,
     "vehicle_count": 6,
-    "vehicle_type": "evobus_396_nmc_na_hybrid",
+    "vehicle_type": "shuttle_6m_rawsuns_64_8",
     "temperature_case": "reference_20_22_c",
     "vehicle": {
-      "manufacturer": "Evobus eCitaro",
-      "battery_capacity_kwh": 396,
+      "manufacturer": "Unspecified",
+      "battery_system": "Rawsuns RDSLI64.8-432",
+      "battery_capacity_kwh": 64.8,
       "battery_type": "NMC",
-      "bus_type": "NA",
-      "passenger_capacity": 88,
-      "heating_strategy": "hybrid",
-      "sample_buses": 11,
-      "reference_kwh_per_km": 0.87,
-      "relative_increase_pct": {
-        "at_0_c": 29,
-        "at_9_c": 29,
-        "at_30_c": 19
-      }
-    },
-    "detour_factor": 1.5
-  },
-  "sfbs": {
-    "start_time": "7:00:00",
-    "end_time": "13:00:00",
-    "average_speed_mps": 6.111111111111111,
-    "vehicle_count": 6,
-    "vehicle_type": "evobus_396_nmc_na_hybrid",
-    "temperature_case": "reference_20_22_c",
-    "vehicle": {
-      "manufacturer": "Evobus eCitaro",
-      "battery_capacity_kwh": 396,
-      "battery_type": "NMC",
-      "bus_type": "NA",
-      "passenger_capacity": 88,
-      "heating_strategy": "hybrid",
-      "sample_buses": 11,
-      "reference_kwh_per_km": 0.87,
-      "relative_increase_pct": {
-        "at_0_c": 29,
-        "at_9_c": 29,
-        "at_30_c": 19
-      }
+      "bus_type": "shuttle",
+      "passenger_capacity": 16,
+      "reference_kwh_per_km": 0.4
     },
     "detour_factor": 1.5
   }

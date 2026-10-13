@@ -6,12 +6,14 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import subprocess
 import sys
+import tomllib
 import webbrowser
 
 
 ROOT = Path(__file__).resolve().parent
 COMMANDS = {
     "select-area": ROOT / "src/crawler/service_area/define_service_area.py",
+    "recrawl-pois": ROOT / "src/crawler/service_area/define_service_area.py",
     "generate-demand": ROOT / "src/reqreate/generate.py",
 }
 
@@ -29,6 +31,20 @@ def serve_visualizer():
             print("\nStopped visualizer.")
 
 
+def generate_demand(args):
+    """Run demand generation once per requested instance."""
+    step_args = [args.task, "--map", args.map]
+    if args.busline:
+        step_args.extend(["--busline", args.busline])
+    if args.debug:
+        step_args.append("--debug")
+    seed = (tomllib.loads((ROOT / "src/reqreate/request_gen.toml").read_text())["seed"]
+            if args.times > 1 else None)
+    for offset in range(args.times):
+        run_args = [*step_args, "--seed", str(seed + offset)] if seed is not None else step_args
+        subprocess.run([sys.executable, str(COMMANDS["generate-demand"]), *run_args], check=True)
+
+
 def main():
     """Dispatch a project command with the current Python environment."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -36,11 +52,14 @@ def main():
     area = commands.add_parser("select-area")
     area.add_argument("map")
     area.add_argument("--busline")
+    recrawl = commands.add_parser("recrawl-pois", help="Update POIs for a saved graph area")
+    recrawl.add_argument("map")
     demand = commands.add_parser("generate-demand")
     demand.add_argument("task", choices=("DARP", "SFBS"))
     demand.add_argument("--map", required=True)
     demand.add_argument("--busline")
     demand.add_argument("--debug", action="store_true")
+    demand.add_argument("--times", type=int, default=1, help="Number of instances to generate (default: 1)")
     commands.add_parser("visualize")
     args = parser.parse_args()
     if args.command == "generate-demand":
@@ -48,19 +67,18 @@ def main():
             demand.error("SFBS requires --busline")
         if args.task == "DARP" and args.busline:
             demand.error("DARP does not use --busline")
+        if args.times < 1:
+            demand.error("--times must be at least 1")
+        generate_demand(args)
+        return
     if args.command == "visualize":
         serve_visualizer()
         return
-    if args.command == "select-area":
-        step_args = ["--map", args.map]
-        if args.busline:
-            step_args.extend(["--busline", args.busline])
-    else:
-        step_args = [args.task, "--map", args.map]
-        if args.busline:
-            step_args.extend(["--busline", args.busline])
-        if args.debug:
-            step_args.append("--debug")
+    step_args = ["--map", args.map]
+    if args.command == "recrawl-pois":
+        step_args.append("--recrawl-pois")
+    elif args.busline:
+        step_args.extend(["--busline", args.busline])
     subprocess.run([sys.executable, str(COMMANDS[args.command]), *step_args], check=True)
 
 

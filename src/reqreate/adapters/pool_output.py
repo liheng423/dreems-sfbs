@@ -33,21 +33,19 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
     in_paths.extend(graph_path(name, area_dir) for name in ("area", "drive_graph", "walk_graph", "pois", "depot"))
     config = tomllib.loads(OPERATIONS_PATH.read_text())
     profiles = tomllib.loads(VEHICLES_PATH.read_text())["profiles"]
-    operations = {}
-    for mode in ("darp", "sfbs"):
-        attributes = config[mode]["attribute"]
-        timing = config[mode]["operation"]
-        operations[mode] = {
-            "start_time": timing["start"],
-            "end_time": timing["end"],
-            "average_speed_mps": attributes["vehicle_speed"],
-            "vehicle_count": attributes["num_of_vehicles"],
-            "vehicle_type": attributes["profile"],
-            "temperature_case": attributes["temperature_case"],
-            "vehicle": profiles[attributes["profile"]],
-        }
-    for mode in ("darp", "sfbs"):
-        operations[mode]["detour_factor"] = config[mode]["attribute"]["detour_factor"]
+    mode = cfg["task"].lower()
+    attributes = config[mode]["attribute"]
+    timing = config[mode]["operation"]
+    operations = {mode: {
+        "start_time": timing["start"],
+        "end_time": timing["end"],
+        "average_speed_mps": attributes["vehicle_speed"],
+        "vehicle_count": attributes["num_of_vehicles"],
+        "vehicle_type": attributes["profile"],
+        "temperature_case": attributes["temperature_case"],
+        "vehicle": profiles[attributes["profile"]],
+        "detour_factor": attributes["detour_factor"],
+    }}
     pool_path = write_json(request_path("pool", instance_dir), pool, compact=True)
     operations_path = write_json(request_path("operations", instance_dir), operations)
     meta = {

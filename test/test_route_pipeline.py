@@ -137,10 +137,9 @@ def test_route_pipeline():
             "requests.json", "operations.json", "requests_metadata.json",
         }
         operations = json.loads(request_path("operations", instance_dir).read_text())
-        assert operations["darp"]["start_time"] == "7:00:00"
-        assert operations["darp"]["average_speed_mps"] == 6.111111111111111
-        assert operations["darp"]["vehicle_type"] == "evobus_396_nmc_na_hybrid"
-        assert operations["darp"]["vehicle"]["manufacturer"] == "Evobus eCitaro"
+        assert set(operations) == {"sfbs"}
+        assert operations["sfbs"]["start_time"] == "7:00:00"
+        assert operations["sfbs"]["average_speed_mps"] == 6.111111111111111
         assert operations["sfbs"]["vehicle_count"] == 6
         assert operations["sfbs"]["vehicle_type"] == "evobus_396_nmc_na_hybrid"
         assert operations["sfbs"]["vehicle"]["manufacturer"] == "Evobus eCitaro"
@@ -176,18 +175,34 @@ def test_generate_demand_command():
     ], check=True)
 
 
+def test_generator_seed_override():
+    cfg = {"task": "DARP", "seed": 42}
+    with patch.object(generate, "available_graphs", return_value=["Esch"]), patch.object(
+        generate, "load_config", return_value=cfg
+    ), patch.object(generate, "graph_dir", return_value=Path("unused")), patch.object(
+        generate, "generate", return_value={"requests": {}}
+    ) as sample, patch.object(generate, "create_request_dir", return_value=Path("unused")), patch.object(
+        generate, "write_pool", return_value=Path("unused/requests.json")
+    ), patch.object(sys, "argv", ["generate.py", "DARP", "--map", "Esch", "--seed", "43"]):
+        generate.main()
+    assert sample.call_args.args[0]["seed"] == 43
+
+
 def test_debug_lead_time_fields():
     """Normal output keeps downstream fields; debug exposes REQreate internals."""
     def candidates(*_):
         return {"0": {"is_prebooked": 0, "lt_dynamic": 300,
                       "lt_prebooked": 36000, "lead_time": 300,
+                      "pickup_from": 300, "pickup_to": 1200,
+                      "dropoff_from": 900, "dropoff_to": 1800, "service_time": 30,
                       "origin": [49.5, 6.1], "originnode_drive": 1,
                       "originx": 6.1, "originzone": 2,
                       "originnode_walk": 3, "seed_location": 42,
                       "origin_drive_point": [49.5, 6.1],
                       "boarding_stop_id": "A"}}
 
-    with patch.object(generate, "prepare_network"), patch.object(
+    net = SimpleNamespace(G_drive=SimpleNamespace(nodes={1: {"x": 6.1, "y": 49.5}}))
+    with patch.object(generate, "prepare_network", return_value=net), patch.object(
         generate, "generate_candidates", side_effect=candidates
     ), patch.object(generate, "filter_requests", side_effect=lambda _, __, reqs: reqs):
         with patch.object(generate, "DEBUG", False):
@@ -195,7 +210,10 @@ def test_debug_lead_time_fields():
         with patch.object(generate, "DEBUG", True):
             debug = generate.generate({"task": "DARP"}, Path("unused"), Path("unused"))["requests"]["0"]
     assert ordinary == {"is_prebooked": 0, "lead_time": 300,
+                        "pickup_from": 300, "pickup_to": 1200,
+                        "dropoff_from": 900, "dropoff_to": 1800, "service_time": 30,
                         "origin": [49.5, 6.1], "originnode_drive": 1,
+                        "origin_drive_point": [49.5, 6.1],
                         "boarding_stop_id": "A"}
     assert debug == candidates()["0"]
 
@@ -284,6 +302,7 @@ def test_generate_without_busline():
         assert all("buslines" not in path for path in meta["inputs_sha256"])
         assert json.loads(request_path("pool", instance_dir).read_text()) == pool
         assert request_path("operations", instance_dir).is_file()
+        assert set(json.loads(request_path("operations", instance_dir).read_text())) == {"darp"}
 
 
 def test_generate_with_busline_saves_stop_points():
@@ -436,6 +455,24 @@ def test_poisson_arrival_windows():
     cfg["distributions"]["dynamic_time_stamp"]["rate_per_hour"] = 0
     cfg["distributions"]["prebooked_earliest_departure"]["rate_per_hour"] = 0
     assert len(generate.sample_arrivals(cfg)[0]) == 0
+
+
+def test_retry_if_filtered_keeps_sampled_request_count():
+    cfg = generate.load_config("DARP")
+    cfg["retry_if_filtered"] = True
+    def request(reqid):
+        return {"reqid": reqid, "is_prebooked": 0, "lead_time": 300,
+                "direct_travel_time": 30}
+
+    with patch.object(generate, "sample_arrivals", return_value=([False, False], [43199, 31000])), patch.object(
+        generate, "_generate_single_data_impl", side_effect=[request(0), request(0), request(1)]
+    ), patch.object(generate.np.random, "uniform", return_value=30000), patch.object(
+        generate, "passes_filters", return_value=True
+    ):
+        requests = generate.generate_candidates(cfg, SimpleNamespace())
+    assert list(requests) == ["0", "1"]
+    assert requests["0"]["time_stamp"] == 30000
+    assert cfg["generated_candidate_count"] == 3
 
 
 def test_distance_distribution_from_request_config():

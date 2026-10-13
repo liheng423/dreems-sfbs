@@ -16,7 +16,7 @@ const network_layer = L.layerGroup().addTo(map);
 const all_snap_layer = L.layerGroup().addTo(map);
 const snap_layer = L.layerGroup().addTo(map);
 const book_colors = { 0: '#e69247', 1: '#496cb1' };
-const poi_colors = { amenity: '#b95750', shop: '#815ab2', leisure: '#308d6a', tourism: '#cf832f', office: '#4e83a8', building: '#6c797b' };
+const poi_colors = { amenity: '#b95750', shop: '#815ab2', leisure: '#308d6a', tourism: '#cf832f', healthcare: '#b15f83', historic: '#9c6b38', railway: '#385d8a', office: '#4e83a8', building: '#6c797b' };
 const $ = (id) => document.getElementById(id);
 let reqs = [];
 let visible_reqs = [];

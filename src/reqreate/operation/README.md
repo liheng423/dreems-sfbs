@@ -49,22 +49,22 @@ Table 1 calls the capacity column “Passenger Capacity”; it does not distingu
 
 ## Route calculation
 
-The explicit scenario in [operation_profile.toml](operation_profile.toml) selects `evobus_396_nmc_na_hybrid` at `reference_20_22_c`. This is an **illustrative profile**, not a claim that the selected route uses that bus or that its ambient temperature was 20–22 °C. Change both keys to match a known vehicle and measured condition before treating the result as a route estimate. The selected profile's `reference_kwh_per_km` is multiplied by `1 + relative_increase_pct / 100` for the selected temperature case; each segment's energy is then `road_distance_m / 1000 × selected_kwh_per_km`.
+The explicit scenario in [operation_profile.toml](operation_profile.toml) selects `shuttle_6m_rawsuns_64_8` at `reference_20_22_c`. This is an **illustrative profile**, not a claim that the selected route uses that vehicle or that its ambient temperature was 20–22 °C. Change both keys to match a known vehicle and measured condition before treating the result as a route estimate. The selected profile's `reference_kwh_per_km` is multiplied by `1 + relative_increase_pct / 100` for the selected temperature case; each segment's energy is then `road_distance_m / 1000 × selected_kwh_per_km`.
 
 The distance is a directed shortest path by GraphML edge length between the nearest road nodes, not a recorded bus path. If two stops snap to the same simplified node, the helper marks and uses their straight-line separation as a lower bound. Table 1 rates came from 20–300 km trips, so allocating one trip-average rate to every short segment is an approximation; the paper does not resolve stop-by-stop acceleration or route-specific passenger loads.
 
-After changing either profile TOML file, regenerate `data/buslines/<route>/energy.json` from the repository root with `python3 src/operation/energy.py --route <route>`. The command reads that route's `businfo.json` and `data/graphs/<route>/drive.graphml`; both files must already exist. Segment stop IDs are the GTFS stop IDs from `businfo.json`.
+After changing either profile TOML file, regenerate `data/buslines/<route>/energy.json` from the repository root with `python src/reqreate/operation/energy.py --route <route>`. The command reads that route's `businfo.json` and `data/graphs/<route>/drive.graphml`; both files must already exist. Segment stop IDs are the GTFS stop IDs from `businfo.json`.
 
 ```python
 import json
 import tomllib
 import osmnx as ox
 
-from energy import estimate_busline_energy
+from src.reqreate.operation.energy import estimate_busline_energy
 
-with open("src/operation/veh_profile.toml", "rb") as file:
+with open("src/reqreate/operation/veh_profile.toml", "rb") as file:
     config = tomllib.load(file)
-with open("src/operation/operation_profile.toml", "rb") as file:
+with open("src/reqreate/operation/operation_profile.toml", "rb") as file:
     config["scenario"] = tomllib.load(file)["sfbs"]["attribute"]
 with open("data/buslines/550/businfo.json") as file:
     businfo = json.load(file)

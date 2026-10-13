@@ -2,6 +2,8 @@
 # Distribution parameters: uniform loc is the minimum and scale is the range width;
 # normal loc is the mean and scale is the standard deviation.
 seed = 42
+# Retry rejected requests until the sampled candidate count is retained.
+retry_if_filtered = true
 
 [simulation]
 start = "08:00:00"

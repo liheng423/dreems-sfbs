@@ -9,7 +9,7 @@ from pathlib import Path
 import networkx as nx
 import osmnx as ox
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from src.output_adapters import busline_dir, busline_path, graph_dir, graph_path, write_json
 from src.reqreate.utils.graph_utils import GraphNodeIndex
 
@@ -75,7 +75,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--route", required=True)
     args = parser.parse_args()
-    root = Path(__file__).resolve().parents[2]
+    root = Path(__file__).resolve().parents[3]
     with Path(__file__).with_name("veh_profile.toml").open("rb") as file:
         config = tomllib.load(file)
     with Path(__file__).with_name("operation_profile.toml").open("rb") as file:
@@ -90,8 +90,8 @@ def main():
         "sources": {
             "businfo": str(busline_path("businfo", route_dir).relative_to(root)),
             "road_graph": str(drive_path.relative_to(root)),
-            "vehicle_profiles": "src/operation/veh_profile.toml",
-            "operation_profile": "src/operation/operation_profile.toml",
+            "vehicle_profiles": "src/reqreate/operation/veh_profile.toml",
+            "operation_profile": "src/reqreate/operation/operation_profile.toml",
         },
         "scenario": config["scenario"],
         "profile": config["profiles"][config["scenario"]["profile"]],

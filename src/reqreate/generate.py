@@ -42,7 +42,8 @@ DAY_END_S = 86399
 DEBUG = False
 REQUEST_OUTPUT_FIELDS = {
     "reqid", "is_prebooked", "lead_time", "time_stamp", "earliest_departure",
-    "latest_arrival", "origin", "destination", "originnode_drive",
+    "latest_arrival", "pickup_from", "pickup_to", "dropoff_from", "dropoff_to",
+    "service_time", "origin", "destination", "originnode_drive",
     "destinationnode_drive", "direct_distance", "direct_travel_time", "energy_kwh",
     "boarding_stop_id", "alighting_stop_id", "boarding_walk_distance_m",
     "alighting_walk_distance_m", "origin_drive_point", "destination_drive_point",
@@ -164,6 +165,8 @@ def load_config(task, busline_name=None):
     if task == "DARP" and busline_name:
         raise ValueError("DARP does not use --busline")
     cfg = tomllib.loads(CFG_PATH.read_text())
+    if not isinstance(cfg.get("retry_if_filtered", False), bool):
+        raise ValueError("retry_if_filtered must be true or false")
     cfg.update(tomllib.loads(MAPS_CFG_PATH.read_text()))
     cfg["task"] = task
     cfg["request_filters"] = REQUEST_FILTERS if task == "SFBS" else BASE_REQUEST_FILTERS
@@ -246,18 +249,31 @@ def generate_candidates(cfg, net):
     random.seed(cfg["seed"])
     prebooked_flags, times = sample_arrivals(cfg)
     count = len(prebooked_flags)
-    cfg["generated_candidate_count"] = count
+    retry = cfg.get("retry_if_filtered", False)
+    attempts = 0
     reqs = {}
     for req_idx, prebooked in enumerate(prebooked_flags):
         graph = graphs[bool(prebooked)]
-        distance = distance_sampler.rvs(loc=pdf["loc"], scale=pdf["scale"])
-        req = _generate_single_data_impl(
-            graph, net, list(graph.nodes), params, req_idx, True, distance,
-            "origin", "destination", pdf["type"], pdf["loc"], pdf["scale"], None,
-            [], 0, [], count, pd.DataFrame(),
-        )
-        set_request_times(req, bool(prebooked), times[req_idx], cfg)
-        reqs[str(req_idx)] = req
+        for attempt in range(1000 if retry else 1):
+            attempts += 1
+            distance = distance_sampler.rvs(loc=pdf["loc"], scale=pdf["scale"])
+            req = _generate_single_data_impl(
+                graph, net, list(graph.nodes), params, req_idx, True, distance,
+                "origin", "destination", pdf["type"], pdf["loc"], pdf["scale"], None,
+                [], 0, [], count, pd.DataFrame(),
+            )
+            time = times[req_idx]
+            if attempt:
+                start = cfg["demand_start_s"] if prebooked else cfg["simulation_start_s"]
+                time = int(np.random.uniform(start, cfg["simulation_end_s"]))
+            set_request_times(req, bool(prebooked), time, cfg)
+            candidate = {str(req_idx): req}
+            if not retry or filter_requests(cfg, net, candidate):
+                reqs.update(candidate)
+                break
+        else:
+            raise RuntimeError(f"Could not find a valid request for ID {req_idx} after 1000 attempts")
+    cfg["generated_candidate_count"] = attempts
     return reqs
 
 
@@ -283,7 +299,9 @@ def filter_requests(cfg, net, reqs):
 def generate(cfg, area_path, poi_path):
     """Generate, filter, and annotate requests for the selected service area."""
     net = prepare_network(cfg, area_path, poi_path)
-    reqs = filter_requests(cfg, net, generate_candidates(cfg, net))
+    reqs = generate_candidates(cfg, net)
+    if not cfg.get("retry_if_filtered", False):
+        reqs = filter_requests(cfg, net, reqs)
     operation = tomllib.loads(OPERATION_CFG_PATH.read_text())[cfg["task"].lower()]["attribute"]
     profiles = tomllib.loads(VEHICLE_CFG_PATH.read_text())["profiles"]
     energy_rate = consumption_kwh_per_km({"scenario": operation, "profiles": profiles})
@@ -311,6 +329,7 @@ def main():
     parser.add_argument("--map", required=True, help="Saved service-area map name")
     parser.add_argument("--busline", help="Required for SFBS; unavailable for DARP")
     parser.add_argument("--debug", action="store_true", help="Include both sampled lead-time fields")
+    parser.add_argument("--seed", type=int, help="Override the seed in request_gen.toml")
     args = parser.parse_args()
     if args.task == "SFBS" and not args.busline:
         parser.error("SFBS requires --busline")
@@ -335,6 +354,8 @@ def main():
         cfg = load_config(args.task, busline_name)
     except ValueError as exc:
         parser.error(str(exc))
+    if args.seed is not None:
+        cfg["seed"] = args.seed
     route_dir = busline_dir(busline_name) if busline_name is not None else None
     area_dir = graph_dir(graph_name)
     area_path = graph_path("area", area_dir)

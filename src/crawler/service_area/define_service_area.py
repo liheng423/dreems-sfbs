@@ -15,14 +15,15 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import sys
 import tomllib
+import traceback
 import webbrowser
 
-from requests.exceptions import ConnectionError as RequestConnectionError
+from requests.exceptions import RequestException
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from src.output_adapters import (BUSLINES_DIR, busline_dir, busline_path, graph_dir,
+from src.output_adapters import (BUSLINES_DIR, GRAPHS_DIR, busline_dir, busline_path, graph_dir,
                                  graph_path, write_area, write_json)
 from src.reqreate.utils.graph_utils import GraphNodeIndex
 
@@ -49,30 +50,20 @@ def validate_areas(geometry, service_geometry=None):
     return operation, service
 
 
-def save_area(geometry, out_dir, service_geometry=None):
-    """Download roads for the operation area and POIs for its service area."""
-    from shapely.geometry import mapping
-
+def crawl_pois(service, tags):
+    """Fetch OSM POIs inside a saved or newly selected service area."""
     import osmnx as ox
-    from osmnx._errors import ResponseStatusCodeError
+    from osmnx._errors import InsufficientResponseError, ResponseStatusCodeError
 
-    operation, service = validate_areas(geometry, service_geometry)
-    ox.settings.use_cache = False
-
-    map_config = tomllib.loads(MAPS_CFG_PATH.read_text())
-    tags = map_config["poi_tags"]
-    # OSMnx appends /interpreter to these API base URLs.
     for overpass_url in OVERPASS_URLS:
         ox.settings.overpass_url = overpass_url
         try:
-            graphs = {kind: ox.graph_from_polygon(operation, network_type=kind, retain_all=True)
-                      for kind in ("drive", "walk")}
             features = ox.features_from_polygon(service, tags=tags)
             break
-        except (RequestConnectionError, ResponseStatusCodeError):
+        except (RequestException, InsufficientResponseError, ResponseStatusCodeError) as error:
             if overpass_url == OVERPASS_URLS[-1]:
                 raise
-            print(f"Overpass request failed at {overpass_url}; trying another server", flush=True)
+            print(f"Overpass request failed at {overpass_url}: {error}; trying another server", flush=True)
     pois = []
     for (osm_type, osm_id), feature in features.iterrows():
         point = feature.geometry.representative_point()
@@ -88,6 +79,49 @@ def save_area(geometry, out_dir, service_geometry=None):
             })
     if not pois:
         raise ValueError("No OSM POIs in the service area")
+    return pois
+
+
+def recrawl_pois(out_dir):
+    """Replace only the POIs for an existing saved service area."""
+    from shapely.geometry import shape
+
+    area_path = graph_path("area", out_dir)
+    if not area_path.is_file():
+        raise ValueError(f"Saved service area not found: {area_path}")
+    service = shape(json.loads(area_path.read_text())["geometry"])
+    if service.geom_type != "Polygon" or not service.is_valid or service.is_empty:
+        raise ValueError(f"Invalid saved service area: {area_path}")
+    import osmnx as ox
+    ox.settings.use_cache = False
+    tags = tomllib.loads(MAPS_CFG_PATH.read_text())["poi_tags"]
+    write_json(graph_path("pois", out_dir), {"features": crawl_pois(service, tags)})
+
+
+def save_area(geometry, out_dir, service_geometry=None):
+    """Download roads for the operation area and POIs for its service area."""
+    from shapely.geometry import mapping
+
+    import osmnx as ox
+    from osmnx._errors import InsufficientResponseError, ResponseStatusCodeError
+
+    operation, service = validate_areas(geometry, service_geometry)
+    ox.settings.use_cache = False
+
+    map_config = tomllib.loads(MAPS_CFG_PATH.read_text())
+    tags = map_config["poi_tags"]
+    # OSMnx appends /interpreter to these API base URLs.
+    for overpass_url in OVERPASS_URLS:
+        ox.settings.overpass_url = overpass_url
+        try:
+            graphs = {kind: ox.graph_from_polygon(operation, network_type=kind, retain_all=True)
+                      for kind in ("drive", "walk")}
+            break
+        except (RequestException, InsufficientResponseError, ResponseStatusCodeError) as error:
+            if overpass_url == OVERPASS_URLS[-1]:
+                raise
+            print(f"Overpass request failed at {overpass_url}: {error}; trying another server", flush=True)
+    pois = crawl_pois(service, tags)
     write_area(mapping(service), graphs, out_dir)
     write_json(graph_path("pois", out_dir), {"features": pois})
     save_depot(graphs["drive"], out_dir, map_config["locations"]["depot"])
@@ -148,6 +182,7 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as error:
             message, status = str(error), 400
         except Exception as error:
+            traceback.print_exc()
             message, status = str(error), 500
         self.send_response(status)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
@@ -160,7 +195,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--map", required=True)
     parser.add_argument("--busline")
+    parser.add_argument("--recrawl-pois", action="store_true")
     args = parser.parse_args()
+    if args.recrawl_pois:
+        if Path(args.map).name != args.map or args.map in (".", ".."):
+            parser.error("Map must be a graph directory name")
+        out_dir = graph_dir(args.map)
+        if not out_dir.is_dir() and GRAPHS_DIR.is_dir():
+            matches = [path for path in GRAPHS_DIR.iterdir()
+                       if path.is_dir() and path.name.casefold() == args.map.casefold()]
+            if len(matches) == 1:
+                out_dir = matches[0]
+        try:
+            recrawl_pois(out_dir)
+        except ValueError as error:
+            parser.error(str(error))
+        print(f"Updated {graph_path('pois', out_dir)}")
+        return
     Handler.map_name = args.map
     Handler.busline_name = args.busline
     try:

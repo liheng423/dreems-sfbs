@@ -2,6 +2,47 @@
   "features": [
     {
       "osm_type": "node",
+      "osm_id": 247373982,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4962242,
+      "lon": 6.0232232
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 267563052,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.5118634,
+      "lon": 5.9161727
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 280448063,
+      "name": "Pharmacie de Soleuvre",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.5233589,
+      "lon": 5.9321016
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 333558648,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4888659,
+      "lon": 6.000689
+    },
+    {
+      "osm_type": "node",
       "osm_id": 393969161,
       "name": "Musée National de la Résistance",
       "tags": {
@@ -19,6 +60,36 @@
       },
       "lat": 49.492655,
       "lon": 5.9774473
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 393971468,
+      "name": null,
+      "tags": {
+        "amenity": "post_office"
+      },
+      "lat": 49.4927345,
+      "lon": 5.9807716
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 440886777,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5081422,
+      "lon": 5.9166224
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 462687624,
+      "name": "BCEE",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.4958075,
+      "lon": 5.9845169
     },
     {
       "osm_type": "node",
@@ -52,6 +123,17 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 491616655,
+      "name": "Pharmacie de Lallange",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.5067296,
+      "lon": 5.989026
+    },
+    {
+      "osm_type": "node",
       "osm_id": 522098333,
       "name": "Roude Léiw",
       "tags": {
@@ -82,6 +164,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 544896521,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4992027,
+      "lon": 5.9780884
+    },
+    {
+      "osm_type": "node",
       "osm_id": 556763722,
       "name": "Cycles Rasqui",
       "tags": {
@@ -109,6 +201,16 @@
       },
       "lat": 49.4973742,
       "lon": 5.9864273
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 795175612,
+      "name": "Commissariat Porte du Sud",
+      "tags": {
+        "amenity": "police"
+      },
+      "lat": 49.5063069,
+      "lon": 6.0098864
     },
     {
       "osm_type": "node",
@@ -182,6 +284,48 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 853230963,
+      "name": "Pharmacie Welschbillig",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.4951515,
+      "lon": 5.983722
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 951816325,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5225406,
+      "lon": 5.9358622
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1012470020,
+      "name": "Pharmacie du Benelux",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.5026608,
+      "lon": 5.9709726
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1012470022,
+      "name": "BCEE",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.5020722,
+      "lon": 5.9714327
+    },
+    {
+      "osm_type": "node",
       "osm_id": 1016051914,
       "name": "Café Chaplin",
       "tags": {
@@ -199,6 +343,16 @@
       },
       "lat": 49.5055404,
       "lon": 6.0104212
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1218122718,
+      "name": "Zolwerknapp",
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.5269232,
+      "lon": 5.9380212
     },
     {
       "osm_type": "node",
@@ -222,6 +376,46 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 1385889421,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4983018,
+      "lon": 6.0030816
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1385889444,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4934847,
+      "lon": 6.0027995
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1424089003,
+      "name": "BIL",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.5058878,
+      "lon": 6.0121123
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1424089007,
+      "name": "Post",
+      "tags": {
+        "amenity": "post_office"
+      },
+      "lat": 49.5060045,
+      "lon": 6.0125516
+    },
+    {
+      "osm_type": "node",
       "osm_id": 1468376518,
       "name": "Ibis Esch Belval",
       "tags": {
@@ -229,6 +423,16 @@
       },
       "lat": 49.5009913,
       "lon": 5.9463482
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1479225736,
+      "name": "Sur la pointe des pieds",
+      "tags": {
+        "amenity": "childcare"
+      },
+      "lat": 49.5085944,
+      "lon": 5.988354
     },
     {
       "osm_type": "node",
@@ -279,6 +483,16 @@
       },
       "lat": 49.5054595,
       "lon": 6.0119854
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1512609339,
+      "name": "BCEE",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.5059228,
+      "lon": 6.0123019
     },
     {
       "osm_type": "node",
@@ -642,6 +856,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 1628188722,
+      "name": "Commissariat à 3 roulements",
+      "tags": {
+        "amenity": "police"
+      },
+      "lat": 49.4920698,
+      "lon": 5.9823246
+    },
+    {
+      "osm_type": "node",
       "osm_id": 1628188740,
       "name": null,
       "tags": {
@@ -669,6 +893,16 @@
       },
       "lat": 49.4926709,
       "lon": 5.9807046
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1676979795,
+      "name": "Belval Lycée",
+      "tags": {
+        "railway": "station"
+      },
+      "lat": 49.5014992,
+      "lon": 5.9345046
     },
     {
       "osm_type": "node",
@@ -812,6 +1046,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 1760783202,
+      "name": "BCEE",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.5006024,
+      "lon": 5.9466956
+    },
+    {
+      "osm_type": "node",
       "osm_id": 1775056856,
       "name": "Maison Schneider",
       "tags": {
@@ -819,6 +1063,26 @@
       },
       "lat": 49.5050815,
       "lon": 6.0090987
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1803217869,
+      "name": null,
+      "tags": {
+        "tourism": "picnic_site"
+      },
+      "lat": 49.4834083,
+      "lon": 5.9857061
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1803217880,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4872764,
+      "lon": 5.9855085
     },
     {
       "osm_type": "node",
@@ -842,6 +1106,17 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 1910666191,
+      "name": "Pharmacie Maitry",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.4929276,
+      "lon": 5.9781968
+    },
+    {
+      "osm_type": "node",
       "osm_id": 1910666200,
       "name": "The Girassol",
       "tags": {
@@ -849,6 +1124,16 @@
       },
       "lat": 49.4925905,
       "lon": 5.9779555
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 1914191194,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4918145,
+      "lon": 5.9779204
     },
     {
       "osm_type": "node",
@@ -872,6 +1157,36 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 1968380185,
+      "name": "Laboratoire analyse medical",
+      "tags": {
+        "healthcare": "laboratory"
+      },
+      "lat": 49.5050731,
+      "lon": 6.0086331
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2165560393,
+      "name": null,
+      "tags": {
+        "tourism": "picnic_site"
+      },
+      "lat": 49.4824533,
+      "lon": 5.9855206
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2265785357,
+      "name": "Le Minettier",
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5023774,
+      "lon": 6.0290779
+    },
+    {
+      "osm_type": "node",
       "osm_id": 2344116083,
       "name": "Urban",
       "tags": {
@@ -879,6 +1194,16 @@
       },
       "lat": 49.50059,
       "lon": 5.9469353
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2420951756,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5263293,
+      "lon": 5.9604668
     },
     {
       "osm_type": "node",
@@ -902,6 +1227,36 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 2597642628,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.4860933,
+      "lon": 5.9864189
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2597642906,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.486055,
+      "lon": 5.9864055
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2597642907,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.4860201,
+      "lon": 5.9863921
+    },
+    {
+      "osm_type": "node",
       "osm_id": 2638560101,
       "name": "Origami Sushi",
       "tags": {
@@ -909,6 +1264,16 @@
       },
       "lat": 49.5016813,
       "lon": 5.9459944
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 2873001079,
+      "name": "BIL",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.5221749,
+      "lon": 5.9210831
     },
     {
       "osm_type": "node",
@@ -952,6 +1317,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 3022276653,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.5206025,
+      "lon": 5.9350037
+    },
+    {
+      "osm_type": "node",
       "osm_id": 3050499921,
       "name": "O'Zen",
       "tags": {
@@ -992,6 +1367,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 3050649446,
+      "name": "BGL BNP Paribas",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.5053786,
+      "lon": 6.0098329
+    },
+    {
+      "osm_type": "node",
       "osm_id": 3050649464,
       "name": "Strasser Pâtisserie",
       "tags": {
@@ -1022,6 +1407,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 3554477708,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4873338,
+      "lon": 5.9812269
+    },
+    {
+      "osm_type": "node",
       "osm_id": 3554477853,
       "name": "Cafe Fortuna",
       "tags": {
@@ -1032,6 +1427,26 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 3677384046,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4913221,
+      "lon": 6.0091213
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3719863646,
+      "name": "Schifflange",
+      "tags": {
+        "railway": "station"
+      },
+      "lat": 49.5063925,
+      "lon": 6.0097258
+    },
+    {
+      "osm_type": "node",
       "osm_id": 3725978200,
       "name": "Bei de Fräschen",
       "tags": {
@@ -1039,6 +1454,36 @@
       },
       "lat": 49.508238,
       "lon": 5.9341563
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3727608556,
+      "name": "Belval-Rédange",
+      "tags": {
+        "railway": "station"
+      },
+      "lat": 49.5030979,
+      "lon": 5.9236701
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3733227187,
+      "name": "Belval-Université",
+      "tags": {
+        "railway": "station"
+      },
+      "lat": 49.499531,
+      "lon": 5.9462903
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3733227188,
+      "name": "Belvaux-Soleuvre",
+      "tags": {
+        "railway": "station"
+      },
+      "lat": 49.5151574,
+      "lon": 5.9259002
     },
     {
       "osm_type": "node",
@@ -1069,6 +1514,16 @@
       },
       "lat": 49.5318912,
       "lon": 5.9435945
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 3901414152,
+      "name": "Service régional de police de la route - Région Sud-Ouest",
+      "tags": {
+        "amenity": "police"
+      },
+      "lat": 49.4975511,
+      "lon": 5.9783992
     },
     {
       "osm_type": "node",
@@ -1212,6 +1667,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 4086474477,
+      "name": "BIL",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.5032158,
+      "lon": 5.947387
+    },
+    {
+      "osm_type": "node",
       "osm_id": 4099591952,
       "name": "Hôtel de la Poste",
       "tags": {
@@ -1232,6 +1697,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 4145063130,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4863878,
+      "lon": 5.9907325
+    },
+    {
+      "osm_type": "node",
       "osm_id": 4164165189,
       "name": "Gang Nam",
       "tags": {
@@ -1239,6 +1714,16 @@
       },
       "lat": 49.4910271,
       "lon": 5.979353
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4185484971,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.5267039,
+      "lon": 5.936907
     },
     {
       "osm_type": "node",
@@ -1269,6 +1754,16 @@
       },
       "lat": 49.5060804,
       "lon": 6.0100888
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4325517092,
+      "name": "Casa de sapalee",
+      "tags": {
+        "tourism": "chalet"
+      },
+      "lat": 49.4842885,
+      "lon": 5.9760789
     },
     {
       "osm_type": "node",
@@ -1432,6 +1927,27 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 4562183189,
+      "name": "Schëfflenger Apdikt",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.505117,
+      "lon": 6.0093251
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4571471520,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4990113,
+      "lon": 5.9775233
+    },
+    {
+      "osm_type": "node",
       "osm_id": 4571471522,
       "name": "Aktas sabbatini",
       "tags": {
@@ -1452,6 +1968,28 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 4605839089,
+      "name": "Pharmacie du Nord",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.4970682,
+      "lon": 5.9787693
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4605862690,
+      "name": "Pharmacie Trierweiler",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.494104,
+      "lon": 5.9845865
+    },
+    {
+      "osm_type": "node",
       "osm_id": 4648788189,
       "name": "Fiduciaire du Sud",
       "tags": {
@@ -1459,6 +1997,17 @@
       },
       "lat": 49.4967537,
       "lon": 5.9764605
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4685951987,
+      "name": "Pharmacie de Belvaux",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.5108226,
+      "lon": 5.9369622
     },
     {
       "osm_type": "node",
@@ -1632,6 +2181,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 4709090458,
+      "name": "BGL BNP Paribas",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.5011379,
+      "lon": 5.9466345
+    },
+    {
+      "osm_type": "node",
       "osm_id": 4736028621,
       "name": "Restaurant Niddeschgaass",
       "tags": {
@@ -1679,6 +2238,26 @@
       },
       "lat": 49.5015089,
       "lon": 5.943185
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4788520845,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5076634,
+      "lon": 6.0087561
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 4788520848,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5076244,
+      "lon": 6.0084278
     },
     {
       "osm_type": "node",
@@ -1765,7 +2344,8 @@
       "osm_id": 4972840328,
       "name": "Parisot René",
       "tags": {
-        "amenity": "dentist"
+        "amenity": "dentist",
+        "healthcare": "dentist"
       },
       "lat": 49.5056238,
       "lon": 6.010722
@@ -1795,7 +2375,8 @@
       "osm_id": 4998421933,
       "name": "Ketterthill",
       "tags": {
-        "amenity": "clinic"
+        "amenity": "clinic",
+        "healthcare": "laboratory"
       },
       "lat": 49.5020644,
       "lon": 5.9422869
@@ -1892,6 +2473,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 5002265549,
+      "name": "Plaakesch Kopp",
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4992835,
+      "lon": 6.0205648
+    },
+    {
+      "osm_type": "node",
       "osm_id": 5017103934,
       "name": "Mon Cadeau",
       "tags": {
@@ -1949,6 +2540,16 @@
       },
       "lat": 49.5096929,
       "lon": 6.0121723
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5070068021,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5021265,
+      "lon": 5.9486538
     },
     {
       "osm_type": "node",
@@ -2055,7 +2656,8 @@
       "osm_id": 5425571235,
       "name": "Dr. Gérard Schreiner",
       "tags": {
-        "amenity": "doctors"
+        "amenity": "doctors",
+        "healthcare": "doctor"
       },
       "lat": 49.5127547,
       "lon": 5.9397733
@@ -2079,6 +2681,16 @@
       },
       "lat": 49.502782,
       "lon": 5.9416815
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 5624962143,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4857403,
+      "lon": 5.9926002
     },
     {
       "osm_type": "node",
@@ -2139,6 +2751,36 @@
       },
       "lat": 49.4917269,
       "lon": 5.9961951
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6019158457,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4947138,
+      "lon": 5.9549868
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6027673758,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5082928,
+      "lon": 5.9162852
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6027673759,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5080725,
+      "lon": 5.9147885
     },
     {
       "osm_type": "node",
@@ -2332,6 +2974,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 6398949131,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.5026094,
+      "lon": 5.9470837
+    },
+    {
+      "osm_type": "node",
       "osm_id": 6437871737,
       "name": "cohabit'âge",
       "tags": {
@@ -2382,6 +3034,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 6718120158,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4836555,
+      "lon": 5.980373
+    },
+    {
+      "osm_type": "node",
       "osm_id": 6731350440,
       "name": "Société Nationale de Circulation Automobile",
       "tags": {
@@ -2389,6 +3051,16 @@
       },
       "lat": 49.5112204,
       "lon": 5.9730394
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 6743942836,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.4914179,
+      "lon": 5.9858866
     },
     {
       "osm_type": "node",
@@ -2482,13 +3154,57 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 7294622906,
+      "name": "Betteling",
+      "tags": {
+        "historic": "archaeological_site"
+      },
+      "lat": 49.5051075,
+      "lon": 6.0306684
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7343749077,
+      "name": "Pharmacie Fleur de Vie",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.5101902,
+      "lon": 5.9569373
+    },
+    {
+      "osm_type": "node",
       "osm_id": 7357929971,
       "name": "Niclou & Krecké",
       "tags": {
-        "amenity": "doctors"
+        "amenity": "doctors",
+        "healthcare": "doctor"
       },
       "lat": 49.5052171,
       "lon": 5.9834386
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7363066607,
+      "name": "Pharmacie des Terres Rouges",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.4939006,
+      "lon": 5.9832545
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7363144755,
+      "name": "Pharmacie de Belval",
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.5020263,
+      "lon": 5.941018
     },
     {
       "osm_type": "node",
@@ -2542,6 +3258,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 7840298315,
+      "name": "Esch-sur-Alzette",
+      "tags": {
+        "railway": "station"
+      },
+      "lat": 49.493909,
+      "lon": 5.9850823
+    },
+    {
+      "osm_type": "node",
       "osm_id": 7948537297,
       "name": "Café au lait",
       "tags": {
@@ -2559,6 +3285,36 @@
       },
       "lat": 49.4968526,
       "lon": 5.9775676
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7975132839,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5080437,
+      "lon": 5.9157823
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7975132840,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5081082,
+      "lon": 5.9151084
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 7977777111,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5149585,
+      "lon": 5.9514664
     },
     {
       "osm_type": "node",
@@ -2629,6 +3385,36 @@
       },
       "lat": 49.4896294,
       "lon": 5.9790069
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8661412359,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5006681,
+      "lon": 6.0169472
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8661412361,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5005662,
+      "lon": 6.0165811
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 8714592219,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5062315,
+      "lon": 5.9675167
     },
     {
       "osm_type": "node",
@@ -2772,6 +3558,36 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 9044258654,
+      "name": "Direction Région Sud - Ouest",
+      "tags": {
+        "amenity": "police"
+      },
+      "lat": 49.4921066,
+      "lon": 5.9822823
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9070578806,
+      "name": "Ferrum Dinosaurum",
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.518254,
+      "lon": 5.9756944
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9070578807,
+      "name": "Ferrum Dinosaurum",
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5181555,
+      "lon": 5.975748
+    },
+    {
+      "osm_type": "node",
       "osm_id": 9103463108,
       "name": "AXA",
       "tags": {
@@ -2862,6 +3678,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 9120219845,
+      "name": "Neuapostolische Kirche",
+      "tags": {
+        "amenity": "place_of_worship"
+      },
+      "lat": 49.4951167,
+      "lon": 5.9539019
+    },
+    {
+      "osm_type": "node",
       "osm_id": 9120226149,
       "name": null,
       "tags": {
@@ -2885,7 +3711,8 @@
       "osm_id": 9135276158,
       "name": null,
       "tags": {
-        "amenity": "dentist"
+        "amenity": "dentist",
+        "healthcare": "dentist"
       },
       "lat": 49.4954873,
       "lon": 5.9862506
@@ -2895,7 +3722,8 @@
       "osm_id": 9135276159,
       "name": null,
       "tags": {
-        "amenity": "dentist"
+        "amenity": "dentist",
+        "healthcare": "dentist"
       },
       "lat": 49.4965317,
       "lon": 5.9860736
@@ -2905,7 +3733,8 @@
       "osm_id": 9175423038,
       "name": "Maison Médicale de garde",
       "tags": {
-        "amenity": "doctors"
+        "amenity": "doctors",
+        "healthcare": "centre"
       },
       "lat": 49.501759,
       "lon": 5.9421301
@@ -2919,6 +3748,36 @@
       },
       "lat": 49.498913,
       "lon": 5.9784917
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9223824239,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5006271,
+      "lon": 5.9830119
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9275111884,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5042041,
+      "lon": 5.9694345
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 9491023960,
+      "name": "Banque BCP",
+      "tags": {
+        "amenity": "bank"
+      },
+      "lat": 49.493038,
+      "lon": 5.9835734
     },
     {
       "osm_type": "node",
@@ -2972,6 +3831,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 9785473939,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5088745,
+      "lon": 5.9813771
+    },
+    {
+      "osm_type": "node",
       "osm_id": 9893804730,
       "name": "Casa Kriola",
       "tags": {
@@ -3019,6 +3888,16 @@
       },
       "lat": 49.4930919,
       "lon": 5.9768317
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10015763808,
+      "name": null,
+      "tags": {
+        "amenity": "childcare"
+      },
+      "lat": 49.503089,
+      "lon": 5.9867464
     },
     {
       "osm_type": "node",
@@ -3102,6 +3981,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 10292821241,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5094469,
+      "lon": 5.956353
+    },
+    {
+      "osm_type": "node",
       "osm_id": 10556738921,
       "name": "Domino's",
       "tags": {
@@ -3149,6 +4038,16 @@
       },
       "lat": 49.4942604,
       "lon": 5.9761387
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 10856053822,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.4992192,
+      "lon": 6.0205197
     },
     {
       "osm_type": "node",
@@ -3212,6 +4111,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 11057162123,
+      "name": "Crèche Nascht Esch Belval",
+      "tags": {
+        "amenity": "childcare"
+      },
+      "lat": 49.5042736,
+      "lon": 5.9453156
+    },
+    {
+      "osm_type": "node",
       "osm_id": 11097143479,
       "name": "Beng Architectes Associés",
       "tags": {
@@ -3249,6 +4158,36 @@
       },
       "lat": 49.5015383,
       "lon": 5.9478841
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11183235355,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5005557,
+      "lon": 5.9822329
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11183235356,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5061912,
+      "lon": 5.9776093
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11221865753,
+      "name": "Foyer Saint Jean Paul II",
+      "tags": {
+        "amenity": "place_of_worship"
+      },
+      "lat": 49.5026573,
+      "lon": 5.9409944
     },
     {
       "osm_type": "node",
@@ -3473,6 +4412,36 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 11881845998,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5095908,
+      "lon": 5.9741873
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11915630862,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5094928,
+      "lon": 5.986715
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 11937265506,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5087736,
+      "lon": 5.9642084
+    },
+    {
+      "osm_type": "node",
       "osm_id": 11953854069,
       "name": "Restaurant Fire",
       "tags": {
@@ -3510,6 +4479,16 @@
       },
       "lat": 49.4941603,
       "lon": 5.9757101
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12047967396,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5020675,
+      "lon": 5.9401225
     },
     {
       "osm_type": "node",
@@ -3553,6 +4532,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 12047967406,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5050634,
+      "lon": 5.9364303
+    },
+    {
+      "osm_type": "node",
       "osm_id": 12047967407,
       "name": "Jolt Coffee Roasters",
       "tags": {
@@ -3583,6 +4572,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 12095707096,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.4994217,
+      "lon": 5.9891488
+    },
+    {
+      "osm_type": "node",
       "osm_id": 12095996268,
       "name": "Miazia",
       "tags": {
@@ -3600,6 +4599,16 @@
       },
       "lat": 49.5093941,
       "lon": 5.9241201
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12097849935,
+      "name": "BioneXt",
+      "tags": {
+        "healthcare": "laboratory"
+      },
+      "lat": 49.5113403,
+      "lon": 5.9301368
     },
     {
       "osm_type": "node",
@@ -3683,6 +4692,16 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 12097853779,
+      "name": "Crèche Boumba",
+      "tags": {
+        "amenity": "childcare"
+      },
+      "lat": 49.5048855,
+      "lon": 5.9460463
+    },
+    {
+      "osm_type": "node",
       "osm_id": 12099592160,
       "name": "Intercoiffure - La Biosthetique byTun",
       "tags": {
@@ -3756,7 +4775,8 @@
       "osm_id": 12222491901,
       "name": "Docteur Fiona Monacelli",
       "tags": {
-        "amenity": "doctors"
+        "amenity": "doctors",
+        "healthcare": "doctor"
       },
       "lat": 49.5027867,
       "lon": 5.9423948
@@ -4063,6 +5083,36 @@
     },
     {
       "osm_type": "node",
+      "osm_id": 12663181948,
+      "name": "Nonnewisen",
+      "tags": {
+        "railway": "station"
+      },
+      "lat": 49.5119893,
+      "lon": 5.9771971
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12663181949,
+      "name": "Lankelz",
+      "tags": {
+        "railway": "station"
+      },
+      "lat": 49.5112872,
+      "lon": 5.9775585
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12734575813,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5066597,
+      "lon": 5.9379395
+    },
+    {
+      "osm_type": "node",
       "osm_id": 12744248410,
       "name": "Digital Learning Hub",
       "tags": {
@@ -4146,7 +5196,8 @@
       "osm_id": 12909224313,
       "name": "Morais Cabinet Dentaire",
       "tags": {
-        "amenity": "dentist"
+        "amenity": "dentist",
+        "healthcare": "dentist"
       },
       "lat": 49.5049975,
       "lon": 5.9435926
@@ -4160,6 +5211,26 @@
       },
       "lat": 49.5051477,
       "lon": 5.9415119
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 12972812842,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5002884,
+      "lon": 5.9706766
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13071398465,
+      "name": "Monument",
+      "tags": {
+        "historic": "monument"
+      },
+      "lat": 49.4954341,
+      "lon": 5.980934
     },
     {
       "osm_type": "node",
@@ -4200,6 +5271,16 @@
       },
       "lat": 49.5029482,
       "lon": 5.9714244
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13123212541,
+      "name": "Le vertige de l’amour",
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5029896,
+      "lon": 5.9713878
     },
     {
       "osm_type": "node",
@@ -4256,7 +5337,8 @@
       "osm_id": 13440178858,
       "name": "Docteur Camille Leveque",
       "tags": {
-        "amenity": "doctors"
+        "amenity": "doctors",
+        "healthcare": "doctor"
       },
       "lat": 49.5083447,
       "lon": 5.9727392
@@ -4266,7 +5348,8 @@
       "osm_id": 13440178863,
       "name": "Ribeiro Freitas Ana Paulina",
       "tags": {
-        "amenity": "doctors"
+        "amenity": "doctors",
+        "healthcare": "doctor"
       },
       "lat": 49.5083487,
       "lon": 5.9727912
@@ -4276,7 +5359,8 @@
       "osm_id": 13440178864,
       "name": "David Da Florência Ficardo",
       "tags": {
-        "amenity": "doctors"
+        "amenity": "doctors",
+        "healthcare": "doctor"
       },
       "lat": 49.5083497,
       "lon": 5.9728526
@@ -4336,10 +5420,31 @@
       "osm_id": 13965504893,
       "name": "Centre Dentaire",
       "tags": {
-        "amenity": "dentist"
+        "amenity": "dentist",
+        "healthcare": "dentist"
       },
       "lat": 49.4975086,
       "lon": 5.9843439
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 13998286784,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.5047985,
+      "lon": 5.914843
+    },
+    {
+      "osm_type": "node",
+      "osm_id": 14024807683,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.5262088,
+      "lon": 5.9372902
     },
     {
       "osm_type": "node",
@@ -4466,6 +5571,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 24877884,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5015257,
+      "lon": 6.009496606359233
+    },
+    {
+      "osm_type": "way",
       "osm_id": 24878434,
       "name": "Hôtel de ville",
       "tags": {
@@ -4474,6 +5589,16 @@
       },
       "lat": 49.5064991,
       "lon": 6.011671312559506
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 24887436,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50500995,
+      "lon": 6.013706699999997
     },
     {
       "osm_type": "way",
@@ -4507,6 +5632,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 25822358,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.485956099999996,
+      "lon": 5.977040504103073
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 26167686,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.511070849999996,
+      "lon": 6.015338429487584
+    },
+    {
+      "osm_type": "way",
       "osm_id": 26171342,
       "name": "École Belvaux Poste",
       "tags": {
@@ -4514,6 +5659,26 @@
       },
       "lat": 49.508324200000004,
       "lon": 5.925733256291762
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 26175395,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.512077700000006,
+      "lon": 6.017207699999997
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 26362460,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50070995,
+      "lon": 6.009771174641227
     },
     {
       "osm_type": "way",
@@ -4544,6 +5709,36 @@
       },
       "lat": 49.4897464,
       "lon": 5.976163501468527
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 27860321,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5111977,
+      "lon": 5.97856835
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 27860332,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51149825,
+      "lon": 5.979806524605655
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 28473113,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4931649,
+      "lon": 5.987408962578119
     },
     {
       "osm_type": "way",
@@ -4601,6 +5796,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 34866551,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5173023,
+      "lon": 5.928168699999998
+    },
+    {
+      "osm_type": "way",
       "osm_id": 34866556,
       "name": null,
       "tags": {
@@ -4619,6 +5824,16 @@
       },
       "lat": 49.50375725,
       "lon": 6.008469583748904
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 37605071,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.508233849999996,
+      "lon": 5.9268625172636415
     },
     {
       "osm_type": "way",
@@ -4770,6 +5985,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 71885232,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51201415,
+      "lon": 5.9785312
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 72318743,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5072691,
+      "lon": 6.0079084499999995
+    },
+    {
+      "osm_type": "way",
       "osm_id": 72842908,
       "name": "Place de Lodève",
       "tags": {
@@ -4783,7 +6018,8 @@
       "osm_id": 72872456,
       "name": "Centre Hospitalier Émile Mayrisch",
       "tags": {
-        "amenity": "hospital"
+        "amenity": "hospital",
+        "healthcare": "hospital"
       },
       "lat": 49.5017968,
       "lon": 5.98145966155386
@@ -5039,6 +6275,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 92838896,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.52017875,
+      "lon": 5.964597449999999
+    },
+    {
+      "osm_type": "way",
       "osm_id": 93359172,
       "name": "PNED G.I.E.",
       "tags": {
@@ -5081,6 +6327,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 100666282,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5023344,
+      "lon": 6.0117337958308505
+    },
+    {
+      "osm_type": "way",
       "osm_id": 105784919,
       "name": "Matgesfeld",
       "tags": {
@@ -5099,6 +6355,36 @@
       },
       "lat": 49.50070545,
       "lon": 5.948219799999999
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 108332947,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.52074845,
+      "lon": 5.93881394322466
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 112777226,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5375856,
+      "lon": 5.941477959283433
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 115911618,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5065497,
+      "lon": 6.028365742416858
     },
     {
       "osm_type": "way",
@@ -5178,6 +6464,57 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 119844254,
+      "name": "Saint-Nicolas",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.52363165,
+      "lon": 5.93739337342971
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 124542082,
+      "name": "Tir a l'Arc",
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.48702,
+      "lon": 5.997053416882129
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 128273673,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50882075,
+      "lon": 6.019033316079607
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 129001492,
+      "name": null,
+      "tags": {
+        "tourism": "viewpoint"
+      },
+      "lat": 49.5106579,
+      "lon": 6.006733175813008
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 129001494,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5134053,
+      "lon": 6.010091543034056
+    },
+    {
+      "osm_type": "way",
       "osm_id": 129344877,
       "name": "Dal Nigro",
       "tags": {
@@ -5211,6 +6548,66 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 130408284,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5220998,
+      "lon": 5.927027527288609
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 130408285,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.52179055,
+      "lon": 5.926597415236486
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 136722700,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51192075,
+      "lon": 6.0226503149286295
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 147436166,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.4910314,
+      "lon": 5.988212049999995
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 147436167,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49133945,
+      "lon": 5.988353801640367
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 147436168,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.491558049999995,
+      "lon": 5.988156599999995
+    },
+    {
+      "osm_type": "way",
       "osm_id": 148555060,
       "name": "Licee Guillaume Kroll",
       "tags": {
@@ -5218,6 +6615,17 @@
       },
       "lat": 49.5095621,
       "lon": 5.963466146008226
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 148565124,
+      "name": "Marie, Reine-du-Monde",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.50741585,
+      "lon": 5.988678986328079
     },
     {
       "osm_type": "way",
@@ -5229,6 +6637,48 @@
       },
       "lat": 49.4890202,
       "lon": 5.976779792560976
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 149937790,
+      "name": "Saint-Joseph",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.497852699999996,
+      "lon": 5.982803944598062
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 149939599,
+      "name": "Sacré-Cœur",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.49088525,
+      "lon": 5.9771462567285445
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 150485849,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49096455,
+      "lon": 5.991087483709515
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 162562142,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50437135,
+      "lon": 5.933246798368602
     },
     {
       "osm_type": "way",
@@ -5263,6 +6713,29 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 178350283,
+      "name": "Pharmacie du Soleil",
+      "tags": {
+        "amenity": "pharmacy",
+        "building": "house",
+        "healthcare": "pharmacy"
+      },
+      "lat": 49.5082716,
+      "lon": 6.01842667551653
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 178404416,
+      "name": "Saint-Remacle",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.5236394,
+      "lon": 5.9672952970231234
+    },
+    {
+      "osm_type": "way",
       "osm_id": 180973726,
       "name": "Chmenki!",
       "tags": {
@@ -5271,6 +6744,16 @@
       },
       "lat": 49.4904612,
       "lon": 5.97511992837166
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 180973736,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.491698,
+      "lon": 5.9774297
     },
     {
       "osm_type": "way",
@@ -5301,6 +6784,16 @@
       },
       "lat": 49.488120949999995,
       "lon": 5.968248699999993
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 188586246,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50928075,
+      "lon": 6.025418928362658
     },
     {
       "osm_type": "way",
@@ -5387,6 +6880,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 232535834,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.496158199999996,
+      "lon": 5.913296915890696
+    },
+    {
+      "osm_type": "way",
       "osm_id": 232536540,
       "name": "Parcours Santé",
       "tags": {
@@ -5394,6 +6897,16 @@
       },
       "lat": 49.49567855,
       "lon": 5.912435335026783
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 233235980,
+      "name": "Camping Gaalgebierg",
+      "tags": {
+        "tourism": "camp_site"
+      },
+      "lat": 49.48503745,
+      "lon": 5.985421189711572
     },
     {
       "osm_type": "way",
@@ -5418,6 +6931,36 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 233756772,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5260473,
+      "lon": 5.960470728877791
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 234456731,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5122261,
+      "lon": 5.98225135
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 234753451,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49988915,
+      "lon": 5.982906949999997
+    },
+    {
+      "osm_type": "way",
       "osm_id": 235266723,
       "name": null,
       "tags": {
@@ -5425,6 +6968,17 @@
       },
       "lat": 49.5096679,
       "lon": 5.9843042998480245
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 236411328,
+      "name": "Saint-Henri",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.50071585,
+      "lon": 5.975004252007299
     },
     {
       "osm_type": "way",
@@ -5436,6 +6990,17 @@
       },
       "lat": 49.4926727,
       "lon": 5.9978891046543925
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 241708552,
+      "name": "Justice de paix d'Esch-sur-Alzette",
+      "tags": {
+        "amenity": "courthouse",
+        "building": "yes"
+      },
+      "lat": 49.49620305,
+      "lon": 5.986236089585965
     },
     {
       "osm_type": "way",
@@ -5493,6 +7058,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 253204194,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5118028,
+      "lon": 6.0209001
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 253205250,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.511713,
+      "lon": 6.018512455633644
+    },
+    {
+      "osm_type": "way",
       "osm_id": 253206808,
       "name": "Scania",
       "tags": {
@@ -5504,6 +7089,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 255779422,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5228916,
+      "lon": 5.961730094259403
+    },
+    {
+      "osm_type": "way",
       "osm_id": 256485995,
       "name": "Bäckerei Bof",
       "tags": {
@@ -5512,6 +7107,46 @@
       },
       "lat": 49.5006121,
       "lon": 5.9767318017047
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 258511118,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5132273,
+      "lon": 5.925862200000012
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 258511168,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51336315,
+      "lon": 5.925423799999988
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 258511236,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51293,
+      "lon": 5.926285739714155
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 258517890,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5000476,
+      "lon": 5.984990149999999
     },
     {
       "osm_type": "way",
@@ -5589,6 +7224,37 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 279453497,
+      "name": "Saints-Pierre-et-Paul",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.51001815,
+      "lon": 5.921276375255754
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 293181551,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.500501299999996,
+      "lon": 5.948835879926827
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 293181552,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.501197250000004,
+      "lon": 5.94921678644682
+    },
+    {
+      "osm_type": "way",
       "osm_id": 294357961,
       "name": "Luxembourg Learning Centre",
       "tags": {
@@ -5604,10 +7270,21 @@
       "name": "Haut fourneau A",
       "tags": {
         "building": "industrial",
+        "historic": "technical_monument",
         "tourism": "attraction"
       },
       "lat": 49.501219199999994,
       "lon": 5.948205672772703
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 294357965,
+      "name": null,
+      "tags": {
+        "tourism": "artwork"
+      },
+      "lat": 49.500793099999996,
+      "lon": 5.947410101156461
     },
     {
       "osm_type": "way",
@@ -5632,6 +7309,36 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 300943503,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5085388,
+      "lon": 6.014361766807751
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 300943504,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.511964500000005,
+      "lon": 6.020826701529982
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 300943506,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.509503699999996,
+      "lon": 6.017623692219342
+    },
+    {
+      "osm_type": "way",
       "osm_id": 300943508,
       "name": null,
       "tags": {
@@ -5653,6 +7360,38 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 301098063,
+      "name": "Saint-Martin",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.5065965,
+      "lon": 6.012349741657813
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 313993091,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5129516,
+      "lon": 5.983972073525514
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 314120195,
+      "name": null,
+      "tags": {
+        "building": "roof",
+        "leisure": "pitch"
+      },
+      "lat": 49.4933092,
+      "lon": 5.988352517749779
+    },
+    {
+      "osm_type": "way",
       "osm_id": 314738680,
       "name": "TICE - Administration",
       "tags": {
@@ -5661,6 +7400,16 @@
       },
       "lat": 49.50559945,
       "lon": 5.960650818368035
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 318712818,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.48593219999999,
+      "lon": 5.974489857737128
     },
     {
       "osm_type": "way",
@@ -5675,6 +7424,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 334905032,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50553635,
+      "lon": 6.000980921691546
+    },
+    {
+      "osm_type": "way",
       "osm_id": 334905033,
       "name": null,
       "tags": {
@@ -5682,6 +7441,16 @@
       },
       "lat": 49.5063402,
       "lon": 6.000164848614228
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 338339281,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50693525,
+      "lon": 5.97799285
     },
     {
       "osm_type": "way",
@@ -5716,6 +7485,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 340708603,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50601075,
+      "lon": 5.936618212993762
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 340708604,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5051052,
+      "lon": 5.9379087386956115
+    },
+    {
+      "osm_type": "way",
       "osm_id": 343943674,
       "name": null,
       "tags": {
@@ -5736,6 +7525,17 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 358653185,
+      "name": null,
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.4879382,
+      "lon": 5.994937200000001
+    },
+    {
+      "osm_type": "way",
       "osm_id": 359562203,
       "name": null,
       "tags": {
@@ -5743,6 +7543,16 @@
       },
       "lat": 49.4873325,
       "lon": 5.985087099679918
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 361390527,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.4950319,
+      "lon": 5.91589349033182
     },
     {
       "osm_type": "way",
@@ -5767,6 +7577,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 363315170,
+      "name": "Belval Skate Park",
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50426175,
+      "lon": 5.936760400761955
+    },
+    {
+      "osm_type": "way",
       "osm_id": 363501835,
       "name": "Stade Jean Jacoby",
       "tags": {
@@ -5774,6 +7594,16 @@
       },
       "lat": 49.500758,
       "lon": 6.005053559274445
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 363535447,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.4938655,
+      "lon": 6.010038926711925
     },
     {
       "osm_type": "way",
@@ -5794,6 +7624,26 @@
       },
       "lat": 49.4920887,
       "lon": 5.989605438929219
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 368666906,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5193284,
+      "lon": 5.925839710462146
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 368666923,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5172399,
+      "lon": 5.9283826
     },
     {
       "osm_type": "way",
@@ -5850,6 +7700,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 374917947,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.519059,
+      "lon": 5.926653433176867
+    },
+    {
+      "osm_type": "way",
       "osm_id": 374917968,
       "name": null,
       "tags": {
@@ -5870,6 +7730,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 376815676,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5002548,
+      "lon": 6.004029574902399
+    },
+    {
+      "osm_type": "way",
       "osm_id": 376911615,
       "name": "Administration Communale de Sanem",
       "tags": {
@@ -5878,6 +7748,26 @@
       },
       "lat": 49.51090725,
       "lon": 5.929815778730999
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 376941324,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.514907,
+      "lon": 5.9421263
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 376941919,
+      "name": "Pump Track",
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50886615,
+      "lon": 5.926126602780486
     },
     {
       "osm_type": "way",
@@ -5961,10 +7851,41 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 381727732,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.491140200000004,
+      "lon": 5.988034350000005
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 381727733,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49124905,
+      "lon": 5.9878566499999994
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 381727736,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.490005249999996,
+      "lon": 5.990730044403192
+    },
+    {
+      "osm_type": "way",
       "osm_id": 381951079,
       "name": "Clinique Sainte Marie",
       "tags": {
-        "amenity": "hospital"
+        "amenity": "hospital",
+        "healthcare": "hospital"
       },
       "lat": 49.50115205,
       "lon": 5.985821041782622
@@ -5978,6 +7899,46 @@
       },
       "lat": 49.500612950000004,
       "lon": 5.985646212932645
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 381988714,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.511503450000006,
+      "lon": 5.9800624753943445
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 381988715,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51150905,
+      "lon": 5.980318775394345
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 381988717,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.511513949999994,
+      "lon": 5.980575048791327
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 381988719,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51200915,
+      "lon": 5.979836874185672
     },
     {
       "osm_type": "way",
@@ -6074,6 +8035,118 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 383620934,
+      "name": "Hondssportveräin Schëffléng",
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.511783199999996,
+      "lon": 6.0125592215861605
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 383817199,
+      "name": "Kabaischen Bieles-Réideng",
+      "tags": {
+        "building": "barn",
+        "tourism": "chalet"
+      },
+      "lat": 49.502348749999996,
+      "lon": 5.924296453641848
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 384313456,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51206005,
+      "lon": 6.0167805513141595
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 384313457,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51200685,
+      "lon": 6.016533473601339
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 384313458,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5119526,
+      "lon": 6.0162826250683015
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 384313459,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.511899099999994,
+      "lon": 6.016035489855759
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 384313477,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5116764,
+      "lon": 6.020914097367043
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 384709900,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51042270000001,
+      "lon": 5.966026574698794
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 386795552,
+      "name": "Commissariat Belvaux",
+      "tags": {
+        "amenity": "police",
+        "building": "public"
+      },
+      "lat": 49.511383300000006,
+      "lon": 5.929862474238889
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 387749403,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51390705,
+      "lon": 5.950980353004586
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 387749422,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.51420475,
+      "lon": 5.950332611966996
+    },
+    {
+      "osm_type": "way",
       "osm_id": 387749441,
       "name": "Boulodrome national",
       "tags": {
@@ -6082,6 +8155,16 @@
       },
       "lat": 49.5134514,
       "lon": 5.950265109811378
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 387749442,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.513935700000005,
+      "lon": 5.950266898493886
     },
     {
       "osm_type": "way",
@@ -6137,6 +8220,17 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 390393161,
+      "name": "Église Adventiste Septième Jour",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "church"
+      },
+      "lat": 49.520327449999996,
+      "lon": 5.940343991423468
+    },
+    {
+      "osm_type": "way",
       "osm_id": 391543365,
       "name": null,
       "tags": {
@@ -6188,6 +8282,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 393248483,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50925785,
+      "lon": 5.9568603997975735
+    },
+    {
+      "osm_type": "way",
       "osm_id": 393603333,
       "name": "Maison des Matériaux",
       "tags": {
@@ -6196,6 +8300,16 @@
       },
       "lat": 49.5047005,
       "lon": 5.951354020846978
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 393878681,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5026503,
+      "lon": 5.967414472446352
     },
     {
       "osm_type": "way",
@@ -6269,6 +8383,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 397446447,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.52623665,
+      "lon": 5.938249342795059
+    },
+    {
+      "osm_type": "way",
       "osm_id": 397458486,
       "name": "Lux-Lettrage",
       "tags": {
@@ -6289,6 +8413,17 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 401317337,
+      "name": "Synagogue d'Esch-sur-Alzette",
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "synagogue"
+      },
+      "lat": 49.49426065,
+      "lon": 5.976976485883718
+    },
+    {
+      "osm_type": "way",
       "osm_id": 405994029,
       "name": null,
       "tags": {
@@ -6296,6 +8431,26 @@
       },
       "lat": 49.49558315,
       "lon": 5.975213890531043
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 407748227,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49046345,
+      "lon": 5.989999816218045
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 407748228,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.490421,
+      "lon": 5.990211241956764
     },
     {
       "osm_type": "way",
@@ -6403,6 +8558,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 460847835,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.503354349999995,
+      "lon": 5.923152726605972
+    },
+    {
+      "osm_type": "way",
       "osm_id": 460847973,
       "name": "Centre d'Éducation Différenciée",
       "tags": {
@@ -6433,6 +8598,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 469117571,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49883645,
+      "lon": 5.968299295828391
+    },
+    {
+      "osm_type": "way",
       "osm_id": 470394830,
       "name": "Möllerei",
       "tags": {
@@ -6441,6 +8616,17 @@
       },
       "lat": 49.5015466,
       "lon": 5.947188370552663
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 479386178,
+      "name": "Maison Relais",
+      "tags": {
+        "amenity": "childcare",
+        "building": "yes"
+      },
+      "lat": 49.51022315,
+      "lon": 6.027494828088359
     },
     {
       "osm_type": "way",
@@ -6539,6 +8725,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 497442465,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.509616449999996,
+      "lon": 5.9739314249999795
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 507664105,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.500778100000005,
+      "lon": 6.005118954546502
+    },
+    {
+      "osm_type": "way",
       "osm_id": 507672340,
       "name": "Centre senior - Minett III",
       "tags": {
@@ -6594,6 +8800,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 520519214,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.505267399999994,
+      "lon": 5.937673352193043
+    },
+    {
+      "osm_type": "way",
       "osm_id": 524254594,
       "name": null,
       "tags": {
@@ -6601,6 +8817,36 @@
       },
       "lat": 49.495873200000005,
       "lon": 5.9145021783567895
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 531492318,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50657175,
+      "lon": 6.002743210783587
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 532422202,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5130444,
+      "lon": 5.93825469200437
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 532422263,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.51460415,
+      "lon": 5.94066512880598
     },
     {
       "osm_type": "way",
@@ -6645,6 +8891,17 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 557580596,
+      "name": "Auberge de Jeunesse Esch-sur-Alzette",
+      "tags": {
+        "building": "yes",
+        "tourism": "hostel"
+      },
+      "lat": 49.493592250000006,
+      "lon": 5.984596848704214
+    },
+    {
+      "osm_type": "way",
       "osm_id": 557580603,
       "name": "Gare",
       "tags": {
@@ -6655,6 +8912,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 562462065,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.48313265,
+      "lon": 5.9861444
+    },
+    {
+      "osm_type": "way",
       "osm_id": 562554240,
       "name": "Schoul Roude Wee",
       "tags": {
@@ -6662,6 +8929,16 @@
       },
       "lat": 49.513175149999995,
       "lon": 5.941284148651286
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 565170377,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.509297000000004,
+      "lon": 5.982959777121762
     },
     {
       "osm_type": "way",
@@ -6726,6 +9003,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 641988988,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4977594,
+      "lon": 5.9853650011
+    },
+    {
+      "osm_type": "way",
       "osm_id": 642317057,
       "name": "Kultur- a Geschichtshaus \"A Gadder\"",
       "tags": {
@@ -6734,6 +9021,16 @@
       },
       "lat": 49.507673499999996,
       "lon": 5.922713118427153
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 642547169,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4980409,
+      "lon": 5.9821475500000005
     },
     {
       "osm_type": "way",
@@ -6971,6 +9268,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 663208899,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5023391,
+      "lon": 6.001751068979711
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 663208900,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50237165,
+      "lon": 6.001772364319891
+    },
+    {
+      "osm_type": "way",
       "osm_id": 664572499,
       "name": "Aktuel for Men",
       "tags": {
@@ -7112,6 +9429,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 773840013,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.54148905,
+      "lon": 5.944220742697004
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 776003271,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49006475,
+      "lon": 5.990504743895019
+    },
+    {
+      "osm_type": "way",
       "osm_id": 777719514,
       "name": "Hôtel Restaurant Acacia",
       "tags": {
@@ -7119,6 +9456,17 @@
       },
       "lat": 49.49328975,
       "lon": 5.9820517062304095
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 784864735,
+      "name": "Elysis",
+      "tags": {
+        "building": "yes",
+        "healthcare": "clinic"
+      },
+      "lat": 49.5058727,
+      "lon": 5.982856315772628
     },
     {
       "osm_type": "way",
@@ -7163,6 +9511,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 855475328,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51422595,
+      "lon": 5.950047850000001
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 863258831,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.51778195,
+      "lon": 5.933197684830454
+    },
+    {
+      "osm_type": "way",
       "osm_id": 863267893,
       "name": null,
       "tags": {
@@ -7180,6 +9548,67 @@
       },
       "lat": 49.522878399999996,
       "lon": 5.937040902270358
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 914790287,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5087097,
+      "lon": 5.91649940215517
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 922482327,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.516113950000005,
+      "lon": 5.944983739766124
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 928286021,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50697305,
+      "lon": 5.936309986261554
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 928286025,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50764745,
+      "lon": 5.935298333735638
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 938089263,
+      "name": "Château Berwart",
+      "tags": {
+        "building": "tower",
+        "historic": "castle"
+      },
+      "lat": 49.499210399999996,
+      "lon": 5.987045983495155
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 940835213,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50751045,
+      "lon": 5.977872490371507
     },
     {
       "osm_type": "way",
@@ -7233,6 +9662,16 @@
       },
       "lat": 49.51873275,
       "lon": 5.975294780273537
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 986679378,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49456655,
+      "lon": 5.9554028508014865
     },
     {
       "osm_type": "way",
@@ -7328,6 +9767,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1038243229,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5116753,
+      "lon": 6.01136192674538
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1038280130,
       "name": null,
       "tags": {
@@ -7348,6 +9797,27 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1041271923,
+      "name": "BCEE",
+      "tags": {
+        "amenity": "bank",
+        "building": "yes"
+      },
+      "lat": 49.51135025,
+      "lon": 5.931172384026969
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1053464795,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.508716250000006,
+      "lon": 5.9263174492550466
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1053464806,
       "name": null,
       "tags": {
@@ -7355,6 +9825,26 @@
       },
       "lat": 49.5013899,
       "lon": 5.943291693120669
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1054665115,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.4920216,
+      "lon": 5.9897494418611075
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1065283771,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5064991,
+      "lon": 5.98083372825948
     },
     {
       "osm_type": "way",
@@ -7379,6 +9869,46 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1072631682,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5000385,
+      "lon": 5.985497417594251
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1072631694,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.500125749999995,
+      "lon": 5.985596601562495
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1072631699,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50010775,
+      "lon": 5.985418708326245
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1088486700,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.49979005,
+      "lon": 5.9830877000000005
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1095177716,
       "name": null,
       "tags": {
@@ -7396,6 +9926,36 @@
       },
       "lat": 49.494255949999996,
       "lon": 5.993490612997696
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1104384888,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.505580300000005,
+      "lon": 5.980377599999998
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1104403334,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50301705,
+      "lon": 5.967526629752395
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1119592519,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50939085,
+      "lon": 5.95682315
     },
     {
       "osm_type": "way",
@@ -7450,6 +10010,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1152757875,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.509242549999996,
+      "lon": 5.9729109000000005
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1155273227,
       "name": null,
       "tags": {
@@ -7470,6 +10040,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1177883999,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50916915,
+      "lon": 6.030200260276329
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1180479044,
       "name": "Kannercampus",
       "tags": {
@@ -7477,6 +10057,46 @@
       },
       "lat": 49.5066938,
       "lon": 5.935261946308725
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1188082310,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.52112655,
+      "lon": 5.987316039915927
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1195645397,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5135126,
+      "lon": 5.944636403815403
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1197292257,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.521303450000005,
+      "lon": 5.93026224838793
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1197293368,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.51896515,
+      "lon": 5.93803455
     },
     {
       "osm_type": "way",
@@ -7510,6 +10130,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1216264953,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.494056799999996,
+      "lon": 5.993472905978942
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1217115863,
       "name": null,
       "tags": {
@@ -7527,6 +10157,16 @@
       },
       "lat": 49.5122496,
       "lon": 5.942428850000001
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1217115866,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5148349,
+      "lon": 5.941625027331839
     },
     {
       "osm_type": "way",
@@ -7557,6 +10197,16 @@
       },
       "lat": 49.52448165,
       "lon": 5.973219450000002
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1217115966,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.52259065,
+      "lon": 5.963811140434339
     },
     {
       "osm_type": "way",
@@ -7597,6 +10247,16 @@
       },
       "lat": 49.522737199999995,
       "lon": 5.96609154902221
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1217115991,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5282691,
+      "lon": 5.961151745523102
     },
     {
       "osm_type": "way",
@@ -7743,6 +10403,40 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1217116050,
+      "name": null,
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "wayside_chapel",
+        "historic": "wayside_chapel"
+      },
+      "lat": 49.5241522,
+      "lon": 5.936790528759894
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1217116054,
+      "name": null,
+      "tags": {
+        "amenity": "place_of_worship",
+        "building": "wayside_chapel",
+        "historic": "wayside_chapel"
+      },
+      "lat": 49.52568585,
+      "lon": 5.93938365
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1217116102,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.51879005,
+      "lon": 5.938094937507584
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1217116106,
       "name": "Fondation Kannerschlass",
       "tags": {
@@ -7770,6 +10464,16 @@
       },
       "lat": 49.51788835,
       "lon": 5.945826607956292
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1217116203,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.52323755,
+      "lon": 5.940650416245495
     },
     {
       "osm_type": "way",
@@ -7833,6 +10537,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1238089745,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.508440300000004,
+      "lon": 5.9786716091751995
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1264326221,
       "name": null,
       "tags": {
@@ -7854,6 +10568,46 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1270888970,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5064776,
+      "lon": 5.93659767730437
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1278994113,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50797915,
+      "lon": 6.016213342088045
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1278994121,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50512895,
+      "lon": 6.0174916
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1282188690,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5099521,
+      "lon": 5.9828449509780945
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1284359643,
       "name": null,
       "tags": {
@@ -7861,6 +10615,16 @@
       },
       "lat": 49.504027300000004,
       "lon": 5.9728260499999974
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1286644815,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5089812,
+      "lon": 5.9702856731838185
     },
     {
       "osm_type": "way",
@@ -7884,6 +10648,56 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1301360653,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50940475,
+      "lon": 6.02594456525974
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1301360654,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.509253799999996,
+      "lon": 6.025166091728136
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1301360655,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5093221,
+      "lon": 6.025632645471264
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1301360656,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50937255,
+      "lon": 6.0257976499999995
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1301360658,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.510355000000004,
+      "lon": 6.027791082418892
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1301360672,
       "name": null,
       "tags": {
@@ -7891,6 +10705,16 @@
       },
       "lat": 49.509804700000004,
       "lon": 6.0314320999999955
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1301807019,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.505100350000006,
+      "lon": 6.030689300000001
     },
     {
       "osm_type": "way",
@@ -7921,6 +10745,16 @@
       },
       "lat": 49.50859605,
       "lon": 6.0195669
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1301807092,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50169335,
+      "lon": 6.009606149999998
     },
     {
       "osm_type": "way",
@@ -8085,6 +10919,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1322910095,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4963951,
+      "lon": 5.987309750000004
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1322910123,
       "name": null,
       "tags": {
@@ -8095,6 +10939,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1322910152,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4917721,
+      "lon": 5.977239717030963
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1322910187,
       "name": "Hôtel Restaurant Acacia",
       "tags": {
@@ -8102,6 +10956,16 @@
       },
       "lat": 49.493471,
       "lon": 5.982190689819092
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1324727362,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50886625,
+      "lon": 5.9888954770532195
     },
     {
       "osm_type": "way",
@@ -8132,6 +10996,26 @@
       },
       "lat": 49.49576275,
       "lon": 5.969849
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1324727530,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50286785,
+      "lon": 5.977974112632575
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1324727531,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.50300795,
+      "lon": 5.977918950000001
     },
     {
       "osm_type": "way",
@@ -8175,6 +11059,26 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1327890969,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.516827,
+      "lon": 5.928077432433925
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1327890970,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.516911,
+      "lon": 5.927883400000001
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1327890984,
       "name": null,
       "tags": {
@@ -8192,6 +11096,16 @@
       },
       "lat": 49.5036347,
       "lon": 5.941121805226333
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1364278550,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.509462400000004,
+      "lon": 5.9708129336438525
     },
     {
       "osm_type": "way",
@@ -8275,6 +11189,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1367108971,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5206357,
+      "lon": 5.93938156929368
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1367109105,
       "name": null,
       "tags": {
@@ -8315,6 +11239,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1367120964,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.494602349999994,
+      "lon": 5.978752836448321
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1367120967,
       "name": null,
       "tags": {
@@ -8322,6 +11256,16 @@
       },
       "lat": 49.497326150000006,
       "lon": 5.968909100000017
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1367120968,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.49779205,
+      "lon": 5.970735713857557
     },
     {
       "osm_type": "way",
@@ -8355,6 +11299,16 @@
     },
     {
       "osm_type": "way",
+      "osm_id": 1420544940,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.4981152,
+      "lon": 5.9869070061034915
+    },
+    {
+      "osm_type": "way",
       "osm_id": 1446954396,
       "name": "École Jean Jaurès",
       "tags": {
@@ -8368,10 +11322,61 @@
       "osm_id": 1465368731,
       "name": "Centre Médical Lallange",
       "tags": {
-        "amenity": "clinic"
+        "amenity": "clinic",
+        "healthcare": "doctor"
       },
       "lat": 49.50835045,
       "lon": 5.972801837582491
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1546340202,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.5094974,
+      "lon": 5.995486013169887
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1550369576,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.50669785,
+      "lon": 5.970883668529794
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1550369577,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.506151349999996,
+      "lon": 5.975924101006068
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1550369598,
+      "name": null,
+      "tags": {
+        "leisure": "pitch"
+      },
+      "lat": 49.5065521,
+      "lon": 5.9734053
+    },
+    {
+      "osm_type": "way",
+      "osm_id": 1550369603,
+      "name": null,
+      "tags": {
+        "leisure": "playground"
+      },
+      "lat": 49.506235149999995,
+      "lon": 5.9728488361842125
     }
   ]
 }

@@ -11,8 +11,7 @@ from unittest.mock import patch
 import networkx as nx
 import osmnx as ox
 import pandas as pd
-from osmnx._errors import ResponseStatusCodeError
-from requests.exceptions import ConnectionError as RequestConnectionError
+from requests.exceptions import ConnectionError as RequestConnectionError, ReadTimeout
 from shapely.geometry import Point, shape
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -110,6 +109,42 @@ def test_distinct_operation_and_service_areas():
         download.assert_not_called()
 
 
+def test_recrawl_pois_updates_only_pois():
+    geometry = {"type": "Polygon", "coordinates": [[
+        [6.2, 49.5], [6.21, 49.5], [6.205, 49.51], [6.2, 49.5]
+    ]]}
+    with TemporaryDirectory() as tmp:
+        out_dir = Path(tmp)
+        graph_path("area", out_dir).write_text(json.dumps({"geometry": geometry}))
+        graph_path("drive_graph", out_dir).write_text("existing graph")
+        poi_path = graph_path("pois", out_dir)
+        poi_path.write_text("old pois")
+        with patch.object(ox, "features_from_polygon", return_value=sample_pois()) as fetch, patch.object(
+            ox, "graph_from_polygon"
+        ) as download:
+            service_area.recrawl_pois(out_dir)
+        assert fetch.call_args.args[0].equals(shape(geometry))
+        download.assert_not_called()
+        assert json.loads(poi_path.read_text())["features"][0]["name"] == "Cafe"
+        assert graph_path("drive_graph", out_dir).read_text() == "existing graph"
+        with patch.object(ox, "features_from_polygon", side_effect=ValueError("fetch failed")):
+            try:
+                service_area.recrawl_pois(out_dir)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError("Failed recrawl was accepted")
+        assert json.loads(poi_path.read_text())["features"][0]["name"] == "Cafe"
+
+
+def test_recrawl_pois_accepts_graph_name_case():
+    with patch.object(sys, "argv", ["define_service_area.py", "--map", "esch", "--recrawl-pois"]), patch.object(
+        service_area, "recrawl_pois"
+    ) as recrawl:
+        service_area.main()
+    assert recrawl.call_args.args[0].samefile(service_area.GRAPHS_DIR / "Esch")
+
+
 def test_validate_endpoint_does_not_download_graphs():
     operation = {"type": "Polygon", "coordinates": [[
         [0, 0], [2, 0], [2, 2], [0, 2], [0, 0]
@@ -152,7 +187,7 @@ def test_save_area_tries_another_overpass_server():
         if len(overpass_urls) == 1:
             raise RequestConnectionError("connection refused")
         if len(overpass_urls) == 2:
-            raise ResponseStatusCodeError("500 Internal Server Error")
+            raise ReadTimeout("request timed out")
         return graph
 
     with TemporaryDirectory() as tmp, patch.object(ox, "graph_from_polygon", side_effect=download), patch.object(
@@ -179,6 +214,8 @@ def test_area_map_without_busline():
 if __name__ == "__main__":
     test_save_area()
     test_distinct_operation_and_service_areas()
+    test_recrawl_pois_updates_only_pois()
+    test_recrawl_pois_accepts_graph_name_case()
     test_validate_endpoint_does_not_download_graphs()
     test_save_area_tries_another_overpass_server()
     test_area_map_without_busline()
