@@ -1,13 +1,15 @@
 """Write the generated request pool and its reproducibility metadata."""
 
 import hashlib
+import csv
 from importlib import metadata
 import json
 import platform
 from pathlib import Path
 import tomllib
 
-from src.output_adapters import busline_path, graph_path, request_path, write_json
+from src.output_adapters import (DARP_OUTPUT_FIELDS, SFBS_OUTPUT_FIELDS, busline_path,
+                                 graph_path, request_path, write_json)
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -16,6 +18,20 @@ MAPS_CFG_PATH = ROOT / "src/reqreate/maps/map_config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
 OPERATIONS_PATH = ROOT / "src/reqreate/operation/operation_profile.toml"
 VEHICLES_PATH = ROOT / "src/reqreate/operation/veh_profile.toml"
+
+
+def write_requests_csv(path, requests, task):
+    """Write one request per row, preserving array values as JSON text."""
+    base_fields = SFBS_OUTPUT_FIELDS if task == "SFBS" else DARP_OUTPUT_FIELDS
+    fields = [*base_fields, *sorted(set().union(*(req.keys() for req in requests.values()))
+                                    - set(base_fields))]
+    with path.open("w", encoding="utf-8", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        for req in requests.values():
+            writer.writerow({key: json.dumps(value, ensure_ascii=False) if isinstance(value, (list, tuple, dict))
+                             else value for key, value in req.items()})
+    return path
 
 
 def sha256(path):
@@ -47,6 +63,7 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
         "detour_factor": attributes["detour_factor"],
     }}
     pool_path = write_json(request_path("pool", instance_dir), pool, compact=True)
+    csv_path = write_requests_csv(request_path("csv", instance_dir), pool["requests"], cfg["task"])
     operations_path = write_json(request_path("operations", instance_dir), operations)
     meta = {
         "task": cfg["task"],
@@ -87,6 +104,7 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
             for path in in_paths
         },
         "pool_sha256": sha256(pool_path),
+        "csv_sha256": sha256(csv_path),
         "operations_sha256": sha256(operations_path),
     }
     write_json(request_path("metadata", instance_dir), meta)

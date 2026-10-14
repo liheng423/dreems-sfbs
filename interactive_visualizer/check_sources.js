@@ -27,6 +27,9 @@ const context = vm.createContext({
     }
   },
   fetch: async (url) => {
+    if (url === '../outputs/requests/') return { ok: true, text: async () => '<a href="new_run/">new_run/</a>' };
+    if (url === '../outputs/requests/new_run/requests.json')
+      return { ok: true, json: async () => ({ 'num_data:': 0, requests: {} }) };
     const file_path = path.join(root, decodeURIComponent(url).replace('../', ''));
     if (!fs.existsSync(file_path)) return { ok: false };
     if (fs.statSync(file_path).isDirectory()) {
@@ -62,28 +65,21 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, 'sources.js'), 'utf8'), con
 
 (async () => {
   await new Promise(setImmediate);
-  assert.ok(element('request-folder').options.some((option) => option.value === '550_550_0001'));
-  assert.ok(!element('request-folder').options.some((option) => option.value === '_cache'));
+  assert.ok(element('request-folder').options.some((option) => option.value === 'new_run'));
   assert.ok(element('graph-folder').options.some((option) => option.value === '550'));
   assert.ok(element('busline-folder').options.some((option) => option.value === '605'));
 
   const request = element('request-folder');
-  request.value = '550_550_0001';
-  await request.listeners.change({ target: request });
-  assert.equal(loaded[0][0], 'requests');
-  assert.match(loaded[0][1], /data\/requests\/550_550_0001\/raw_requests\.json/);
-  const fetch_old = context.fetch;
-  context.fetch = async (url) => url.endsWith('/new_run/requests.json')
-    ? { ok: true, json: async () => ({ 'num_data:': 0, requests: {} }) } : fetch_old(url);
   request.value = 'new_run';
   await request.listeners.change({ target: request });
-  assert.match(loaded[1][1], /data\/requests\/new_run\/requests\.json/);
+  assert.equal(loaded[0][0], 'requests');
+  assert.match(loaded[0][1], /outputs\/requests\/new_run\/requests\.json/);
 
   const graph = element('graph-folder');
   graph.value = '550';
   await graph.listeners.change({ target: graph });
-  assert.match(loaded[2][1], /data\/graphs\/550\/pois\.json/);
-  assert.match(element('graph-name').textContent, /data\/graphs\/550\/service_area\.geojson/);
+  assert.match(loaded[1][1], /outputs\/graphs\/550\/pois\.json/);
+  assert.match(element('graph-name').textContent, /outputs\/graphs\/550\/service_area\.geojson/);
   assert.ok(loaded.some(([kind, name]) => kind === 'graphml' && name.endsWith('/550/drive.graphml')));
   element('graph-type').value = 'walk';
   await element('graph-type').listeners.change();
@@ -92,7 +88,7 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, 'sources.js'), 'utf8'), con
   const busline = element('busline-folder');
   busline.value = '550';
   await busline.listeners.change({ target: busline });
-  assert.deepEqual(loaded.slice(5).map(([kind]) => kind), ['stops', 'businfo', 'energy']);
+  assert.deepEqual(loaded.slice(4).map(([kind]) => kind), ['stops', 'businfo', 'energy']);
   busline.value = '605';
   await busline.listeners.change({ target: busline });
   assert.ok(removed.length);

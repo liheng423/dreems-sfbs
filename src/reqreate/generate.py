@@ -29,7 +29,8 @@ from filters.route_schedule import index_route_departures
 from maps.pois import load_pois, set_poi_zones
 from adapters.pool_output import write_pool
 from src.reqreate.operation.energy import consumption_kwh_per_km
-from src.output_adapters import (GRAPH_FILES, available_buslines, available_graphs, busline_dir,
+from src.output_adapters import (DARP_OUTPUT_FIELDS, GRAPH_FILES, SFBS_OUTPUT_FIELDS,
+                                 available_buslines, available_graphs, busline_dir,
                                  busline_path, create_request_dir, graph_dir, graph_path)
 
 
@@ -40,18 +41,6 @@ OPERATION_CFG_PATH = ROOT / "src/reqreate/operation/operation_profile.toml"
 VEHICLE_CFG_PATH = ROOT / "src/reqreate/operation/veh_profile.toml"
 DAY_END_S = 86399
 DEBUG = False
-REQUEST_OUTPUT_FIELDS = {
-    "reqid", "is_prebooked", "lead_time", "time_stamp", "earliest_departure",
-    "latest_arrival", "pickup_from", "pickup_to", "dropoff_from", "dropoff_to",
-    "service_time", "origin", "destination", "originnode_drive",
-    "destinationnode_drive", "direct_distance", "direct_travel_time", "energy_kwh",
-    "boarding_stop_id", "alighting_stop_id", "boarding_walk_distance_m",
-    "alighting_walk_distance_m", "origin_drive_point", "destination_drive_point",
-    "boarding_stop_point", "alighting_stop_point",
-}
-SFBS_OUTPUT_FIELDS = REQUEST_OUTPUT_FIELDS - {"originnode_drive", "destinationnode_drive"}
-
-
 def clock_seconds(value):
     """Parse a same-day HH:MM[:SS] clock time."""
     if not isinstance(value, str):
@@ -305,7 +294,7 @@ def generate(cfg, area_path, poi_path):
     operation = tomllib.loads(OPERATION_CFG_PATH.read_text())[cfg["task"].lower()]["attribute"]
     profiles = tomllib.loads(VEHICLE_CFG_PATH.read_text())["profiles"]
     energy_rate = consumption_kwh_per_km({"scenario": operation, "profiles": profiles})
-    fields = SFBS_OUTPUT_FIELDS if cfg["task"] == "SFBS" else REQUEST_OUTPUT_FIELDS
+    fields = SFBS_OUTPUT_FIELDS if cfg["task"] == "SFBS" else DARP_OUTPUT_FIELDS
     for req in reqs.values():
         for role in ("origin", "destination"):
             node = req.get(f"{role}node_drive")

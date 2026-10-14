@@ -2,7 +2,7 @@
   "schema_version": 2,
   "sources": {
     "businfo": "data/buslines/550/businfo.json",
-    "road_graph": "data/graphs/550/drive.graphml",
+    "road_graph": "outputs/graphs/550/drive.graphml",
     "energy_config": "src/busline/energy.toml",
     "paper": ".ref/papers/Analysis_and_Characterization_of_the_Energy_Consumption_in_an_Electric_Bus_Fleet.pdf",
     "paper_location": "Table 1, printed page 256"

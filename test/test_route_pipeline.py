@@ -1,6 +1,7 @@
 """Exercise a non-550 route through GTFS, stop places, and demand settings."""
 
 import hashlib
+import csv
 import json
 from contextlib import redirect_stdout
 from io import StringIO
@@ -134,7 +135,7 @@ def test_route_pipeline():
                 meta["demand_start_s"]) == (28800, 43200, cfg["demand_start_s"])
         assert {path.relative_to(instance_dir).as_posix() for path in instance_dir.rglob("*")
                 if path.is_file()} == {
-            "requests.json", "operations.json", "requests_metadata.json",
+            "requests.json", "requests.csv", "operations.json", "requests_metadata.json",
         }
         operations = json.loads(request_path("operations", instance_dir).read_text())
         assert set(operations) == {"sfbs"}
@@ -145,6 +146,9 @@ def test_route_pipeline():
         assert operations["sfbs"]["vehicle"]["manufacturer"] == "Evobus eCitaro"
         assert meta["operations_sha256"] == hashlib.sha256(
             request_path("operations", instance_dir).read_bytes()).hexdigest()
+        assert list(csv.DictReader(request_path("csv", instance_dir).open(newline=""))) == []
+        assert meta["csv_sha256"] == hashlib.sha256(
+            request_path("csv", instance_dir).read_bytes()).hexdigest()
 
 
 def test_generate_demand_command():
@@ -301,6 +305,13 @@ def test_generate_without_busline():
         assert meta["bus_filters_enabled"] is False
         assert all("buslines" not in path for path in meta["inputs_sha256"])
         assert json.loads(request_path("pool", instance_dir).read_text()) == pool
+        with request_path("csv", instance_dir).open(newline="") as file:
+            rows = list(csv.DictReader(file))
+        assert len(rows) == 1
+        assert rows[0]["reqid"] == "0"
+        assert json.loads(rows[0]["origin"]) == valid_req["origin"]
+        assert rows[0]["direct_distance"] == str(valid_req["direct_distance"])
+        assert "boarding_stop_id" not in rows[0]
         assert request_path("operations", instance_dir).is_file()
         assert set(json.loads(request_path("operations", instance_dir).read_text())) == {"darp"}
 

@@ -8,8 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 BUSLINES_DIR = DATA_DIR / "buslines"
-GRAPHS_DIR = DATA_DIR / "graphs"
-REQUESTS_DIR = DATA_DIR / "requests"
+GRAPHS_DIR = ROOT / "outputs" / "graphs"
+REQUESTS_DIR = ROOT / "outputs" / "requests"
 BUSLINE_FILES = {
     "businfo": "businfo.json",
     "stops": "stops.json",
@@ -20,14 +20,36 @@ GRAPH_FILES = {
     "area": "service_area.geojson",
     "drive_graph": "drive.graphml",
     "walk_graph": "walk.graphml",
+    "drive_nodes": "drive_nodes.csv",
+    "drive_edges": "drive_edges.csv",
+    "walk_nodes": "walk_nodes.csv",
+    "walk_edges": "walk_edges.csv",
     "pois": "pois.json",
     "depot": "depot.json",
 }
+GRAPH_CSV_PRIORITY = {
+    "nodes": ("osmid", "x", "y", "geometry"),
+    "edges": ("u", "v", "key", "length", "geometry", "highway", "maxspeed", "access", "oneway"),
+}
 REQUEST_FILES = {
     "pool": "requests.json",
+    "csv": "requests.csv",
     "metadata": "requests_metadata.json",
     "operations": "operations.json",
 }
+REQUEST_OUTPUT_FIELDS = (
+    "reqid", "is_prebooked", "lead_time", "time_stamp", "earliest_departure",
+    "latest_arrival", "pickup_from", "pickup_to", "dropoff_from", "dropoff_to",
+    "service_time", "origin", "destination", "originnode_drive",
+    "destinationnode_drive", "direct_distance", "direct_travel_time", "energy_kwh",
+    "boarding_stop_id", "alighting_stop_id", "boarding_walk_distance_m",
+    "alighting_walk_distance_m", "origin_drive_point", "destination_drive_point",
+    "boarding_stop_point", "alighting_stop_point",
+)
+SFBS_OUTPUT_FIELDS = tuple(name for name in REQUEST_OUTPUT_FIELDS
+                           if name not in ("originnode_drive", "destinationnode_drive"))
+DARP_OUTPUT_FIELDS = tuple(name for name in REQUEST_OUTPUT_FIELDS
+                           if not name.startswith(("boarding_", "alighting_")))
 
 
 def busline_dir(route_short_name, buslines_dir=BUSLINES_DIR):
@@ -95,6 +117,27 @@ def write_json(path, value, *, compact=False):
     return path
 
 
+def graph_csv_columns(frame, priority):
+    """Put routing columns first and optional OSM attributes last."""
+    return [name for name in priority if name in frame] + sorted(set(frame.columns) - set(priority))
+
+
+def write_graph_csv(graph, kind, directory):
+    """Export one saved road graph to matching node and edge CSV files."""
+    import osmnx as ox
+
+    directory.mkdir(parents=True, exist_ok=True)
+    nodes = ox.convert.graph_to_gdfs(graph, edges=False).reset_index()
+    nodes[graph_csv_columns(nodes, GRAPH_CSV_PRIORITY["nodes"])].to_csv(
+        graph_path(f"{kind}_nodes", directory), index=False)
+    edges_path = graph_path(f"{kind}_edges", directory)
+    if graph.number_of_edges():
+        edges = ox.convert.graph_to_gdfs(graph, nodes=False).reset_index()
+        edges[graph_csv_columns(edges, GRAPH_CSV_PRIORITY["edges"])].to_csv(edges_path, index=False)
+    else:
+        edges_path.write_text("u,v,key\n", encoding="utf-8")
+
+
 def write_area(geometry, graphs, directory):
     """Save the selected GeoJSON service area and its two OSM road graphs."""
     import osmnx as ox
@@ -106,4 +149,5 @@ def write_area(geometry, graphs, directory):
         path = graph_path(f"{kind}_graph", directory)
         path.parent.mkdir(parents=True, exist_ok=True)
         ox.save_graphml(graph, filepath=path)
+        write_graph_csv(graph, kind, directory)
     return directory

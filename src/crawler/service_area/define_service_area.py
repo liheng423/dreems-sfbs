@@ -4,8 +4,8 @@
 Run with
 ``python main.py select-area test --busline 605``. The browser
 opens on a local map; draw the operation area, optionally adjust the service
-area, and click Save. The service boundary, OSMnx drive/walk GraphML files,
-and POIs go to ``data/graphs/<map>/``.
+area, and click Save. The service boundary, OSMnx drive/walk GraphML and CSV
+files, and POIs go to ``outputs/graphs/<map>/``.
 The road graphs come from current OpenStreetMap data, not the GTFS service date.
 """
 

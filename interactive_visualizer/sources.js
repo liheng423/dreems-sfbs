@@ -4,8 +4,9 @@ let graph_layer = null;
 
 /** Read folder names from Python's local directory listing. */
 async function folder_names(kind) {
-  const response = await fetch(`../data/${kind}/`);
-  if (!response.ok) throw new Error(`Cannot list data/${kind}/`);
+  const base = kind === 'requests' ? 'outputs/requests' : kind === 'graphs' ? 'outputs/graphs' : `data/${kind}`;
+  const response = await fetch(`../${base}/`);
+  if (!response.ok) throw new Error(`Cannot list ${base}/`);
   const listing = new DOMParser().parseFromString(await response.text(), 'text/html');
   return [...listing.querySelectorAll('a[href]')]
     .map((link) => link.getAttribute('href'))
@@ -15,8 +16,9 @@ async function folder_names(kind) {
 }
 
 async function folder_json(kind, folder, file) {
-  const response = await fetch(`../data/${kind}/${encodeURIComponent(folder)}/${file}`);
-  if (!response.ok) throw new Error(`Cannot load data/${kind}/${folder}/${file}`);
+  const base = kind === 'requests' ? 'outputs/requests' : kind === 'graphs' ? 'outputs/graphs' : `data/${kind}`;
+  const response = await fetch(`../${base}/${encodeURIComponent(folder)}/${file}`);
+  if (!response.ok) throw new Error(`Cannot load ${base}/${folder}/${file}`);
   return response.json();
 }
 
@@ -39,7 +41,7 @@ $('request-folder').addEventListener('change', async (event) => {
       pool = await folder_json('requests', folder, file);
     }
     if (event.target.value !== folder) return;
-    load_reqs(pool, `data/requests/${folder}/${file}`);
+    load_reqs(pool, `outputs/requests/${folder}/${file}`);
   } catch (error) {
     show_source_error('file-error', error);
   }
@@ -58,7 +60,7 @@ async function load_selected_graphml(folder) {
     if (selected_req) show_req(selected_req, false);
     return;
   }
-  const file_name = `data/graphs/${folder}/${kind}.graphml`;
+  const file_name = `outputs/graphs/${folder}/${kind}.graphml`;
   const response = await fetch(`../${file_name}`);
   if (!response.ok) throw new Error(`Cannot load ${file_name}`);
   const xml = new DOMParser().parseFromString(await response.text(), 'application/xml');
@@ -80,8 +82,8 @@ $('graph-folder').addEventListener('change', async (event) => {
     ]);
     if (event.target.value !== folder) return;
     graph_layer = L.geoJSON(area, { style: { color: '#27858a', weight: 2, fillOpacity: .06 } }).addTo(map);
-    load_pois(pois, `data/graphs/${folder}/pois.json`);
-    $('graph-name').textContent = `data/graphs/${folder}/service_area.geojson`;
+    load_pois(pois, `outputs/graphs/${folder}/pois.json`);
+    $('graph-name').textContent = `outputs/graphs/${folder}/service_area.geojson`;
     $('graph-error').hidden = true;
     if (!reqs.length) map.fitBounds(graph_layer.getBounds());
     await load_selected_graphml(folder);

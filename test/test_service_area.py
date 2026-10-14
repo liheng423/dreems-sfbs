@@ -35,14 +35,15 @@ def sample_pois():
 def test_save_area():
     graph = nx.MultiDiGraph()
     graph.graph["crs"] = "epsg:4326"
-    graph.add_node(1, x=6.2, y=49.5)
-    graph.add_node(2, x=6.21, y=49.51)
-    graph.add_edge(1, 2, length=100)
+    graph.add_node(141925, x=6.2, y=49.5, highway="traffic_signals")
+    graph.add_node(141928, x=6.21, y=49.51)
+    graph.add_edge(141925, 141928, length=100)
+    graph.add_edge(141925, 141928, length=120, highway="residential", maxspeed="30", name="Parallel")
     assert nearest_graph_point(graph, 49.5001, 6.2001) == {
-        "node_id": 1, "point": [49.5, 6.2]}
-    assert nearest_graph_point(graph, node_id=2) == {
-        "node_id": 2, "point": [49.51, 6.21]}
-    assert GraphNodeIndex(graph).nearest(49.5001, 6.2001)["node_id"] == 1
+        "node_id": 141925, "point": [49.5, 6.2]}
+    assert nearest_graph_point(graph, node_id=141928) == {
+        "node_id": 141928, "point": [49.51, 6.21]}
+    assert GraphNodeIndex(graph).nearest(49.5001, 6.2001)["node_id"] == 141925
     geometry = {"type": "Polygon", "coordinates": [[
         [6.2, 49.5], [6.21, 49.5], [6.205, 49.51], [6.2, 49.5]
     ]]}
@@ -57,6 +58,20 @@ def test_save_area():
         assert out_dir == graph_dir
         assert graph_path("drive_graph", graph_dir).is_file()
         assert graph_path("walk_graph", graph_dir).is_file()
+        assert set(ox.load_graphml(graph_path("drive_graph", graph_dir)).nodes) == {141925, 141928}
+        for kind in ("drive", "walk"):
+            nodes = pd.read_csv(graph_path(f"{kind}_nodes", graph_dir))
+            edges = pd.read_csv(graph_path(f"{kind}_edges", graph_dir))
+            assert nodes.columns[:4].tolist() == ["osmid", "x", "y", "geometry"]
+            assert nodes.columns[-1] == "highway"
+            assert edges.columns[:7].tolist() == [
+                "u", "v", "key", "length", "geometry", "highway", "maxspeed"]
+            assert edges.columns[-1] == "name"
+            assert nodes[["osmid", "y", "x"]].values.tolist() == [
+                [141925, 49.5, 6.2], [141928, 49.51, 6.21]]
+            assert edges[["u", "v", "key", "length"]].values.tolist() == [
+                [141925, 141928, 0, 100], [141925, 141928, 1, 120]]
+            assert edges.loc[1, "name"] == "Parallel"
         depot = json.loads(graph_path("depot", graph_dir).read_text())
         assert depot["original_point"] == [49.568613, 5.922762]
         node = graph.nodes[depot["drive_node_id"]]
@@ -67,6 +82,13 @@ def test_save_area():
         assert all(call.args[0].equals(shape(geometry)) for call in download.call_args_list)
         assert all(call.kwargs["retain_all"] for call in download.call_args_list)
         assert [call.kwargs["network_type"] for call in download.call_args_list] == ["drive", "walk"]
+        csv_paths = [graph_path(f"{kind}_{table}", graph_dir)
+                     for kind in ("drive", "walk") for table in ("nodes", "edges")]
+        original_csvs = {path: path.read_bytes() for path in csv_paths}
+        for path in csv_paths:
+            path.unlink()
+        service_area.save_area(geometry, graph_dir)
+        assert {path: path.read_bytes() for path in csv_paths} == original_csvs
 
 
 def test_distinct_operation_and_service_areas():
@@ -92,6 +114,7 @@ def test_distinct_operation_and_service_areas():
         out_dir = Path(tmp)
         service_area.save_area(operation, out_dir, service)
         assert json.loads(graph_path("area", out_dir).read_text())["geometry"] == service
+        assert graph_path("drive_edges", out_dir).read_text() == "u,v,key\n"
         assert all(call.args[0].equals(shape(operation)) for call in download.call_args_list)
         assert fetch.call_args.args[0].equals(shape(service))
         assert [poi["name"] for poi in json.loads(graph_path("pois", out_dir).read_text())["features"]] == ["Inside"]

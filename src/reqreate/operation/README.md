@@ -53,7 +53,7 @@ The explicit scenario in [operation_profile.toml](operation_profile.toml) select
 
 The distance is a directed shortest path by GraphML edge length between the nearest road nodes, not a recorded bus path. If two stops snap to the same simplified node, the helper marks and uses their straight-line separation as a lower bound. Table 1 rates came from 20–300 km trips, so allocating one trip-average rate to every short segment is an approximation; the paper does not resolve stop-by-stop acceleration or route-specific passenger loads.
 
-After changing either profile TOML file, regenerate `data/buslines/<route>/energy.json` from the repository root with `python src/reqreate/operation/energy.py --route <route>`. The command reads that route's `businfo.json` and `data/graphs/<route>/drive.graphml`; both files must already exist. Segment stop IDs are the GTFS stop IDs from `businfo.json`.
+After changing either profile TOML file, regenerate `data/buslines/<route>/energy.json` from the repository root with `python src/reqreate/operation/energy.py --route <route>`. The command reads that route's `businfo.json` and `outputs/graphs/<route>/drive.graphml`; both files must already exist. Segment stop IDs are the GTFS stop IDs from `businfo.json`.
 
 ```python
 import json
@@ -68,6 +68,6 @@ with open("src/reqreate/operation/operation_profile.toml", "rb") as file:
     config["scenario"] = tomllib.load(file)["sfbs"]["attribute"]
 with open("data/buslines/550/businfo.json") as file:
     businfo = json.load(file)
-graph = ox.load_graphml("data/graphs/550/drive.graphml")
+graph = ox.load_graphml("outputs/graphs/550/drive.graphml")
 segments = estimate_busline_energy(graph, businfo, config)
 ```
