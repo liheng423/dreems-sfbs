@@ -5,7 +5,8 @@ DREEMS-SFBS generates synthetic passenger requests for Semi-Flex Bus (SFBS) and 
 Features:
 
 - 🗺️ Draw an **operation area** on an OpenStreetMap (OSM) map for the driving and walking road graphs. Set a **service area** inside it for points of interest (POIs) and passenger request origins and destinations.
-- 🎲 Generate POI-based requests with REQreate, using bus stops and timetables for SFBS or no bus route for DARP.
+- 🗺️ Retrieve POIs directly from OSM automatically. 
+- 🎲 Generate POI-based requests with REQreate (see the [REQreate paper](https://arxiv.org/abs/2208.12225) for more details), using bus stops and timetables for SFBS or no bus route for DARP.
 - ⚙️ Tune demand, filters, and vehicle settings through configuration files.
 - 🔎 Inspect road graph previews and explore requests in an interactive browser viewer.
 - 📤 Export graphs and request instances in GraphML, JSON, and CSV for downstream optimization.
@@ -154,7 +155,7 @@ See [Request Outputs](#request-outputs) for the saved field definitions.
 
 Edit these TOML files before running `generate-demand`:
 
-1. [request_gen.toml](src/reqreate/request_gen.toml): Set `simulation.start`, `end`, and `demand_start` as `HH:MM:SS` times. Set the two `rate_per_hour` values for dynamic and prebooked demand. The `lt_*`, `pickup_timewindow`, `dropoff_timewindow`, and `service_time` values are in seconds; `radial_distance` is in metres. For a fixed value, use `type = "uniform"` with `scale = 0`. Set `seed` for repeatable runs and `retry_if_filtered` to choose whether rejected requests are resampled until the number of requests reaches the preset.
+1. [request_gen.toml](src/reqreate/request_gen.toml): Set `simulation.start`, `end`, and `demand_start` as `HH:MM:SS` times. Set the two `rate_per_hour` values for dynamic and prebooked demand. The `lt_*`, `pickup_timewindow`, `dropoff_timewindow`, and `service_time` values are in seconds; `radial_distance` is in metres. For a fixed value, use `type = "uniform"` with `scale = 0`. Set `seed` for repeatable runs and `retry_if_filtered` to choose whether rejected requests are resampled until the number of requests reaches the preset. See [REQreate](https://arxiv.org/abs/2208.12225) for more details. 
 2. [map_config.toml](src/reqreate/maps/map_config.toml): Choose OSM `poi_tags` to collect when saving a map, set `method_pois.rows` and `columns` for the POI sampling grid, and set `locations.depot` with a default name, latitude, and longitude. Add a map name under `[locations.depots]` to override it for one map. After changing `poi_tags` for an existing map, run `python main.py recrawl-pois MAP` to update its saved POIs. Save the area again if you change the depot.
 3. [veh_profile.toml](src/reqreate/operation/veh_profile.toml): Use an existing `[profiles.NAME]` or add one with `battery_capacity_kwh`, `passenger_capacity`, and `reference_kwh_per_km`. Add `relative_increase_pct` entries only for temperature cases you intend to select.
 4. [operation_profile.toml](src/reqreate/operation/operation_profile.toml): Edit `[darp.attribute]` or `[sfbs.attribute]` for the task you run. Set `vehicle_speed` in m/s, `detour_factor` (at least 1), `num_of_vehicles`, and `profile` to a `NAME` in `veh_profile.toml`. Use `temperature_case = "reference_20_22_c"` for the unadjusted energy rate, or an `at_*_c` key present in that vehicle's `relative_increase_pct`. Request sampling times come from `request_gen.toml`.
