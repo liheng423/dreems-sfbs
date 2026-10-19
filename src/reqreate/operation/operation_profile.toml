@@ -6,10 +6,6 @@ pickup_timewindow = { type = "uniform", loc = 900, scale = 0 } # 15 min
 dropoff_timewindow = { type = "uniform", loc = 900, scale = 0 } # 15 min
 profile = "shuttle_6m_rawsuns_64_8"
 temperature_case = "reference_20_22_c"
-[darp.operation]
-
-start = "7:00:00"
-end = "13:00:00"
 
 [sfbs.attribute]
 num_of_vehicles = 6
@@ -19,8 +15,3 @@ detour_factor = 1.5
 # Illustrative choice; Route 550's vehicle type is unverified.
 profile = "shuttle_6m_rawsuns_64_8"
 temperature_case = "reference_20_22_c"
-
-[sfbs.operation]
-
-start = "7:00:00"
-end = "13:00:00"

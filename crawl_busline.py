@@ -1,6 +1,6 @@
-"""Crawl one GTFS route into data/buslines/<route>/.
+"""Extract one scheduled GTFS route into data/buslines/<name>/.
 
-Example: python crawl_busline.py --route 605
+Example: python crawl_busline.py --gtfs-zip feed.zip --service-date 2026-10-19 --route 12
 """
 
 from src.crawler.busline.crawl_gtfs import main

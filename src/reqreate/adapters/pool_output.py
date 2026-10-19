@@ -1,15 +1,11 @@
-"""Write the generated request pool and its reproducibility metadata."""
+"""Write the generated request pool and its configuration snapshot."""
 
-import hashlib
 import csv
-from importlib import metadata
 import json
-import platform
 from pathlib import Path
 import tomllib
 
-from src.output_adapters import (DARP_OUTPUT_FIELDS, SFBS_OUTPUT_FIELDS, busline_path,
-                                 graph_path, request_path, write_json)
+from src.output_adapters import DARP_OUTPUT_FIELDS, SFBS_OUTPUT_FIELDS, request_path, write_json
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -34,27 +30,13 @@ def write_requests_csv(path, requests, task):
     return path
 
 
-def sha256(path):
-    """Return the SHA-256 hex digest of a file's contents."""
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
-               instance_dir, pool):
-    """Write the request pool and provenance metadata; return the pool path."""
-    poi_path = graph_path("pois", area_dir)
-    in_paths = [CFG_PATH, MAPS_CFG_PATH, FILTERS_PATH, OPERATIONS_PATH, VEHICLES_PATH]
-    if busline_name is not None:
-        in_paths.extend(busline_path(name, route_dir) for name in ("stops", "businfo"))
-    in_paths.extend(graph_path(name, area_dir) for name in ("area", "drive_graph", "walk_graph", "pois", "depot"))
+def write_pool(cfg, busline_name, graph_name, instance_dir, pool):
+    """Write the request pool and its settings; return the pool path."""
     config = tomllib.loads(OPERATIONS_PATH.read_text())
     profiles = tomllib.loads(VEHICLES_PATH.read_text())["profiles"]
     mode = cfg["task"].lower()
     attributes = config[mode]["attribute"]
-    timing = config[mode]["operation"]
     operations = {mode: {
-        "start_time": timing["start"],
-        "end_time": timing["end"],
         "average_speed_mps": attributes["vehicle_speed"],
         "vehicle_count": attributes["num_of_vehicles"],
         "vehicle_type": attributes["profile"],
@@ -63,49 +45,34 @@ def write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
         "detour_factor": attributes["detour_factor"],
     }}
     pool_path = write_json(request_path("pool", instance_dir), pool, compact=True)
-    csv_path = write_requests_csv(request_path("csv", instance_dir), pool["requests"], cfg["task"])
-    operations_path = write_json(request_path("operations", instance_dir), operations)
-    meta = {
-        "task": cfg["task"],
-        "busline": busline_name,
-        "graph": graph_name,
-        "generator": "REQreate._generate_single_data_impl + configured time sampler",
-        "python_version": platform.python_version(),
-        "package_versions": {
-            name: metadata.version(name)
-            for name in ("reqreate", "numpy", "pandas", "scipy", "osmnx", "networkx")
-        },
-        "seed": cfg["seed"],
-        "candidate_count": cfg.get("generated_candidate_count", cfg["requests"]),
-        "mean_candidate_count": cfg["requests"],
-        "prebooked_probability": cfg["prebooked_probability"],
-        "dynamic_time_stamp_distribution": cfg["distributions"]["dynamic_time_stamp"],
-        "prebooked_earliest_departure_distribution": cfg["distributions"]["prebooked_earliest_departure"],
-        "request_count": pool["num_data:"],
-        "simulation_start_s": cfg["simulation_start_s"],
-        "simulation_end_s": cfg["simulation_end_s"],
-        "demand_start_s": cfg["demand_start_s"],
-        "network_input": "GeoJSON service area and saved OSM drive/walk graphs",
-        "vehicle_speed_mps": cfg["vehicle_speed_mps"],
-        "detour_factor": cfg["detour_factor"],
-        "travel_time_method": f"Directed road distance / {cfg['task']} vehicle_speed",
-        "spatial_sampling": (
-            "REQreate method_pois: POI-density zones and radial trip distances, "
-            "followed by area, minimum-distance, and positive-travel-time filters"
-            + (", plus walking-access, walking-dominance, and scheduled-bus feasibility filters"
-               if cfg["task"] == "SFBS" else "")
-        ),
-        "bus_filters_enabled": cfg["task"] == "SFBS",
-        "poi_count": len(json.loads(poi_path.read_text())["features"]),
-        "distance_method": "Directed OSM shortest path weighted by length in metres",
-        "inputs_sha256": {
-            str(path.resolve().relative_to(ROOT) if path.resolve().is_relative_to(ROOT)
-                else path.resolve()): sha256(path)
-            for path in in_paths
-        },
-        "pool_sha256": sha256(pool_path),
-        "csv_sha256": sha256(csv_path),
-        "operations_sha256": sha256(operations_path),
-    }
-    write_json(request_path("metadata", instance_dir), meta)
+    write_requests_csv(request_path("csv", instance_dir), pool["requests"], cfg["task"])
+    write_json(request_path("operations", instance_dir), operations)
+    parameters_path = request_path("parameters", instance_dir)
+    settings = [
+        f"task = {json.dumps(cfg['task'])}",
+        f"map = {json.dumps(graph_name)}",
+        f"busline = {json.dumps(busline_name)}",
+        f"effective_seed = {cfg['seed']}",
+        f"debug = {str(cfg.get('debug', False)).lower()}",
+    ]
+    for path in (CFG_PATH, MAPS_CFG_PATH):
+        settings.extend(("", f"# {path.relative_to(ROOT)}", path.read_text(encoding="utf-8").rstrip()))
+    other_mode = "sfbs" if mode == "darp" else "darp"
+    for path in (FILTERS_PATH, OPERATIONS_PATH):
+        source = path.read_text(encoding="utf-8")
+        start = source.index(f"[{mode}")
+        end = source.find(f"[{other_mode}", start)
+        section = source[start:end if end != -1 else None].splitlines()
+        while section and (not section[-1].strip() or section[-1].lstrip().startswith("#")):
+            section.pop()
+        settings.extend(("", f"# {path.relative_to(ROOT)}", "\n".join(section)))
+    profile_name = attributes["profile"]
+    settings.extend(("", f"# {VEHICLES_PATH.relative_to(ROOT)}", f"[profiles.{profile_name}]"))
+    for name, value in profiles[profile_name].items():
+        if isinstance(value, dict):
+            rendered = "{ " + ", ".join(f"{key} = {json.dumps(item)}" for key, item in value.items()) + " }"
+        else:
+            rendered = json.dumps(value, ensure_ascii=False)
+        settings.append(f"{name} = {rendered}")
+    parameters_path.write_text("\n".join(settings) + "\n", encoding="utf-8")
     return pool_path

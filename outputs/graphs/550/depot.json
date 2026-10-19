@@ -1,13 +1,13 @@
 {
-  "name": "Depot Sales-Lentz Bascharage",
+  "name": "Depot Emile Weber Bettembourg",
   "original_point": [
-    49.568613,
-    5.922762
+    49.50278,
+    6.09103
   ],
-  "drive_node_id": 9466184571,
+  "drive_node_id": 25921461,
   "drive_point": [
-    49.5072647,
-    6.0599412
+    49.5034383,
+    6.0895724
   ],
-  "snap_distance_m": 12021.657424607507
+  "snap_distance_m": 128.20574919020154
 }

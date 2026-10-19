@@ -10,6 +10,5 @@ data/requests/*
 outputs/*
 !outputs/graphs/
 !outputs/requests/
-outputs/requests/*
 !outputs/requests/README.md
 src/.deprecrated_demand_gen

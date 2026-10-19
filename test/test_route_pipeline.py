@@ -1,6 +1,5 @@
 """Exercise a non-550 route through GTFS, stop places, and demand settings."""
 
-import hashlib
 import csv
 import json
 from contextlib import redirect_stdout
@@ -10,6 +9,7 @@ import re
 import subprocess
 import sys
 from tempfile import TemporaryDirectory
+import tomllib
 from types import SimpleNamespace
 from unittest.mock import patch
 import zipfile
@@ -118,37 +118,45 @@ def test_route_pipeline():
             side_effect=lambda task, graph_name: create_request_dir(
                 task, graph_name, requests_dir),
         ), patch.object(sys, "argv", ["generate.py", "SFBS", "--map", "550",
-                                       "--busline", "605"]):
+                                       "--busline", "605", "--seed", "43"]):
             generate.main()
         assert sample.call_args.args[0]["busline_name"] == "605"
         assert sample.call_args.args[1:] == (graph_path("area", area_dir), poi_path)
         instance_dir = requests_dir / "sfbs_550_0001"
         assert request_path("pool", instance_dir).is_file()
-        meta = json.loads(request_path("metadata", instance_dir).read_text())
-        assert (meta["candidate_count"], meta["busline"], meta["graph"]) == (100, "605", "550")
-        assert (meta["mean_candidate_count"], meta["prebooked_probability"]) == (100, 0.5)
-        assert meta["dynamic_time_stamp_distribution"] == {
-            "type": "poisson", "rate_per_hour": 12.5}
-        assert meta["prebooked_earliest_departure_distribution"] == {
-            "type": "poisson", "rate_per_hour": 12.5}
-        assert (meta["simulation_start_s"], meta["simulation_end_s"],
-                meta["demand_start_s"]) == (28800, 43200, cfg["demand_start_s"])
+        assert sample.call_args.args[0]["seed"] == 43
         assert {path.relative_to(instance_dir).as_posix() for path in instance_dir.rglob("*")
                 if path.is_file()} == {
-            "requests.json", "requests.csv", "operations.json", "requests_metadata.json",
+            "requests.json", "requests.csv", "operations.json", "parameters.txt",
         }
+        parameters_path = request_path("parameters", instance_dir)
+        parameters = parameters_path.read_text()
+        assert 'task = "SFBS"\nmap = "550"\nbusline = "605"\neffective_seed = 43' in parameters
+        for path in (generate.CFG_PATH, generate.MAPS_CFG_PATH):
+            assert f"# {path.relative_to(ROOT)}\n{path.read_text().rstrip()}" in parameters
+        filter_marker = f"# {generate.FILTERS_PATH.relative_to(ROOT)}\n"
+        operation_marker = f"# {generate.OPERATION_CFG_PATH.relative_to(ROOT)}\n"
+        vehicle_marker = f"# {generate.VEHICLE_CFG_PATH.relative_to(ROOT)}\n"
+        filter_section = parameters.split(filter_marker, 1)[1].split(operation_marker, 1)[0]
+        operation_section = parameters.split(operation_marker, 1)[1].split(vehicle_marker, 1)[0]
+        assert tomllib.loads(filter_section) == {"sfbs": tomllib.loads(generate.FILTERS_PATH.read_text())["sfbs"]}
+        assert tomllib.loads(operation_section) == {"sfbs": tomllib.loads(generate.OPERATION_CFG_PATH.read_text())["sfbs"]}
+        assert "[darp" not in parameters
         operations = json.loads(request_path("operations", instance_dir).read_text())
         assert set(operations) == {"sfbs"}
-        assert operations["sfbs"]["start_time"] == "7:00:00"
+        assert "start_time" not in operations["sfbs"]
+        assert "end_time" not in operations["sfbs"]
         assert operations["sfbs"]["average_speed_mps"] == 6.111111111111111
         assert operations["sfbs"]["vehicle_count"] == 6
-        assert operations["sfbs"]["vehicle_type"] == "evobus_396_nmc_na_hybrid"
-        assert operations["sfbs"]["vehicle"]["manufacturer"] == "Evobus eCitaro"
-        assert meta["operations_sha256"] == hashlib.sha256(
-            request_path("operations", instance_dir).read_bytes()).hexdigest()
+        operation_cfg = tomllib.loads(generate.OPERATION_CFG_PATH.read_text())
+        vehicle_cfg = tomllib.loads(generate.VEHICLE_CFG_PATH.read_text())
+        profile = operation_cfg["sfbs"]["attribute"]["profile"]
+        assert operations["sfbs"]["vehicle_type"] == profile
+        assert operations["sfbs"]["vehicle"] == vehicle_cfg["profiles"][profile]
+        vehicle_section = parameters.split(f"[profiles.{profile}]\n", 1)[1]
+        assert tomllib.loads(f"[profiles.{profile}]\n{vehicle_section}")["profiles"][profile] == operations["sfbs"]["vehicle"]
+        assert parameters.count("[profiles.") == 1
         assert list(csv.DictReader(request_path("csv", instance_dir).open(newline=""))) == []
-        assert meta["csv_sha256"] == hashlib.sha256(
-            request_path("csv", instance_dir).read_bytes()).hexdigest()
 
 
 def test_generate_demand_command():
@@ -300,10 +308,11 @@ def test_generate_without_busline():
         ), redirect_stdout(output):
             generate.main()
         instance_dir = data_dir / "requests/darp_Esch_0001"
-        meta = json.loads(request_path("metadata", instance_dir).read_text())
-        assert meta["busline"] is None
-        assert meta["bus_filters_enabled"] is False
-        assert all("buslines" not in path for path in meta["inputs_sha256"])
+        assert not request_path("metadata", instance_dir).exists()
+        parameters = request_path("parameters", instance_dir).read_text()
+        assert 'busline = null' in parameters
+        assert "[darp.attribute]" in parameters
+        assert "[sfbs" not in parameters
         assert json.loads(request_path("pool", instance_dir).read_text()) == pool
         with request_path("csv", instance_dir).open(newline="") as file:
             rows = list(csv.DictReader(file))

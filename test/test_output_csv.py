@@ -7,7 +7,7 @@ import sys
 from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from src.reqreate.adapters.pool_output import write_requests_csv
+from src.reqreate.adapters.pool_output import write_pool, write_requests_csv
 
 
 def test_output_csv():
@@ -34,5 +34,18 @@ def test_output_csv():
         assert "originnode_drive" not in row
 
 
+def test_darp_parameters():
+    with TemporaryDirectory() as directory:
+        write_pool({"task": "DARP", "seed": 42}, None, "Esch", Path(directory),
+                   {"num_data:": 0, "requests": {}})
+        parameters = (Path(directory) / "parameters.txt").read_text()
+        assert "[darp]" in parameters
+        assert "[darp.attribute]" in parameters
+        assert "[darp.operation]" not in parameters
+        assert "[sfbs" not in parameters
+        assert parameters.count("[profiles.") == 1
+
+
 if __name__ == "__main__":
     test_output_csv()
+    test_darp_parameters()

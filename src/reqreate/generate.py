@@ -345,14 +345,13 @@ def main():
         parser.error(str(exc))
     if args.seed is not None:
         cfg["seed"] = args.seed
-    route_dir = busline_dir(busline_name) if busline_name is not None else None
+    cfg["debug"] = args.debug
     area_dir = graph_dir(graph_name)
     area_path = graph_path("area", area_dir)
     poi_path = graph_path("pois", area_dir)
     pool = generate(cfg, area_path, poi_path)
     instance_dir = create_request_dir(cfg["task"], graph_name)
-    pool_path = write_pool(cfg, busline_name, graph_name, route_dir, area_dir,
-                           instance_dir, pool)
+    pool_path = write_pool(cfg, busline_name, graph_name, instance_dir, pool)
     print(f"Wrote {len(pool['requests'])} REQreate requests to {pool_path}")
 
 

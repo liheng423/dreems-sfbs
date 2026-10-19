@@ -34,8 +34,9 @@ GRAPH_CSV_PRIORITY = {
 REQUEST_FILES = {
     "pool": "requests.json",
     "csv": "requests.csv",
-    "metadata": "requests_metadata.json",
+    "metadata": "requests_metadata.json",  # Read old instances only.
     "operations": "operations.json",
+    "parameters": "parameters.txt",
 }
 REQUEST_OUTPUT_FIELDS = (
     "reqid", "is_prebooked", "lead_time", "time_stamp", "earliest_departure",

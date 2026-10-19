@@ -124,7 +124,9 @@ def save_area(geometry, out_dir, service_geometry=None):
     pois = crawl_pois(service, tags)
     write_area(mapping(service), graphs, out_dir)
     write_json(graph_path("pois", out_dir), {"features": pois})
-    save_depot(graphs["drive"], out_dir, map_config["locations"]["depot"])
+    locations = map_config["locations"]
+    save_depot(graphs["drive"], out_dir,
+               locations.get("depots", {}).get(out_dir.name, locations["depot"]))
     return out_dir
 
 

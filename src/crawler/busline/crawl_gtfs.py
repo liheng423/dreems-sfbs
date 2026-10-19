@@ -21,16 +21,10 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
 
-DEFAULT_GTFS_URL = (
-    "https://download.data.public.lu/resources/horaires-et-arrets-des-transport-publics-gtfs/"
-    "20261001-055928/gtfs-20260930-20261212.zip"
-)
-DEFAULT_SERVICE_DATE = "2026-10-06"
-LICENSE = "Creative Commons Attribution 4.0"
-
-
-def read_table(archive: zipfile.ZipFile, filename: str) -> List[dict]:
-    """Read a required GTFS CSV table while preserving text fields."""
+def read_table(archive: zipfile.ZipFile, filename: str, *, optional=False) -> List[dict]:
+    """Read a GTFS CSV table while preserving text fields."""
+    if optional and filename not in archive.namelist():
+        return []
     text = archive.read(filename).decode("utf-8-sig")
     return list(csv.DictReader(io.StringIO(text)))
 
@@ -67,6 +61,12 @@ def time_seconds(value: str) -> Optional[int]:
     return hours * 3600 + minutes * 60 + seconds
 
 
+def format_time(seconds: int) -> str:
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+
 def stop_event(row: dict) -> dict:
     """Preserve separate arrival and departure times when a bus dwells."""
     arrival = row.get("arrival_time", "")
@@ -89,9 +89,39 @@ def stop_event(row: dict) -> dict:
     }
 
 
-def load_archive(path: Optional[Path], url: str) -> tuple[bytes, str]:
-    if path:
+def complete_stop_times(rows: List[dict]) -> List[dict]:
+    """Interpolate untimed intermediate stops between scheduled stop times."""
+    rows = [dict(row) for row in rows]
+    timed = [i for i, row in enumerate(rows)
+             if row.get("arrival_time") or row.get("departure_time")]
+    if not timed or timed[0] != 0 or timed[-1] != len(rows) - 1:
+        raise ValueError("A trip must have times at its first and last stops")
+    for left, right in zip(timed, timed[1:]):
+        if right == left + 1:
+            continue
+        start = time_seconds(rows[left].get("departure_time") or rows[left].get("arrival_time"))
+        end = time_seconds(rows[right].get("arrival_time") or rows[right].get("departure_time"))
+        if end < start:
+            raise ValueError("Trip stop times must be ordered")
+        distances = [row.get("shape_dist_traveled", "") for row in rows[left:right + 1]]
+        if all(distances):
+            positions = [float(value) for value in distances]
+            if any(a >= b for a, b in zip(positions, positions[1:])):
+                positions = list(range(right - left + 1))
+        else:
+            positions = list(range(right - left + 1))
+        span = positions[-1] - positions[0]
+        for i in range(left + 1, right):
+            seconds = round(start + (end - start) * (positions[i - left] - positions[0]) / span)
+            rows[i]["arrival_time"] = rows[i]["departure_time"] = format_time(seconds)
+    return rows
+
+
+def load_archive(path: Optional[Path], url: Optional[str]) -> tuple[bytes, str]:
+    if path is not None:
         return path.read_bytes(), path.name
+    if url is None:
+        raise ValueError("Pass --gtfs-zip or --gtfs-url")
     request = urllib.request.Request(url, headers={"User-Agent": "dreems-busline-crawler/1.0"})
     with urllib.request.urlopen(request, timeout=90) as response:
         return response.read(), url.rsplit("/", 1)[-1]
@@ -101,9 +131,10 @@ def crawl(
     archive_bytes: bytes,
     archive_name: str,
     source_url: str,
-    route_short_name: str,
+    route_short_name: Optional[str],
     service_date: dt.date,
     route_id: Optional[str] = None,
+    license_name: str = "",
 ) -> dict:
     digest = hashlib.sha256(archive_bytes).hexdigest()
     with zipfile.ZipFile(io.BytesIO(archive_bytes)) as archive:
@@ -111,18 +142,25 @@ def crawl(
         matches = [
             row
             for row in routes
-            if row.get("route_short_name") == route_short_name
+            if (route_short_name is None or row.get("route_short_name") == route_short_name)
             and (route_id is None or row.get("route_id") == route_id)
         ]
         if len(matches) != 1:
             raise ValueError(
-                f"Expected one route for short name {route_short_name!r}; found {len(matches)}. "
-                "Pass --route-id when the feed has multiple matching route IDs."
+                f"Expected one route for short name {route_short_name!r} and ID {route_id!r}; "
+                f"found {len(matches)}. Pass --route-id to disambiguate."
             )
         route = matches[0]
 
-        calendar_rows = read_table(archive, "calendar.txt")
-        calendar_date_rows = read_table(archive, "calendar_dates.txt")
+        calendar_rows = read_table(archive, "calendar.txt", optional=True)
+        calendar_date_rows = read_table(archive, "calendar_dates.txt", optional=True)
+        if not calendar_rows and not calendar_date_rows:
+            raise ValueError("GTFS feed needs calendar.txt or calendar_dates.txt")
+        agencies = read_table(archive, "agency.txt", optional=True)
+        feed_info = read_table(archive, "feed_info.txt", optional=True)
+        feed_info = feed_info[0] if feed_info else {}
+        agency = next((row for row in agencies if row.get("agency_id") == route.get("agency_id")),
+                      agencies[0] if len(agencies) == 1 else {})
         services = active_services(calendar_rows, calendar_date_rows, service_date)
         route_trips = [
             row
@@ -133,21 +171,50 @@ def crawl(
         trips = [row for row in route_trips if row["service_id"] in services]
         trip_ids = {row["trip_id"] for row in trips}
         trip_stops: Dict[str, List[dict]] = defaultdict(list)
-        for row in read_table(archive, "stop_times.txt"):
-            if row["trip_id"] in trip_ids:
-                trip_stops[row["trip_id"]].append(row)
+        with archive.open("stop_times.txt") as raw:
+            for row in csv.DictReader(io.TextIOWrapper(raw, encoding="utf-8-sig")):
+                if row["trip_id"] in trip_ids:
+                    trip_stops[row["trip_id"]].append(row)
         stop_table = {row["stop_id"]: row for row in read_table(archive, "stops.txt")}
+        frequency_rows = [row for row in read_table(archive, "frequencies.txt", optional=True)
+                          if row["trip_id"] in trip_ids]
 
     if not trips:
         raise ValueError(
-            f"Route {route_short_name} has no trips active on {service_date.isoformat()}"
+            f"Route {route.get('route_short_name') or route['route_id']} has no trips active "
+            f"on {service_date.isoformat()}"
         )
 
+    frequencies = defaultdict(list)
+    for row in frequency_rows:
+        if row.get("exact_times", "0") != "1":
+            raise ValueError("Selected route has frequency-based service without exact departures")
+        frequencies[row["trip_id"]].append(row)
     grouped = defaultdict(list)
     for trip in trips:
-        events = sorted(trip_stops[trip["trip_id"]], key=lambda row: int(row["stop_sequence"]))
+        events = complete_stop_times(sorted(trip_stops[trip["trip_id"]],
+                                            key=lambda row: int(row["stop_sequence"])))
         signature = tuple(row["stop_id"] for row in events)
-        grouped[(trip.get("direction_id", ""), signature)].append((trip, events))
+        key = trip.get("direction_id", ""), signature
+        if trip["trip_id"] not in frequencies:
+            grouped[key].append((trip, events))
+            continue
+        template_start = time_seconds(events[0]["departure_time"] or events[0]["arrival_time"])
+        for frequency in frequencies[trip["trip_id"]]:
+            start = time_seconds(frequency["start_time"])
+            end = time_seconds(frequency["end_time"])
+            headway = int(frequency["headway_secs"])
+            if headway <= 0 or end <= start:
+                raise ValueError("Invalid frequencies.txt time range or headway")
+            for departure in range(start, end, headway):
+                offset = departure - template_start
+                shifted = [{**event, **{
+                    field: format_time(time_seconds(event[field]) + offset)
+                    for field in ("arrival_time", "departure_time")
+                    if event.get(field)
+                }} for event in events]
+                expanded_trip = {**trip, "trip_id": f"{trip['trip_id']}@{departure}"}
+                grouped[key].append((expanded_trip, shifted))
 
     patterns = []
     used_stop_ids = set()
@@ -210,23 +277,28 @@ def crawl(
 
     starts = [pattern["service_period"]["first_departure_seconds"] for pattern in patterns]
     ends = [pattern["service_period"]["last_arrival_seconds"] for pattern in patterns]
-    feed_start = min((row["start_date"] for row in calendar_rows), default="")
-    feed_end = max((row["end_date"] for row in calendar_rows), default="")
+    feed_start = feed_info.get("feed_start_date") or min(
+        [row["start_date"] for row in calendar_rows] +
+        [row["date"] for row in calendar_date_rows if row["exception_type"] == "1"], default="")
+    feed_end = feed_info.get("feed_end_date") or max(
+        [row["end_date"] for row in calendar_rows] +
+        [row["date"] for row in calendar_date_rows if row["exception_type"] == "1"], default="")
     return {
         "schema_version": 1,
         "source": {
-            "producer": "Administration des transports publics, Luxembourg",
-            "dataset": "Horaires et arrêts des transport publics (GTFS)",
-            "license": LICENSE,
+            "producer": feed_info.get("feed_publisher_name") or agency.get("agency_name", ""),
+            "dataset": "GTFS Schedule",
+            "license": license_name,
             "source_url": source_url,
             "archive_name": archive_name,
             "archive_sha256": digest,
             "feed_service_range": [feed_start, feed_end],
+            "agency_timezone": agency.get("agency_timezone", ""),
         },
         "service_date": service_date.isoformat(),
         "route": {
             "route_id": route["route_id"],
-            "route_short_name": route_short_name,
+            "route_short_name": route.get("route_short_name", ""),
             "route_long_name": route.get("route_long_name", ""),
             "route_type": route.get("route_type", ""),
         },
@@ -273,28 +345,35 @@ def main() -> None:
     sys.path.insert(0, str(root))
     from src.output_adapters import busline_dir, busline_path, write_json
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--route", required=True)
-    parser.add_argument("--route-id")
-    parser.add_argument("--service-date", default=DEFAULT_SERVICE_DATE)
-    parser.add_argument("--gtfs-url", default=DEFAULT_GTFS_URL)
-    parser.add_argument("--gtfs-zip", type=Path, help="Use a previously downloaded GTFS ZIP")
+    parser.add_argument("--route", help="GTFS route_short_name")
+    parser.add_argument("--route-id", help="GTFS route_id; can replace or disambiguate --route")
+    parser.add_argument("--name", help="Output folder name (for example tec-12)")
+    parser.add_argument("--service-date", required=True, help="GTFS service day, YYYY-MM-DD")
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--gtfs-url", help="Download a GTFS Schedule ZIP")
+    source.add_argument("--gtfs-zip", type=Path, help="Use a local GTFS Schedule ZIP")
+    parser.add_argument("--source-url", default="", help="Original URL when using --gtfs-zip")
+    parser.add_argument("--license", default="", help="Dataset license, if known")
     parser.add_argument("--mandatory-stop-id", action="append", default=[],
                         help="Mark an additional GTFS stop ID as mandatory")
     parser.add_argument("--output", type=Path, help="Override the businfo.json path")
     parser.add_argument("--stops-output", type=Path, help="Override the stops.json path")
     args = parser.parse_args()
+    if not (args.route or args.route_id):
+        parser.error("Pass --route or --route-id")
 
     service_date = dt.date.fromisoformat(args.service_date)
     archive_bytes, archive_name = load_archive(args.gtfs_zip, args.gtfs_url)
     result = crawl(
         archive_bytes,
         archive_name,
-        args.gtfs_url,
+        args.gtfs_url or args.source_url,
         args.route,
         service_date,
         args.route_id,
+        args.license,
     )
-    route_dir = busline_dir(args.route)
+    route_dir = busline_dir(args.name or result["route"]["route_short_name"] or result["route"]["route_id"])
     businfo_path = args.output or busline_path("businfo", route_dir)
     stops_path = args.stops_output or (businfo_path.with_name("stops.json") if args.output
                                        else busline_path("stops", route_dir))

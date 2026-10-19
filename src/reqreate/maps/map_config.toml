@@ -17,3 +17,8 @@ columns = 50
 
 [locations]
 depot = { "name" = "Depot Sales-Lentz Bascharage", "lat" = 49.568613, "lon" = 5.922762 }
+
+# Route 550 uses Emile Weber's Bettembourg vehicle depot at 120 Z.A.E. Wolser A.
+# Address: https://map.geoportail.lu/addresses/Bettembourg/Z.A.E.%20WOLSER%20A/120/?lang=fr
+[locations.depots]
+"550" = { "name" = "Depot Emile Weber Bettembourg", "lat" = 49.502780, "lon" = 6.091030 }

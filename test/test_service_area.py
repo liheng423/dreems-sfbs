@@ -89,6 +89,11 @@ def test_save_area():
             path.unlink()
         service_area.save_area(geometry, graph_dir)
         assert {path: path.read_bytes() for path in csv_paths} == original_csvs
+        route_dir = graph_dir.parent / "550"
+        service_area.save_area(geometry, route_dir)
+        route_depot = json.loads(graph_path("depot", route_dir).read_text())
+        assert route_depot["name"] == "Depot Emile Weber Bettembourg"
+        assert route_depot["original_point"] == [49.502780, 6.091030]
 
 
 def test_distinct_operation_and_service_areas():

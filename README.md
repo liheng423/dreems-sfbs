@@ -1,127 +1,112 @@
-# DREEMS-SFBS
+# Overview
 
-## Overview
+DREEMS-SFBS generates synthetic passenger requests for Semi-Flex Bus (SFBS) and Dial-a-Ride Problem (DARP) services.
 
-Generate **synthetic** passenger requests for a chosen area and. Draw its service area on an OSM map, then generate either Semi-Flex Bus (**SFBS**) requests constrained by bus stops and timetables or Dial-and-Ride (**DAR**) requests without a bus route.
+Features:
 
-This repo consists of the following features: 
-- Select area of interest anywhere in the world to retrieve driving graph and Points of Interest (POIs).
-- Automatic synthetic demand generation based on POIs and REQreate.
-- Parameters fully tunable.
-- Both simple visualization and interactive visualization available for debugging and demonstration.
-- **Generate Realistic Graph and Synthetic Requests Data** that are **Ready to use** for downstream optimization algorithms.  
+- 🗺️ Draw an **operation area** on an OpenStreetMap (OSM) map for the driving and walking road graphs. Set a **service area** inside it for points of interest (POIs) and passenger request origins and destinations.
+- 🎲 Generate POI-based requests with REQreate, using bus stops and timetables for SFBS or no bus route for DARP.
+- ⚙️ Tune demand, filters, and vehicle settings through configuration files.
+- 🔎 Inspect road graph previews and explore requests in an interactive browser viewer.
+- 📤 Export graphs and request instances in GraphML, JSON, and CSV for downstream optimization.
 
 ## Input and Output Data
 
 ### Inputs
-- [SFBS ONLY] Bus stop and schedule information (See ...file).
-- Select an area of interest with embedded area selector (See Quick start)
-- Parameters to set up the generation algorithm. 
+
+- An operation area for road networks and a service area inside it for POIs and request endpoints, selected in the browser map.
+- Demand settings in [request_gen.toml](src/reqreate/request_gen.toml), plus [map](src/reqreate/maps/map_config.toml), [filter](src/reqreate/filters/filters.toml), and [operation](src/reqreate/operation/operation_profile.toml) settings.
+- For SFBS, GTFS stops and schedules saved under `data/buslines/<route>/` by [crawl_busline.py](crawl_busline.py).
 
 ### Outputs
-- Driving and walking graph data in `.graphml` and `.csv` formats.
-- 
 
-
+- Driving and walking graphs in GraphML and CSV, plus the selected area and POIs, under `outputs/graphs/<map>/`.
+- One JSON and CSV request pool per run under `outputs/requests/<task>_<map>_<number>/`, such as `outputs/requests/darp_my_area_0001/`.
 
 ## Quick start
 
-Use Python 3.12 and `uv` from the repository root:
+Use Python 3.12 and `uv` from the repository root. Install the dependencies into the Python environment you will use for the commands below:
 
 ```bash
 uv pip install --python python -r requirements.txt
 python check_dependencies.py
-python crawl_busline.py --route 550
-python main.py select-area 550 --busline 550
-python main.py generate-demand SFBS --map 550 --busline 550
+```
+
+To create a new map, run:
+
+```bash
+python main.py select-area my_area
+```
+
+In the browser, draw the **operation area** to download its road networks. The **service area** initially matches it; adjust the service area inside it if requests and POIs should cover a smaller region. Click **Save**, wait for the download to finish, then stop the area selector with Ctrl+C.
+
+Generate a DARP instance and open the viewer:
+
+```bash
+python main.py generate-demand DARP --map my_area
 python main.py visualize
 ```
 
-Route 550 uses the crawler's default Luxembourg GTFS feed and service date. In the `select-area` browser page, draw the operation area, adjust the service area inside it, and click **Save** before generating demand. For another route, including one in Belgium, replace the feed, date, route, and map name:
+For SFBS, use a map and route with saved GTFS data. The repository includes map and route `550`:
 
 ```bash
-python crawl_busline.py --gtfs-zip path/to/feed.zip --service-date YYYY-MM-DD --route ROUTE
-python main.py select-area MAP --busline ROUTE
-python main.py generate-demand SFBS --map MAP --busline ROUTE
+python main.py generate-demand SFBS --map 550 --busline 550
 ```
 
-Use `--route-id ID` if the GTFS feed has multiple routes with the same short name. For demand without a bus timetable, run `python main.py generate-demand DARP --map MAP`. Add `--times N` to generate N instances. Results go to `outputs/requests/`; the viewer opens them with the saved map and busline data. Area selection needs OSM access. The published `reqreate==0.1.1` may fail with NumPy 2.x during generation; see the bundled [patch](src/reqreate/instance_generator.patch).
+### Plot a request map
+
+From the repository root, choose a saved map and request instance by folder name. Either command saves one PNG under `visualizations/` showing requests, the road network, POIs, depot, and service area. SFBS maps also show the selected bus route as straight links between consecutive GTFS stops; the feed snapshot does not store the route's road geometry.
+
+```bash
+python visualize_requests.py --map Esch --instance darp_Esch_0001
+julia visualize_requests.jl --map Esch --instance darp_Esch_0001
+python visualize_requests.py --map 550 --instance sfbs_550_0001
+```
+
+For Julia, install `JSON3` and `Luxor` once with `julia -e 'using Pkg; Pkg.add(["JSON3", "Luxor"])'`.
+
+For another route, use [crawl_busline.py](crawl_busline.py) to save its GTFS stops and schedule, then pass `--busline NAME` when selecting an area to display its stops. Add `--times N` to a generation command for N instances. Selecting a new area requires OSM access. The published `reqreate==0.1.1` may fail with NumPy 2.x during generation; see the bundled [patch](src/reqreate/instance_generator.patch).
+
+### [SFBS Only] Importing an Existing Bus Line
+
+The input format follows [GTFS Schedule ZIP](https://gtfs.org/documentation/schedule/reference/) standard. Choose a service date covered by the feed and a route's `route_short_name` or `route_id` from `routes.txt` (`route_type=3` for a standard bus route). From the repository root, run:
+
+```bash
+python crawl_busline.py --gtfs-zip path/to/feed.zip --service-date 2026-10-19 --route 12 --name tec-12
+```
+
+Replace the example path, date, route, and output name with values from your feed. For a downloadable feed, use `--gtfs-url URL` in place of `--gtfs-zip path/to/feed.zip`. Use `--route-id ID` instead of `--route 12` if the feed has no short name, or add it when several routes share that name. `--name` sets the folder under `data/buslines/`; use an operator prefix such as `tec-12` when route numbers may overlap. If omitted, the folder uses the route's short name or ID. For a local ZIP, `--source-url URL` records its original source; `--license TEXT` records the feed's license when known.
+
+The crawler writes `data/buslines/<name>/businfo.json` with the selected day's stops, trip times, and route patterns, plus `stops.json` for REQreate. 
+
+For example, to import the timetable for Luxembourg bus route 550, run:
+```
+python crawl_busline.py \
+  --gtfs-url "https://download.data.public.lu/resources/horaires-et-arrets-des-transport-publics-gtfs/20261015-054835/gtfs-20261014-20261212.zip" \
+  --service-date 2026-10-19 \
+  --route 550 \
+  --name lu-550 \
+  --license "Creative Commons Attribution 4.0"
+```
+
+For other feeds, consult an open-data portal such as [Belgian Mobility Open Data](https://data.belgianmobility.io/en/data.html).
 
 ## How requests are calculated
 
-- Set `simulation.start`, `demand_start`, `end`, arrival rates, lead times, and stop windows in [request_gen.toml](src/reqreate/request_gen.toml). Clock settings use `HH:MM[:SS]`; generated request times use seconds from the service day's midnight. The current simulation runs 08:00–12:00.
-- Dynamic and prebooked candidate counts are independent Poisson draws: `rate_per_hour × window_hours` gives each expected count. Dynamic requests sample an appearance time between `start` and `end`, then add lead time for `earliest_departure`. Prebooked requests sample `earliest_departure` between `demand_start` and `end`, then subtract lead time for appearance; a negative appearance time means the previous day.
-- REQreate samples origins and destinations within the saved service area using OSM POIs, configured distance and direction, and the road graph. `direct_distance` is the shortest directed driving path; `direct_travel_time = int(direct_distance / vehicle_speed)`, with speed from [operation_profile.toml](src/reqreate/operation/operation_profile.toml).
-- `pickup_from = earliest_departure`; `pickup_to = pickup_from + pickup_window`. `dropoff_to = pickup_to + ceil(direct_travel_time × detour_factor) + service_time`; `dropoff_from = dropoff_to - dropoff_window`. `latest_arrival = dropoff_to`. Requests finishing after `end` are rejected.
-- Both tasks require valid area, minimum road distance, and positive travel time. SFBS also requires reachable stops and a scheduled trip that fits the passenger's time limits. Rejected candidates are resampled when `retry_if_filtered = true`. See [output field definitions](#request-fields) for the full field list and units.
+[request_gen.toml](src/reqreate/request_gen.toml) sets arrival rates, lead times, and time windows; [operation_profile.toml](src/reqreate/operation/operation_profile.toml) sets vehicle speed and detour factor. The generator then:
 
-## Project structure
-
-| Path | Purpose |
-| --- | --- |
-| `crawl_busline.py`, `src/crawler/` | Read GTFS; save routes, stops, service areas, OSM graphs, and POIs. |
-| `main.py`, `src/reqreate/` | Run demand generation, filters, and calculations; configure them in `*.toml`. |
-| `data/buslines/` | Saved GTFS route data. |
-| `outputs/graphs/`, `outputs/requests/` | Saved maps and generated request JSON/CSV with metadata. |
-| `interactive_visualizer/` | Browser viewer for generated results. |
-
-## Saved road graphs
-
-Each `outputs/graphs/<map>/` folder contains the selected `service_area.geojson`, `pois.json`, `depot.json`, and two road networks. `drive.graphml` and `walk.graphml` are the complete OSMnx graphs used by demand generation. The matching `drive_nodes.csv`, `drive_edges.csv`, `walk_nodes.csv`, and `walk_edges.csv` are tables of those same graphs for spreadsheet or data-frame use. The graphs cover the selected operation area; the GeoJSON boundary is the service area.
-
-Saving a map with `python main.py select-area <map>` writes the GraphML and CSV files together. Saving the same map again regenerates all four CSVs alongside the new GraphML files.
-
-Both formats use the original OSM node IDs: a nodes CSV `osmid` matches its GraphML node ID and the `u` and `v` endpoints in the corresponding edges CSV.
-
-Each nodes CSV has one row per graph node. Each edges CSV has one row per **directed** edge, including separate rows for parallel edges. Route planning columns come first in the order shown below. Remaining OSM attributes appear afterward, alphabetically; their presence varies by map and network. A blank cell means that attribute was absent for that row. Values containing commas are quoted using standard CSV rules. OSMnx list attributes appear as Python-style lists, and geometry uses WKT with coordinates in longitude, latitude order. Use GraphML when graph-level metadata or original attribute types matter.
-
-### Route planning columns
-
-| File | Columns, in order | Use |
-| --- | --- | --- |
-| Nodes | `osmid`, `x`, `y`, `geometry` | Original OSM node ID; longitude and latitude in decimal degrees; WKT point for mapping. `osmid` matches edge endpoints and the GraphML node ID. |
-| Edges | `u`, `v`, `key`, `length`, `geometry` | Source and target node IDs, parallel-edge key, length in metres for routing cost, and WKT path for mapping. Use `(u, v, key)` to identify an edge. |
-| Edges, when present | `highway`, `maxspeed`, `access`, `oneway` | Road or path class, posted speed, access restrictions, and OSM direction tag. The edge direction is already encoded by `u` and `v`. |
-
-### Additional OSM details
-
-| Column | Meaning |
-| --- | --- |
-| `street_count` in nodes | Number of physical streets connected to the node, as computed by OSMnx. |
-| `osmid` in edges | OSM way ID, or a list of way IDs when a simplified edge combines ways. |
-| `name`, `ref` | OSM road or path name and route reference. |
-| `reversed` | Whether OSMnx reversed the original OSM way direction. |
-| Other columns, such as `lanes`, `bridge`, `tunnel`, `width`, `junction`, `service` | Optional OSM attributes; they may contain a single value or a list. |
-
-For example, join `drive_edges.csv.u` to `drive_nodes.csv.osmid` for the start coordinate, and join `v` for the end coordinate. Use the `walk_` files the same way.
-
-## Generated demand outputs
-
-`python main.py generate-demand ...` creates one `outputs/requests/<task>_<map>_<number>/` directory per run. `data/buslines/` and `outputs/graphs/` supply its inputs. Earlier runs under `data/requests/` are legacy data and are not moved by the generator. See [graph CSV fields](#route-planning-columns) for the saved road networks.
-
-Each run contains:
-
-| File | Contents |
-| --- | --- |
-| `requests.json` | `{ "num_data:": N, "requests": { "<id>": request, ... } }`; request IDs are strings in the map. |
-| `requests.csv` | One row per request, including a header when N is zero. Uses UTF-8 and standard CSV quoting. Coordinate arrays are JSON text such as `"[49.5, 6.1]"` inside a CSV cell. Extra `--debug` fields are appended after the standard columns in alphabetical order. |
-| [`operations.json`](#operations) | One object keyed by task (`darp` or `sfbs`) with the selected operating and vehicle profile. |
-| [`requests_metadata.json`](#metadata) | Run settings, software versions, input hashes, and SHA-256 hashes of `requests.json`, `requests.csv`, and `operations.json`. |
-
-Request times are seconds relative to the service day; negative `time_stamp` means a prebooked request appeared on the previous day. Coordinate arrays use `[latitude, longitude]` in decimal degrees. Empty CSV cells mean that a field was absent or null in that request. The CSV and JSON contain the same request values, with arrays serialized as JSON text in CSV. A dash (—) in the Unit column means the field is an ID, label, Boolean, ratio, or other unitless value.
-
-The methods below follow [`generate.py`](src/reqreate/generate.py), [`area_network.py`](src/reqreate/maps/area_network.py), [`filters.py`](src/reqreate/filters/filters.py), and [`pool_output.py`](src/reqreate/adapters/pool_output.py). Configuration comes from [`request_gen.toml`](src/reqreate/request_gen.toml), [`operation_profile.toml`](src/reqreate/operation/operation_profile.toml), and [`filters.toml`](src/reqreate/filters/filters.toml).
-
-The generator draws separate Poisson counts for dynamic and prebooked requests. Given those counts, it samples dynamic appearance times uniformly in the simulation window and prebooked departure times uniformly from `demand_start` to simulation end. REQreate samples locations using saved POIs, POI-density zones, and configured radial distance and direction. Candidates must pass the service-area, minimum-driving-distance, positive-travel-time, and time-window checks. SFBS additionally requires stop access, a trip that is not dominated by walking, and a feasible scheduled bus. With `retry_if_filtered = true`, a rejected request is resampled under the same candidate ID (up to 1,000 attempts); otherwise it is dropped. Only retained requests are written.
+1. Draws independent Poisson counts for dynamic and prebooked requests. Dynamic requests sample an appearance time; prebooked requests sample an earliest departure time. Lead time connects the two.
+2. Samples origins and destinations within the service area using OSM POIs, estimates driving time from the directed road graph, and sets pickup and dropoff windows.
+3. Keeps requests that meet area, distance, and time limits. SFBS also checks walking and bus timetable feasibility. With `retry_if_filtered = true`, rejected candidates are resampled.
 
 ### Time axis
 
-Numeric time points such as `time_stamp`, `earliest_departure`, and the window boundaries use **seconds since the service day's midnight**. Durations such as `lead_time`, `direct_travel_time`, `service_time`, and the sampled pickup and dropoff window lengths are also seconds, but they are intervals rather than clock positions. A negative `time_stamp` refers to the preceding day. `operations.json` stores a separate operating period as clock strings; it does not set the demand simulation boundaries.
-
-The following **illustrative dynamic request** uses a 5-minute lead time, a 15-minute pickup window, 10 minutes of direct driving, a 1.5 detour factor, 30 seconds of stop service, and a 15-minute dropoff window. The axis shows clock positions; the calculations underneath show how each position is obtained.
+Request times are seconds from service-day midnight. The formulas below show how appearance, pickup, and dropoff times are calculated; `service_time` is sampled per stop and must fit both time windows. This illustrative dynamic request uses a 5-minute lead time, a 15-minute pickup window, 10 minutes of direct driving, a 1.5 detour factor, 30 seconds of stop service, and a 15-minute dropoff window.
 
 ```text
 Time since service-day midnight →
+
+## Dynamic Requests:
 
 seconds     32400       32700             33600   33630             34530
 clock       09:00       09:05             09:20   09:20:30          09:35:30
@@ -140,92 +125,96 @@ dynamic:   time_stamp          = sampled appearance time       = 32400
 pickup:    pickup_from         = earliest_departure           = 32700
            pickup_to           = pickup_from + pickup_window  = 32700 + 900 = 33600
 drive:     direct_travel_time  = int(direct_distance / vehicle_speed_mps) = 600
-dropoff:   dropoff_to          = pickup_to + ceil(600 × 1.5) + 30 = 34530
+dropoff:   dropoff_to          = pickup_to + ceil(direct_travel_time × detour_factor) + service_time
+                                   = 33600 + ceil(600 × 1.5) + 30 = 34530
            dropoff_from        = dropoff_to - dropoff_window  = 34530 - 900 = 33630
 deadline:  latest_arrival      = dropoff_to                    = 34530
 
+## Prebooked:
+
 Same 09:05 earliest departure, but PREBOOKED with a 10-hour lead time:
            earliest_departure = sampled departure time       = 32700
-           time_stamp         = earliest_departure - 36000   = -3300
+           time_stamp         = earliest_departure - lead_time = 32700 - 36000 = -3300
            -3300 seconds means 23:05 on the PREVIOUS day.
 ```
 
-| Time concept | Source or calculation | What it limits |
+See [Request Outputs](#request-outputs) for the saved field definitions.
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| `crawl_busline.py`, `src/crawler/` | Read GTFS; save routes, stops, service areas, OSM graphs, and POIs. |
+| `main.py`, `src/reqreate/` | Run demand generation, filters, and calculations; configure them in `*.toml`. |
+| `data/buslines/` | Saved GTFS route data. |
+| `outputs/graphs/`, `outputs/requests/` | Saved maps and generated request JSON/CSV with parameters. |
+| `interactive_visualizer/` | Browser viewer for generated results. |
+
+# Configurations
+
+Edit these TOML files before running `generate-demand`:
+
+1. [request_gen.toml](src/reqreate/request_gen.toml): Set `simulation.start`, `end`, and `demand_start` as `HH:MM:SS` times. Set the two `rate_per_hour` values for dynamic and prebooked demand. The `lt_*`, `pickup_timewindow`, `dropoff_timewindow`, and `service_time` values are in seconds; `radial_distance` is in metres. For a fixed value, use `type = "uniform"` with `scale = 0`. Set `seed` for repeatable runs and `retry_if_filtered` to choose whether rejected requests are resampled until the number of requests reaches the preset.
+2. [map_config.toml](src/reqreate/maps/map_config.toml): Choose OSM `poi_tags` to collect when saving a map, set `method_pois.rows` and `columns` for the POI sampling grid, and set `locations.depot` with a default name, latitude, and longitude. Add a map name under `[locations.depots]` to override it for one map. After changing `poi_tags` for an existing map, run `python main.py recrawl-pois MAP` to update its saved POIs. Save the area again if you change the depot.
+3. [veh_profile.toml](src/reqreate/operation/veh_profile.toml): Use an existing `[profiles.NAME]` or add one with `battery_capacity_kwh`, `passenger_capacity`, and `reference_kwh_per_km`. Add `relative_increase_pct` entries only for temperature cases you intend to select.
+4. [operation_profile.toml](src/reqreate/operation/operation_profile.toml): Edit `[darp.attribute]` or `[sfbs.attribute]` for the task you run. Set `vehicle_speed` in m/s, `detour_factor` (at least 1), `num_of_vehicles`, and `profile` to a `NAME` in `veh_profile.toml`. Use `temperature_case = "reference_20_22_c"` for the unadjusted energy rate, or an `at_*_c` key present in that vehicle's `relative_increase_pct`. Request sampling times come from `request_gen.toml`.
+
+See [vehicle profile details](src/reqreate/operation/README.md) for the supplied energy values.
+
+# Outputs
+
+## Saved road graphs
+
+Each `outputs/graphs/<map>/` folder contains the selected `service_area.geojson`, `pois.json`, `depot.json`, and two road networks. `drive.graphml` and `walk.graphml` are the complete OSMnx graphs used by demand generation. The matching csvs are tables of those same graphs for spreadsheet or data-frame use. The graphs (graphml) cover the selected operation area; the GeoJSON boundary is the service area.
+
+Saving a map with `python main.py select-area <map>` writes the GraphML and CSV files together. Saving the same map again regenerates all four CSVs alongside the new GraphML files.
+
+Both formats use the original OSM node IDs: a nodes CSV `osmid` matches its GraphML node ID and the `u` and `v` endpoints in the corresponding edges CSV. *Since the number of IDs in OSM could be extremely large, it's encouraged to re-enumerate the node IDs in downstream tasks.*
+
+
+
+### Route planning columns
+
+| File | Columns, in order | Use |
 | --- | --- | --- |
-| Simulation start/end | `simulation.start` and `simulation.end` in `request_gen.toml`, converted from clock strings to seconds. | Dynamic appearance times are drawn inside this interval; retained requests must finish by simulation end. |
-| Demand start | `simulation.demand_start` in `request_gen.toml`, converted to seconds. | Prebooked earliest departures are drawn from here to simulation end; every retained request must have `earliest_departure >= demand_start`. |
-| Appearance and lead time | Dynamic: draw `time_stamp`, then add the sampled `lead_time`. Prebooked: draw `earliest_departure`, then subtract `lead_time`. | Prebooked requests are retained only if their appearance is before simulation start. |
-| Pickup window | Starts at `earliest_departure`; its length is sampled from `pickup_timewindow`. | Pickup service must fit inside `[pickup_from, pickup_to]`. |
-| Direct driving time | `int(direct_distance / vehicle_speed_mps)`. | Supplies the road travel estimate used in the dropoff deadline. |
-| Dropoff window | Ends at `pickup_to + ceil(direct_travel_time × detour_factor) + service_time`; its length is sampled from `dropoff_timewindow`. | Dropoff service must fit inside `[dropoff_from, dropoff_to]`; `latest_arrival` equals `dropoff_to`. |
+| Nodes | `osmid`, `x`, `y`, `geometry` | Original OSM node ID; longitude and latitude in decimal degrees; WKT point for mapping. `osmid` matches edge endpoints and the GraphML node ID. |
+| Edges | `u`, `v`, `key`, `length`, `geometry` | Source and target node IDs, parallel-edge key, length in metres for routing cost, and WKT path for mapping. Use `(u, v, key)` to identify an edge. |
+| Edges, when present | `highway`, `maxspeed`, `access`, `oneway` | Road or path class, posted speed, access restrictions, and OSM direction tag. The edge direction is already encoded by `u` and `v`. |
 
-The pickup and dropoff windows may **overlap**. `dropoff_from` is calculated from `dropoff_to`; it is not calculated by adding driving time to `pickup_from`. The generator checks that `service_time` fits within each window. These windows are bounds for scheduling, not predicted actual pickup and dropoff times.
+### Additional details
 
-### Request fields
+These fields are less relevant to the optimization problems but useful when working with OSMnx.
 
-| Field | Unit | How generated |
-| --- | --- | --- |
-| `num_data:` | requests | Count of retained requests: `len(requests)`. |
-| `requests` | — | Map of retained requests, keyed by their candidate IDs as strings. Rejected IDs may leave gaps when retries are disabled. |
-| `reqid` | — | Candidate index assigned to REQreate; matches the JSON request key. |
-| `is_prebooked` | — | `1` for a candidate drawn from the prebooked Poisson count, `0` for one drawn from the dynamic count; flags are shuffled before generation. |
-| `lead_time` | s | REQreate samples `lt_prebooked` or `lt_dynamic` from the configured distribution according to `is_prebooked`. |
-| `time_stamp` | s from service-day midnight | Dynamic: sampled appearance time. Prebooked: `earliest_departure - lead_time`; may be negative. |
-| `earliest_departure` | s from service-day midnight | Prebooked: sampled departure time. Dynamic: `time_stamp + lead_time`. |
-| `pickup_from`, `pickup_to` | s from service-day midnight | `pickup_from = earliest_departure`; `pickup_to = pickup_from +` a sampled `pickup_timewindow` duration. Pickup service must finish by `pickup_to`. |
-| `dropoff_from`, `dropoff_to` | s from service-day midnight | `dropoff_to = pickup_to + ceil(direct_travel_time × detour_factor) + service_time`; `dropoff_from = dropoff_to -` a sampled `dropoff_timewindow` duration. |
-| `latest_arrival` | s from service-day midnight | Set equal to `dropoff_to`. |
-| `service_time` | s | Duration sampled from the configured `service_time` distribution; applied at each stop. |
-| `origin`, `destination` | decimal degrees `[latitude, longitude]` | REQreate samples trip endpoints from the saved service-area and POI-density zones using configured radial distance and direction. |
-| `originnode_drive`, `destinationnode_drive` | — | DARP only: drive-graph node IDs to which REQreate snaps the sampled endpoints. |
-| `origin_drive_point`, `destination_drive_point` | decimal degrees `[latitude, longitude]` | Read the snapped nodes' `y` (latitude) and `x` (longitude) coordinates from `drive.graphml`. |
-| `direct_distance` | m | REQreate's `dist_drive(origin, destination)`: directed shortest path between snapped drive nodes, weighted by edge `length`. |
-| `direct_travel_time` | s | `int(direct_distance / vehicle_speed_mps)` using the task's operation profile. |
-| `energy_kwh` | kWh | `(direct_distance / 1000) × reference_kwh_per_km × (1 + temperature_increase_pct / 100)`; the reference temperature case uses 0% increase. Walking energy is excluded. |
-| `boarding_stop_id`, `alighting_stop_id` | — | SFBS only: choose a GTFS stop pair with a feasible scheduled trip; minimize combined access walks, then prefer earlier bus arrival and departure. |
-| `boarding_walk_distance_m`, `alighting_walk_distance_m` | m | SFBS only: shortest paths on the undirected walk graph, plus straight-line connectors from the passenger and stop to their nearest graph nodes. |
-| `boarding_stop_point`, `alighting_stop_point` | decimal degrees `[latitude, longitude]` | SFBS only: copy the chosen stops' coordinates from the saved busline `stops.json`. |
+In the nodes file, `street_count` gives the number of physical streets connected to each node. In the edges file, `osmid` is the OSM way ID, or a list of IDs if a simplified edge combines multiple ways. `name` and `ref` give the road or path name and route reference, while `reversed` indicates whether OSMnx reversed the original way direction. Optional attributes such as `lanes`, `bridge`, `tunnel`, `width`, `junction`, and `service` may contain a single value or a list. To get an edge’s start and end coordinates, join `drive_edges.csv.u` and `drive_edges.csv.v` to `drive_nodes.csv.osmid`, respectively; use the `walk_` files the same way.
 
-`--debug` retains REQreate's extra sampling fields. `lt_dynamic` and `lt_prebooked` are sampled lead times in seconds from `request_gen.toml`; `lead_time` selects one of them. Other REQreate debug fields follow their upstream definitions.
+## Generated demand outputs
+
+Each `generate-demand` run writes a new numbered directory at `outputs/requests/<task>_<map>_<number>/` (for example, `darp_my_area_0001`). DARP uses the saved map in `outputs/graphs/`; SFBS also uses its route data in `data/buslines/`.
+
+| File | What it contains |
+| --- | --- |
+| `requests.json` | A request pool shaped as `{"num_data:": N, "requests": {"<id>": {...}}}`. The unusual `num_data:` key includes the colon. IDs are strings and can have gaps if filtering removes candidates. |
+| `requests.csv` | The same requests, the same as `requests.json` content-wise. |
+| `operations.json` | One `darp` or `sfbs` operation setting with the selected operating hours, vehicle settings, and full vehicle profile. |
+| `parameters.txt` | The demand and map settings, only the selected task's filter and operation settings, and only its vehicle profile. The task, map, busline, effective seed, and debug setting appear at the top. |
+
+The JSON and CSV request values use the same fields. CSV is UTF-8 with standard quoting; Times and durations are in seconds. Coordinates are `[latitude, longitude]` in decimal degrees.
+
+## Request Outputs
+
+Time fields and their calculations are explained in the [Time axis](#time-axis).
+
+| Field | Meaning |
+| --- | --- |
+| `reqid`, `is_prebooked` | Request ID (the `requests.json` key); `1` = prebooked, `0` = dynamic. |
+| `time_stamp`, `lead_time`, `earliest_departure`, `pickup_*`, `dropoff_*`, `latest_arrival`, `service_time`, `direct_travel_time` | Appearance, lead time, departure, pickup and dropoff windows, deadline, stop service duration, and direct driving time. |
+| `origin`, `destination` | Sampled passenger locations, possibly off the road network. |
+| `origin_drive_point`, `destination_drive_point`; `originnode_drive`, `destinationnode_drive` | Nearest driving graph nodes to the passenger locations: coordinates for both tasks, node IDs saved only for DARP. SFBS still uses the nodes internally to calculate `direct_distance`. |
+| `direct_distance`, `energy_kwh` | Directed shortest road distance between those nodes (metres); estimated energy = `(direct_distance / 1000) × reference_kwh_per_km × (1 + temperature_increase_pct / 100)`. The reference case uses 0% increase. |
+| `boarding_stop_id`, `alighting_stop_id`; `boarding_stop_point`, `alighting_stop_point`; `boarding_walk_distance_m`, `alighting_walk_distance_m` | SFBS only: selected GTFS stops, their coordinates, and walking distances (including connectors to the walking graph). The bus stops are separate from the passenger locations and driving graph points. |
+
+Only requests passing area, distance, travel time, and time window checks are saved; SFBS also checks walking access and timetable feasibility. `retry_if_filtered = true` resamples rejected candidates under the same ID up to 1,000 times; otherwise they are dropped. `--debug` retains extra sampling fields such as `lt_dynamic` and `lt_prebooked`.
 
 ### Operations
 
-Each run's `operations.json` has one top-level `darp` or `sfbs` object. The writer copies its values from the selected task in [`operation_profile.toml`](src/reqreate/operation/operation_profile.toml) and its vehicle entry from [`veh_profile.toml`](src/reqreate/operation/veh_profile.toml). The clock strings below describe the **operation profile**; request generation uses the separate simulation boundaries documented in [the time axis](#time-axis).
-
-| Field | Unit | How generated |
-| --- | --- | --- |
-| `start_time`, `end_time` | clock time (`H:MM:SS`) | Copy the task's `operation.start` and `operation.end` strings. |
-| `average_speed_mps` | m/s | Copy `attribute.vehicle_speed`; used to calculate `direct_travel_time`. |
-| `vehicle_count` | vehicles | Copy `attribute.num_of_vehicles`. |
-| `vehicle_type` | — | Copy `attribute.profile`, the vehicle profile name. |
-| `temperature_case` | — | Copy the configured temperature scenario label; `reference_20_22_c` denotes the 20–22 °C reference case. |
-| `vehicle` | mixed; see below | Copy the profile selected by `vehicle_type` from `veh_profile.toml`. |
-| `detour_factor` | — | Copy `attribute.detour_factor`; used to calculate `dropoff_to`. |
-
-Within `vehicle`, `battery_capacity_kwh` is kWh, `passenger_capacity` is passengers, `sample_buses` is buses, `reference_kwh_per_km` is kWh/km, and `relative_increase_pct` values are percent. Keys such as `at_0_c` indicate ambient temperature in °C. `manufacturer`, `battery_system`, `battery_type`, `bus_type`, and `heating_strategy` are unitless labels. Some profiles omit optional fields.
-
-### Metadata
-
-Each run's `requests_metadata.json` records the inputs and effective settings used to generate its requests. The `simulation_*_s` values describe **demand sampling**; the `start_time` and `end_time` strings in [`operations.json`](#operations) describe a separate operation profile. See [the time axis](#time-axis) for how request times are calculated. Fields are written by [`pool_output.py`](src/reqreate/adapters/pool_output.py).
-
-| Field | Unit | How generated |
-| --- | --- | --- |
-| `task`, `busline`, `graph` | — | Copy the command-line task, optional `--busline`, and `--map` selection. |
-| `seed` | — | Read from `request_gen.toml`, unless `--seed` overrides it; `--times N` increments it for each run. |
-| `generator` | — | Fixed description of the REQreate sampler and local time sampler. |
-| `python_version`, `package_versions` | — | Read the running Python version and installed package metadata when writing the run. |
-| `candidate_count` | attempts | Count calls to the REQreate candidate sampler, including retries. |
-| `mean_candidate_count` | requests | Sum each arrival rate × its sampling-window duration in hours; the expected Poisson candidate count. |
-| `request_count` | requests | Copy `num_data:` from the saved request pool. |
-| `prebooked_probability` | — (0–1) | Expected prebooked count divided by `mean_candidate_count`; 0 when the mean is 0. |
-| `dynamic_time_stamp_distribution`, `prebooked_earliest_departure_distribution` | mixed; see below | Copy the corresponding Poisson configuration objects from `request_gen.toml`. |
-| `simulation_start_s`, `simulation_end_s`, `demand_start_s` | s from service-day midnight | Parse `simulation.start`, `simulation.end`, and `simulation.demand_start` clock strings from `request_gen.toml`. |
-| `network_input`, `spatial_sampling`, `distance_method`, `travel_time_method` | — | Fixed method descriptions recorded by the writer; `spatial_sampling` adds the SFBS filters for SFBS runs. |
-| `vehicle_speed_mps` | m/s | Copy the selected task's `attribute.vehicle_speed`, also saved as `average_speed_mps` in `operations.json`. |
-| `detour_factor` | — | Copy the selected task's `attribute.detour_factor`, also saved in `operations.json`. |
-| `bus_filters_enabled` | — | `true` for SFBS, `false` for DARP. |
-| `poi_count` | POIs | Count features in the selected map's saved `pois.json`. |
-| `inputs_sha256` | — | Compute SHA-256 for the configuration files, selected graph files, and, for SFBS, busline `stops.json` and `businfo.json`. |
-| `pool_sha256`, `csv_sha256`, `operations_sha256` | — | Compute SHA-256 from the bytes of `requests.json`, `requests.csv`, and `operations.json` after writing them. |
-
-The distribution objects have a unitless `type` (currently `poisson`) and `rate_per_hour` in requests/hour; both values come directly from [`request_gen.toml`](src/reqreate/request_gen.toml).
+`operations.json` has one top-level key, `darp` or `sfbs`. Its `average_speed_mps`, `vehicle_count`, `vehicle_type`, `temperature_case`, and `detour_factor` come from that task's attributes in [operation_profile.toml](src/reqreate/operation/operation_profile.toml). `vehicle` contains the selected profile from [veh_profile.toml](src/reqreate/operation/veh_profile.toml), including battery capacity, passenger capacity, and reference energy consumption. Optional profile fields vary by vehicle.
