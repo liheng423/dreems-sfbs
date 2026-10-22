@@ -1,4 +1,4 @@
-"""Select a route's graph area, generate demand, or explore the results."""
+"""Select map areas or graph locations, generate demand, or explore results."""
 
 import argparse
 from functools import partial
@@ -13,6 +13,7 @@ import webbrowser
 ROOT = Path(__file__).resolve().parent
 COMMANDS = {
     "select-area": ROOT / "src/crawler/service_area/define_service_area.py",
+    "select-locations": ROOT / "src/locations/select_locations.py",
     "recrawl-pois": ROOT / "src/crawler/service_area/define_service_area.py",
     "generate-demand": ROOT / "src/reqreate/generate.py",
 }
@@ -52,6 +53,8 @@ def main():
     area = commands.add_parser("select-area")
     area.add_argument("map")
     area.add_argument("--busline")
+    locations = commands.add_parser("select-locations", help="Choose locations on an existing driving graph")
+    locations.add_argument("map")
     recrawl = commands.add_parser("recrawl-pois", help="Update POIs for a saved graph area")
     recrawl.add_argument("map")
     demand = commands.add_parser("generate-demand")
@@ -77,7 +80,7 @@ def main():
     step_args = ["--map", args.map]
     if args.command == "recrawl-pois":
         step_args.append("--recrawl-pois")
-    elif args.busline:
+    elif args.command == "select-area" and args.busline:
         step_args.extend(["--busline", args.busline])
     subprocess.run([sys.executable, str(COMMANDS[args.command]), *step_args], check=True)
 

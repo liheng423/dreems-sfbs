@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Select locations · __MAP__</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  body { margin: 0; height: 100vh; display: flex; flex-direction: column; font: 15px sans-serif; }
+  header { padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+  h1 { font-size: 18px; margin: 0; }
+  #counts, #status, #legend { font-size: 13px; }
+  #legend { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  #legend span { display: inline-flex; align-items: center; gap: 4px; }
+  #legend i, .location-node { width: 10px; height: 10px; box-sizing: border-box; border: 1px solid #526c63; border-radius: 50%; }
+  #legend i { display: inline-block; }
+  #map { flex: 1; min-height: 0; }
+  button { font: inherit; }
+</style>
+<header>
+  <h1>Graph locations · __MAP__</h1>
+  <span>Click a node and choose any combination of location types.</span>
+  <span id="legend"><span><i style="background:#174b9b"></i> Optional SFBS bus stops</span><span><i style="background:#b56a18"></i> DARP + SFBS parking</span><span><i style="background:#a33375"></i> Fixed charging stations</span></span>
+  <span id="counts"></span>
+  <button id="save" disabled>Save location CSVs</button>
+  <span id="status" role="status">Loading saved graph nodes…</span>
+</header>
+<div id="map" aria-label="Map of selectable driving graph nodes"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([49.61, 6.13], 10);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  const layer = L.featureGroup().addTo(map);
+  const counts = document.querySelector('#counts');
+  const save = document.querySelector('#save');
+  const status = document.querySelector('#status');
+  const names = {
+    optional_bus_stops: 'bus stops',
+    parking_locations: 'parking',
+    fixed_charging_stations: 'charging'
+  };
+  const colors = {
+    optional_bus_stops: '#174b9b',
+    parking_locations: '#b56a18',
+    fixed_charging_stations: '#a33375'
+  };
+  const markers = new Map();
+  let selected = Object.fromEntries(Object.keys(names).map(name => [name, new Set()]));
+
+  function updateNode(id) {
+    const chosen = Object.keys(names).filter(name => selected[name].has(id));
+    const section = 100 / chosen.length;
+    markers.get(id).getElement().style.background = chosen.length < 2
+      ? (chosen.length ? colors[chosen[0]] : '#dce8df')
+      : `conic-gradient(${chosen.map((name, index) =>
+        `${colors[name]} ${index * section}% ${(index + 1) * section}%`).join(', ')})`;
+    counts.textContent = Object.entries(names)
+      .map(([name, label]) => `${label}: ${selected[name].size}`).join(' · ');
+  }
+
+  function nodePopup(id) {
+    const popup = document.createElement('div');
+    const title = document.createElement('strong');
+    title.textContent = `Drive graph node ${id}`;
+    popup.append(title);
+    for (const [name, label] of Object.entries(names)) {
+      const row = document.createElement('label');
+      row.style.display = 'block';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = selected[name].has(id);
+      checkbox.onchange = () => {
+        if (checkbox.checked) selected[name].add(id);
+        else selected[name].delete(id);
+        updateNode(id);
+        save.disabled = false;
+      };
+      row.append(checkbox, ` ${label}`);
+      popup.append(row);
+    }
+    return popup;
+  }
+  save.onclick = async () => {
+    save.disabled = true;
+    status.textContent = 'Saving location CSVs…';
+    try {
+      const response = await fetch('/save', {method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(Object.fromEntries(Object.entries(selected)
+          .map(([name, ids]) => [name, [...ids]])))});
+      status.textContent = await response.text();
+      if (!response.ok) save.disabled = false;
+    } catch (error) {
+      status.textContent = error.message;
+      save.disabled = false;
+    }
+  };
+
+  async function load() {
+    const response = await fetch('/data');
+    if (!response.ok) throw new Error(await response.text());
+    const data = await response.json();
+    selected = Object.fromEntries(Object.keys(names)
+      .map(name => [name, new Set(data.locations[name])]));
+    for (const [id, lat, lon] of data.nodes) {
+      const point = [Number(lat), Number(lon)];
+      const marker = L.marker(point, {icon: L.divIcon({className: 'location-node',
+        iconSize: [10, 10], iconAnchor: [5, 5]})})
+        .bindPopup(() => nodePopup(id)).addTo(layer);
+      markers.set(id, marker);
+      updateNode(id);
+    }
+    status.textContent = `${markers.size} drive graph nodes available.`;
+    if (markers.size) map.fitBounds(layer.getBounds().pad(0.1));
+  }
+  load().catch(error => { status.textContent = error.message; });
+</script>
+</html>

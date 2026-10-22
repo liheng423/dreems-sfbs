@@ -49,6 +49,14 @@ python main.py select-area my_area
 
 In the browser, draw the **operation area** to download its road networks. The **service area** initially matches it; adjust the service area inside it if requests and POIs should cover a smaller region. Click **Save**, wait for the download to finish, then stop the area selector with Ctrl+C.
 
+To choose locations on an existing map's driving graph, run:
+
+```bash
+python main.py select-locations my_area
+```
+
+The separate location selector shows every driving graph node. Click a node and check any combination of **Optional SFBS bus stops**, **DARP + SFBS parking locations**, and **Fixed charging stations**. Every node circle is the same size; a node assigned to several types splits its circle into their colors. Click **Save location CSVs**; reopen this command to edit saved choices. Stop it with Ctrl+C.
+
 Generate a DARP instance and open the viewer:
 
 ```bash
@@ -179,6 +187,8 @@ See [vehicle profile details](src/reqreate/operation/README.md) for the supplied
 ## Saved road graphs
 
 Each `outputs/graphs/<map>/` folder contains the selected `service_area.geojson`, `pois.json`, `depot.json`, and two road networks. `drive.graphml` and `walk.graphml` are the complete OSMnx graphs used by demand generation. The matching csvs are tables of those same graphs for spreadsheet or data-frame use. The graphs (graphml) cover the selected operation area; the GeoJSON boundary is the service area.
+
+The separate `select-locations` command writes `optional_bus_stops.csv`, `parking_locations.csv`, and `fixed_charging_stations.csv` in the same folder. Each has `osmid,x,y` columns, using original driving graph node IDs, longitude, and latitude. A node may appear in more than one file. If the graph is regenerated, reopen the location selector to review and save the choices against its new nodes.
 
 Saving a map with `python main.py select-area <map>` writes the GraphML and CSV files together. Saving the same map again regenerates all four CSVs alongside the new GraphML files.
 
