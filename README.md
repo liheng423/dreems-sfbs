@@ -4,7 +4,7 @@ DREEMS-SFBS generates synthetic passenger requests for Semi-Flex Bus (SFBS) and 
 
 Features:
 
-- 🗺️ Draw an adreaon an OpenStreetMap (OSM) map for the driving and walking road graphs. Generate points of interest (POIs) and passenger request origins and destinations.
+- 🗺️ Draw an area on an OpenStreetMap (OSM) map for the driving and walking road graphs. Generate points of interest (POIs) and passenger request origins and destinations.
 - 🗺️ Retrieve POIs directly from OSM automatically. 
 - 🎲 Generate POI-based requests with REQreate (see the [REQreate paper](https://arxiv.org/abs/2208.12225) for more details), using bus stops and timetables for SFBS or no bus route for DAR.
 - ⚙️ Tune demand, filters, and vehicle settings through configuration files.
@@ -19,7 +19,7 @@ Features:
 
 - An **operation area** for road networks and a **service area** inside it for POIs and request endpoints, selected in the browser map.
 - Demand settings in [request_gen.toml](src/reqreate/request_gen.toml), plus [map](src/reqreate/maps/map_config.toml), [filter](src/reqreate/filters/filters.toml), and [operation](src/reqreate/operation/operation_profile.toml) settings.
-- For SFBS, GTFS stops and schedules saved under `outputs/buslines/<route>/` by [crawl_busline.py](crawl_busline.py). Notes for KU Leuven: what values do we need for bus schedule and the data format?
+- For SFBS, GTFS stops and schedules are saved under `outputs/buslines/<route>/` by [crawl_busline.py](crawl_busline.py). Notes: what values do we need for the bus schedule and the data format?
 
 ### Outputs
 
@@ -67,7 +67,7 @@ This modification will be saved in `outputs/buslines/<route>/stops.json` and `bu
 
 In the other mode, click graph nodes to select parking and charging locations; their IDs and coordinates come from the saved graph. Click **Save changes** to write both types to `outputs/graphs/<map>/locations.csv`. When a bus route is selected, bus stop edits are saved separately in the route's `stops.json` and `buslines.json`.
 
-This modification will be saevd in `outputs/graphs/<map>/locations.csv`
+This modification will be saved in `outputs/graphs/<map>/locations.csv`
 
 Every selection, stop edit, route edit, mode change, and save attempt is appended to `outputs/graphs/<map>/select_locations.jsonl` with a UTC timestamp. Edits are logged when they happen, before **Save changes**; each saved state is recorded too.
 
@@ -253,7 +253,7 @@ Time fields and their calculations are explained in the [Time axis](#time-axis).
 | `direct_distance`, `energy_kwh` | Directed shortest road distance between those nodes (metres); estimated energy = `(direct_distance / 1000) × reference_kwh_per_km × (1 + temperature_increase_pct / 100)`. The reference case uses 0% increase. |
 | `boarding_stop_id`, `alighting_stop_id`; `boarding_stop_point`, `alighting_stop_point`; `boarding_walk_distance_m`, `alighting_walk_distance_m` | SFBS only: selected GTFS stops, their coordinates, and walking distances (including connectors to the walking graph). The bus stops are separate from the passenger locations and driving graph points. |
 
-Only requests passing area, distance, travel time, and time window checks are saved; SFBS also checks walking access and timetable feasibility. `retry_if_filtered = true` resamples rejected candidates under the same ID up to 1,000 times; otherwise they are dropped. `--debug` retains extra sampling fields such as `lt_dynamic` and `lt_prebooked`.
+Only requests passing area, distance, travel time, and time window checks are saved; SFBS also checks walking access and timetable feasibility. `retry_if_filtered = true` resamples rejected candidates under the same ID up to a maximum of 1,000 times; otherwise they are dropped. `--debug` retains extra sampling fields such as `lt_dynamic` and `lt_prebooked`.
 
 ### Operations
 
