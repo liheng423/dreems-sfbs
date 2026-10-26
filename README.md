@@ -48,7 +48,6 @@ In the browser, draw the **operation area** to download its road networks. The *
 
 ### Adding New Bus Stops and Charging Locations
 
-// TODO: Review this
 To choose locations on an existing map's driving graph, run:
 
 ```bash
@@ -59,13 +58,13 @@ python main.py select-locations my_area (--busline my_route)
 
 The location selector has **Bus line** and **Parking and charging** modes. To insert a bus stop, choose its direction, zoom into the route, click a pale graph-node circle, and click **Insert stop** in the popup. The button names the two stops it will go between. Then click **Save changes**. You can also drag a route-line midpoint onto a graph node. Clicking a midpoint alone does nothing, and a drag that misses a stop or graph node leaves the route unchanged. Click a stop to edit its class or GTFS description. The selected order is saved as `selected_stop_ids` in `buslines.json`; imported GTFS trip times remain in their original order.
 
-Caveat: The displayed sequence (especially for newly-added stops) do not change timetable feasibility; new stops need scheduled trip times before requests can board or alight there. In this case, please edit its timetable.
+Caveat: The displayed sequence (especially for newly-added stops) do not change timetable feasibility; new stops need scheduled trip times before requests can board or alight there. In this case, please edit its timetable json file.
 
 This modification will be saved in `outputs/buslines/<route>/stops.json` and `buslines.json`.
 
 #### Adding a new charging or parking location
 
-In the other mode, click graph nodes to select parking and charging locations; their IDs and coordinates come from the saved graph. Click **Save changes** to write both types to `outputs/graphs/<map>/locations.csv`. When a bus route is selected, bus stop edits are saved separately in the route's `stops.json` and `buslines.json`.
+Click graph nodes to select parking and charging locations; their IDs and coordinates come from the saved graph. Click **Save changes** to write both types to `outputs/graphs/<map>/locations.csv`. When a bus route is selected, bus stop edits are saved separately in the route's `stops.json` and `buslines.json`.
 
 This modification will be saved in `outputs/graphs/<map>/locations.csv`
 
