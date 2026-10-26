@@ -29,7 +29,7 @@ from filters.route_schedule import index_route_departures
 from maps.pois import load_pois, set_poi_zones
 from adapters.pool_output import write_pool
 from src.reqreate.operation.energy import consumption_kwh_per_km
-from src.output_adapters import (DARP_OUTPUT_FIELDS, GRAPH_FILES, SFBS_OUTPUT_FIELDS,
+from src.output_adapters import (DAR_OUTPUT_FIELDS, GRAPH_FILES, SFBS_OUTPUT_FIELDS,
                                  available_buslines, available_graphs, busline_dir,
                                  busline_path, create_request_dir, graph_dir, graph_path)
 
@@ -147,12 +147,12 @@ def set_request_times(req, prebooked, time, cfg):
 
 def load_config(task, busline_name=None):
     """Load the selected task's demand, operation, and filter settings."""
-    if task not in ("DARP", "SFBS"):
-        raise ValueError("task must be DARP or SFBS")
+    if task not in ("DAR", "SFBS"):
+        raise ValueError("task must be DAR or SFBS")
     if task == "SFBS" and not busline_name:
         raise ValueError("SFBS requires --busline")
-    if task == "DARP" and busline_name:
-        raise ValueError("DARP does not use --busline")
+    if task == "DAR" and busline_name:
+        raise ValueError("DAR does not use --busline")
     cfg = tomllib.loads(CFG_PATH.read_text())
     if not isinstance(cfg.get("retry_if_filtered", False), bool):
         raise ValueError("retry_if_filtered must be true or false")
@@ -294,7 +294,7 @@ def generate(cfg, area_path, poi_path):
     operation = tomllib.loads(OPERATION_CFG_PATH.read_text())[cfg["task"].lower()]["attribute"]
     profiles = tomllib.loads(VEHICLE_CFG_PATH.read_text())["profiles"]
     energy_rate = consumption_kwh_per_km({"scenario": operation, "profiles": profiles})
-    fields = SFBS_OUTPUT_FIELDS if cfg["task"] == "SFBS" else DARP_OUTPUT_FIELDS
+    fields = SFBS_OUTPUT_FIELDS if cfg["task"] == "SFBS" else DAR_OUTPUT_FIELDS
     for req in reqs.values():
         for role in ("origin", "destination"):
             node = req.get(f"{role}node_drive")
@@ -311,19 +311,19 @@ def generate(cfg, area_path, poi_path):
 
 
 def main():
-    """Generate a DARP or SFBS request instance on the selected map."""
+    """Generate a DAR or SFBS request instance on the selected map."""
     global DEBUG
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("task", choices=("DARP", "SFBS"))
+    parser.add_argument("task", choices=("DAR", "SFBS"))
     parser.add_argument("--map", required=True, help="Saved service-area map name")
-    parser.add_argument("--busline", help="Required for SFBS; unavailable for DARP")
+    parser.add_argument("--busline", help="Required for SFBS; unavailable for DAR")
     parser.add_argument("--debug", action="store_true", help="Include both sampled lead-time fields")
     parser.add_argument("--seed", type=int, help="Override the seed in request_gen.toml")
     args = parser.parse_args()
     if args.task == "SFBS" and not args.busline:
         parser.error("SFBS requires --busline")
-    if args.task == "DARP" and args.busline:
-        parser.error("DARP does not use --busline")
+    if args.task == "DAR" and args.busline:
+        parser.error("DAR does not use --busline")
     DEBUG = args.debug
     graph_names = available_graphs()
     if args.map not in graph_names:

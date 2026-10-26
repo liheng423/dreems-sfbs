@@ -1,4 +1,4 @@
-"""Check that DARP operation settings control request travel and arrival times."""
+"""Check that DAR operation settings control request travel and arrival times."""
 
 from pathlib import Path
 import sys
@@ -21,9 +21,9 @@ def main():
     """A changed profile must change road travel and derived arrival times."""
     with TemporaryDirectory() as directory:
         profile_path = Path(directory) / "operation_profile.toml"
-        profile_path.write_text("[darp.attribute]\nvehicle_speed = 10.0\ndetour_factor = 2.0\n")
+        profile_path.write_text("[dar.attribute]\nvehicle_speed = 10.0\ndetour_factor = 2.0\n")
         with patch.object(generate, "OPERATION_CFG_PATH", profile_path):
-            cfg = generate.load_config("DARP")
+            cfg = generate.load_config("DAR")
 
     assert cfg["vehicle_speed_mps"] == 10.0
     req = {"lead_time": 300, "direct_travel_time": 12}
@@ -44,7 +44,7 @@ def main():
     net = AreaNetwork("test", graph, graph, box(0, 0, 1, 1), pd.DataFrame())
     net.vehicle_speed_mps = cfg["vehicle_speed_mps"]
     assert net._return_estimated_travel_time_drive(1, 2) == 12
-    print("Validated DARP operation profile demand settings")
+    print("Validated DAR operation profile demand settings")
 
 
 if __name__ == "__main__":

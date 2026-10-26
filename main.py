@@ -59,7 +59,7 @@ def main():
     recrawl = commands.add_parser("recrawl-pois", help="Update POIs for a saved graph area")
     recrawl.add_argument("map")
     demand = commands.add_parser("generate-demand")
-    demand.add_argument("task", choices=("DARP", "SFBS"))
+    demand.add_argument("task", choices=("DAR", "SFBS"))
     demand.add_argument("--map", required=True)
     demand.add_argument("--busline")
     demand.add_argument("--debug", action="store_true")
@@ -69,8 +69,8 @@ def main():
     if args.command == "generate-demand":
         if args.task == "SFBS" and not args.busline:
             demand.error("SFBS requires --busline")
-        if args.task == "DARP" and args.busline:
-            demand.error("DARP does not use --busline")
+        if args.task == "DAR" and args.busline:
+            demand.error("DAR does not use --busline")
         if args.times < 1:
             demand.error("--times must be at least 1")
         generate_demand(args)

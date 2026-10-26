@@ -19,7 +19,7 @@ def test_requests_map():
         graph.mkdir(parents=True)
         (run / "requests.json").write_text(json.dumps({"requests": {
             "4": {"origin": [49.5, 6.0], "destination": [49.51, 6.01]}}}))
-        (run / "parameters.txt").write_text('task = "DARP"\nmap = "test"\nbusline = null\n')
+        (run / "parameters.txt").write_text('task = "DAR"\nmap = "test"\nbusline = null\n')
         (graph / "drive_nodes.csv").write_text(
             "osmid,x,y,geometry\n1,6.0,49.5,\n2,6.01,49.51,\n")
         (graph / "drive_edges.csv").write_text(

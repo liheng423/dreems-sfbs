@@ -1,36 +1,31 @@
 # Overview
 
-DREEMS-SFBS generates synthetic passenger requests for Semi-Flex Bus (SFBS) and Dial-a-Ride Problem (DARP, also as known as Dynamic Ride Sharing (DRS)) services.
+DREEMS-SFBS generates synthetic passenger requests for Semi-Flex Bus (SFBS) and Dial-a-Ride (DAR, also as known as Dynamic Ride Sharing (DRS)) services.
 
 Features:
 
-- 🗺️ Draw an **operation area** on an OpenStreetMap (OSM) map for the driving and walking road graphs. Set a **service area** inside it for points of interest (POIs) and passenger request origins and destinations.
-
-// TODO: (DEFINE HERE OPERATIONAL AND SERVICE)
-
+- 🗺️ Draw an adreaon an OpenStreetMap (OSM) map for the driving and walking road graphs. Generate points of interest (POIs) and passenger request origins and destinations.
 - 🗺️ Retrieve POIs directly from OSM automatically. 
-- 🎲 Generate POI-based requests with REQreate (see the [REQreate paper](https://arxiv.org/abs/2208.12225) for more details), using bus stops and timetables for SFBS or no bus route for DARP.
+- 🎲 Generate POI-based requests with REQreate (see the [REQreate paper](https://arxiv.org/abs/2208.12225) for more details), using bus stops and timetables for SFBS or no bus route for DAR.
 - ⚙️ Tune demand, filters, and vehicle settings through configuration files.
 - 🔎 Inspect road graph previews and explore requests in an interactive browser viewer.
 - 📤 Export graphs and request instances in GraphML, JSON, and CSV for downstream optimization.
 
-// TODO: We need to check [HOW TO TIMEABLE format in KU Leuven]
+
 
 ## Input and Output Data
 
 ### Inputs
 
-- An operation area for road networks and a service area inside it for POIs and request endpoints, selected in the browser map.
+- An **operation area** for road networks and a **service area** inside it for POIs and request endpoints, selected in the browser map.
 - Demand settings in [request_gen.toml](src/reqreate/request_gen.toml), plus [map](src/reqreate/maps/map_config.toml), [filter](src/reqreate/filters/filters.toml), and [operation](src/reqreate/operation/operation_profile.toml) settings.
-- For SFBS, GTFS stops and schedules saved under `outputs/buslines/<route>/` by [crawl_busline.py](crawl_busline.py).
+- For SFBS, GTFS stops and schedules saved under `outputs/buslines/<route>/` by [crawl_busline.py](crawl_busline.py). Notes for KU Leuven: what values do we need for bus schedule and the data format?
 
 ### Outputs
 
 - Driving and walking graphs in GraphML and CSV, plus the selected area and POIs, under `outputs/graphs/<map>/`.
 
-[WALKING GRAPH IS ONLY USED FOR SFBS (to bus)]
-
-- One JSON and CSV request pool (change the word) per run under `outputs/requests/<task>_<map>_<number>/`, such as `outputs/requests/darp_my_area_0001/`.
+- One JSON and CSV request pool (change the word) per run under `outputs/requests/<task>_<map>_<number>/`, such as `outputs/requests/dar_my_area_0001/`.
 
 ## Quick start
 
@@ -42,6 +37,7 @@ python check_dependencies.py
 ```
 
 ### Creating a New Map
+
 To create a new map, run:
 
 ```bash
@@ -51,21 +47,37 @@ python main.py select-area my_area
 In the browser, draw the **operation area** to download its road networks. The **service area** initially matches it; adjust the service area inside it if requests and POIs should cover a smaller region. Click **Save**, wait for the download to finish, then stop the area selector with Ctrl+C.
 
 ### Adding New Bus Stops and Charging Locations
+
 // TODO: Review this
 To choose locations on an existing map's driving graph, run:
 
 ```bash
-python main.py select-locations my_area --busline my_route
+python main.py select-locations my_area (--busline my_route)
 ```
 
-The location selector has **Bus line** and **Parking and charging** modes. To insert a bus stop, choose its direction, zoom into the route, click a pale graph-node circle, and click **Insert stop** in the popup. The button names the two stops it will go between. Then click **Save changes**. You can also drag a route-line midpoint onto a graph node; its handle is hidden until hovered, and [Leaflet-Geoman Free](https://geoman.io/docs/leaflet/modes/edit-mode) handles snapping. Clicking a midpoint alone does nothing, and a drag that misses a stop or graph node leaves the route unchanged. Click a stop to edit its class or GTFS description; stop IDs and coordinates are read-only. The selected order is saved as `selected_stop_ids` in `buslines.json`; imported GTFS trip times remain in their original order. In the other mode, click graph nodes to select parking and charging locations; their IDs and coordinates come from the saved graph. Saving writes the route's `stops.json` and `buslines.json` and the map's parking and charging CSVs. Omit `--busline` when the route name matches the map name, or when selecting only parking and charging locations. Stop classes and the displayed sequence do not change timetable feasibility; new stops need scheduled trip times before requests can board or alight there. Stop the selector with Ctrl+C.
+#### Adding a new bus stop
+
+The location selector has **Bus line** and **Parking and charging** modes. To insert a bus stop, choose its direction, zoom into the route, click a pale graph-node circle, and click **Insert stop** in the popup. The button names the two stops it will go between. Then click **Save changes**. You can also drag a route-line midpoint onto a graph node. Clicking a midpoint alone does nothing, and a drag that misses a stop or graph node leaves the route unchanged. Click a stop to edit its class or GTFS description. The selected order is saved as `selected_stop_ids` in `buslines.json`; imported GTFS trip times remain in their original order.
+
+Caveat: The displayed sequence (especially for newly-added stops) do not change timetable feasibility; new stops need scheduled trip times before requests can board or alight there. In this case, please edit its timetable.
+
+This modification will be saved in `outputs/buslines/<route>/stops.json` and `buslines.json`.
+
+#### Adding a new charging or parking location
+
+In the other mode, click graph nodes to select parking and charging locations; their IDs and coordinates come from the saved graph. Click **Save changes** to write both types to `outputs/graphs/<map>/locations.csv`. When a bus route is selected, bus stop edits are saved separately in the route's `stops.json` and `buslines.json`.
+
+This modification will be saevd in `outputs/graphs/<map>/locations.csv`
+
+Every selection, stop edit, route edit, mode change, and save attempt is appended to `outputs/graphs/<map>/select_locations.jsonl` with a UTC timestamp. Edits are logged when they happen, before **Save changes**; each saved state is recorded too.
+
 
 ### Generating Requests
 
-Generate a DARP instance and open the viewer:
+Generate a DAR instance and open the viewer:
 
 ```bash
-python main.py generate-demand DARP --map my_area
+python main.py generate-demand DAR --map my_area
 python main.py visualize
 ```
 
@@ -80,8 +92,8 @@ python main.py generate-demand SFBS --map 550 --busline 550
 From the repository root, choose a saved map and request instance by folder name. Either command saves one PNG under `visualizations/` showing requests, the road network, POIs, depot, and service area. SFBS maps also show the selected bus route as straight links between consecutive GTFS stops; the feed snapshot does not store the route's road geometry.
 
 ```bash
-python visualize_requests.py --map Esch --instance darp_Esch_0001
-julia visualize_requests.jl --map Esch --instance darp_Esch_0001
+python visualize_requests.py --map Esch --instance dar_Esch_0001
+julia visualize_requests.jl --map Esch --instance dar_Esch_0001
 python visualize_requests.py --map 550 --instance sfbs_550_0001
 ```
 
@@ -182,7 +194,7 @@ Edit these TOML files before running `generate-demand`:
 1. [request_gen.toml](src/reqreate/request_gen.toml): Set `simulation.start`, `end`, and `demand_start` as `HH:MM:SS` times. Set the two `rate_per_hour` values for dynamic and prebooked demand. The `lt_*`, `pickup_timewindow`, `dropoff_timewindow`, and `service_time` values are in seconds; `radial_distance` is in metres. For a fixed value, use `type = "uniform"` with `scale = 0`. Set `seed` for repeatable runs and `retry_if_filtered` to choose whether rejected requests are resampled until the number of requests reaches the preset. See [REQreate](https://arxiv.org/abs/2208.12225) for more details.
 2. [map_config.toml](src/reqreate/maps/map_config.toml): Choose OSM `poi_tags` to collect when saving a map, set `method_pois.cell_size_m` for the POI sampling grid (500 m by default), and set `locations.depot` with a default name, latitude, and longitude. Add a map name under `[locations.depots]` to override it for one map. After changing `poi_tags` for an existing map, run `python main.py recrawl-pois MAP` to update its saved POIs. Save the area again if you change the depot.
 3. [veh_profile.toml](src/reqreate/operation/veh_profile.toml): Use an existing `[profiles.NAME]` or add one with `battery_capacity_kwh`, `passenger_capacity`, and `reference_kwh_per_km`. Add `relative_increase_pct` entries only for temperature cases you intend to select.
-4. [operation_profile.toml](src/reqreate/operation/operation_profile.toml): Edit `[darp.attribute]` or `[sfbs.attribute]` for the task you run. Set `vehicle_speed` in m/s, `detour_factor` (at least 1), `num_of_vehicles`, and `profile` to a `NAME` in `veh_profile.toml`. Use `temperature_case = "reference_20_22_c"` for the unadjusted energy rate, or an `at_*_c` key present in that vehicle's `relative_increase_pct`. Request sampling times come from `request_gen.toml`.
+4. [operation_profile.toml](src/reqreate/operation/operation_profile.toml): Edit `[dar.attribute]` or `[sfbs.attribute]` for the task you run. Set `vehicle_speed` in m/s, `detour_factor` (at least 1), `num_of_vehicles`, and `profile` to a `NAME` in `veh_profile.toml`. Use `temperature_case = "reference_20_22_c"` for the unadjusted energy rate, or an `at_*_c` key present in that vehicle's `relative_increase_pct`. Request sampling times come from `request_gen.toml`.
 5. [c_truck_profile.toml](src/reqreate/operation/c_truck_profile.toml): Define mobile trucks that charge other vehicles. The included placeholder has separate traction and charging battery capacities in kWh, charging output power in kW, and driving energy use in kWh/km. Select it with `charging_truck_profile` and set `num_of_charging_trucks` in each task's `operation_profile.toml` attributes.
 
 See [vehicle profile details](src/reqreate/operation/README.md) for the supplied energy values.
@@ -193,7 +205,7 @@ See [vehicle profile details](src/reqreate/operation/README.md) for the supplied
 
 Each `outputs/graphs/<map>/` folder contains the selected `service_area.geojson`, `pois.json`, `depot.json`, and two road networks. `drive.graphml` and `walk.graphml` are the complete OSMnx graphs used by demand generation. The matching csvs are tables of those same graphs for spreadsheet or data-frame use. The graphs (graphml) cover the selected operation area; the GeoJSON boundary is the service area.
 
-The separate `select-locations` command writes `parking_locations.csv` and `fixed_charging_stations.csv` in the graph folder. Each has `osmid,x,y` columns, using original driving graph node IDs, longitude, and latitude. Bus stop choices and classes go into the selected route's `outputs/buslines/<route>/stops.json`. New graph-node stops use names `Stop_OSM_<osmid>`. If the graph is regenerated, reopen the location selector to review its saved choices against the new nodes.
+The separate `select-locations` command writes `locations.csv` in the graph folder. Its `type,osmid,x,y` columns identify parking or charging sites, using original driving graph node IDs, longitude, and latitude. Bus stop choices and classes go into the selected route's `outputs/buslines/<route>/stops.json`. New graph-node stops use names `Stop_OSM_<osmid>`. If the graph is regenerated, reopen the location selector to review its saved choices against the new nodes.
 
 Saving a map with `python main.py select-area <map>` writes the GraphML and CSV files together. Saving the same map again regenerates all four CSVs alongside the new GraphML files.
 
@@ -217,13 +229,13 @@ In the nodes file, `street_count` gives the number of physical streets connected
 
 ## Generated demand outputs
 
-Each `generate-demand` run writes a new numbered directory at `outputs/requests/<task>_<map>_<number>/` (for example, `darp_my_area_0001`). DARP uses the saved map in `outputs/graphs/`; SFBS also uses its route data in `outputs/buslines/`.
+Each `generate-demand` run writes a new numbered directory at `outputs/requests/<task>_<map>_<number>/` (for example, `dar_my_area_0001`). DAR uses the saved map in `outputs/graphs/`; SFBS also uses its route data in `outputs/buslines/`.
 
 | File | What it contains |
 | --- | --- |
 | `requests.json` | A request pool shaped as `{"num_data:": N, "requests": {"<id>": {...}}}`. The unusual `num_data:` key includes the colon. IDs are strings and can have gaps if filtering removes candidates. |
 | `requests.csv` | The same requests, the same as `requests.json` content-wise. |
-| `operations.json` | One `darp` or `sfbs` operation setting with the selected operating hours, vehicle settings, and full vehicle profile. |
+| `operations.json` | One `dar` or `sfbs` operation setting with the selected operating hours, vehicle settings, and full vehicle profile. |
 | `parameters.txt` | The demand and map settings, only the selected task's filter and operation settings, and only its vehicle profile. The task, map, busline, effective seed, and debug setting appear at the top. |
 
 The JSON and CSV request values use the same fields. CSV is UTF-8 with standard quoting; Times and durations are in seconds. Coordinates are `[latitude, longitude]` in decimal degrees.
@@ -237,7 +249,7 @@ Time fields and their calculations are explained in the [Time axis](#time-axis).
 | `reqid`, `is_prebooked` | Request ID (the `requests.json` key); `1` = prebooked, `0` = dynamic. |
 | `order_place_time`, `lead_time`, `earliest_departure`, `pickup_*`, `dropoff_*`, `latest_arrival`, `service_time`, `direct_travel_time` | Order placement, lead time, departure, pickup and dropoff windows, deadline, stop service duration, and direct driving time. |
 | `origin`, `destination` | Sampled passenger locations, possibly off the road network. |
-| `origin_drive_point`, `destination_drive_point`; `originnode_drive`, `destinationnode_drive` | Nearest driving graph nodes to the passenger locations: coordinates for both tasks, node IDs saved only for DARP. SFBS still uses the nodes internally to calculate `direct_distance`. |
+| `origin_drive_point`, `destination_drive_point`; `originnode_drive`, `destinationnode_drive` | Nearest driving graph nodes to the passenger locations: coordinates for both tasks, node IDs saved only for DAR. SFBS still uses the nodes internally to calculate `direct_distance`. |
 | `direct_distance`, `energy_kwh` | Directed shortest road distance between those nodes (metres); estimated energy = `(direct_distance / 1000) × reference_kwh_per_km × (1 + temperature_increase_pct / 100)`. The reference case uses 0% increase. |
 | `boarding_stop_id`, `alighting_stop_id`; `boarding_stop_point`, `alighting_stop_point`; `boarding_walk_distance_m`, `alighting_walk_distance_m` | SFBS only: selected GTFS stops, their coordinates, and walking distances (including connectors to the walking graph). The bus stops are separate from the passenger locations and driving graph points. |
 
@@ -245,17 +257,6 @@ Only requests passing area, distance, travel time, and time window checks are sa
 
 ### Operations
 
-`operations.json` has one top-level key, `darp` or `sfbs`. Its `average_speed_mps`, `vehicle_count`, `vehicle_type`, `temperature_case`, and `detour_factor` come from that task's attributes in [operation_profile.toml](src/reqreate/operation/operation_profile.toml). `vehicle` contains the selected profile from [veh_profile.toml](src/reqreate/operation/veh_profile.toml), including battery capacity, passenger capacity, and reference energy consumption. Optional profile fields vary by vehicle.
+`operations.json` has one top-level key, `dar` or `sfbs`. Its `average_speed_mps`, `vehicle_count`, `vehicle_type`, `temperature_case`, and `detour_factor` come from that task's attributes in [operation_profile.toml](src/reqreate/operation/operation_profile.toml). `vehicle` contains the selected profile from [veh_profile.toml](src/reqreate/operation/veh_profile.toml), including battery capacity, passenger capacity, and reference energy consumption. Optional profile fields vary by vehicle.
 
 `charging_trucks` contains the configured truck count, selected type, and the full profile from [c_truck_profile.toml](src/reqreate/operation/c_truck_profile.toml). These values are exported for downstream use; demand generation does not simulate charging.
-
-
-
-
-
-## TODO
-
-
-
-- ADD CHARGING STATIONS and Optional Stops and Parking Locations WITH GUI and exported in outputs
-- lead time

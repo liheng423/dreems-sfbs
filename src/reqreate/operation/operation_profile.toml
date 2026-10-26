@@ -1,4 +1,4 @@
-[darp.attribute]
+[dar.attribute]
 vehicle_speed = 6.111111111111111 # 22 km/h converted to m/s
 detour_factor = 1.5
 num_of_vehicles = 6

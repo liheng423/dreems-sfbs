@@ -29,7 +29,7 @@ def test_sfbs_saves_stop_endpoints_only():
 
 
 def test_demand_tasks():
-    for args in (["--map", "Esch"], ["DARP", "--map", "Esch", "--busline", "550"],
+    for args in (["--map", "Esch"], ["DAR", "--map", "Esch", "--busline", "550"],
                  ["SFBS", "--map", "Esch"]):
         result = subprocess.run([sys.executable, str(ROOT / "main.py"), "generate-demand", *args],
                                 capture_output=True, text=True)
@@ -42,20 +42,20 @@ def test_demand_tasks():
 
     with TemporaryDirectory() as directory:
         operations = Path(directory) / "operations.toml"
-        operations.write_text("[darp.attribute]\nvehicle_speed = 10\ndetour_factor = 1.5\n"
+        operations.write_text("[dar.attribute]\nvehicle_speed = 10\ndetour_factor = 1.5\n"
                               "[sfbs.attribute]\nvehicle_speed = 5\ndetour_factor = 2\n")
         filters = Path(directory) / "filters.toml"
-        filters.write_text("[darp]\nmax_walking_distance_m = 100\nwalking_speed_mps = 1\n"
-                           "[[darp.parameters]]\nname = 'min_distance'\nvalue = 100\n"
+        filters.write_text("[dar]\nmax_walking_distance_m = 100\nwalking_speed_mps = 1\n"
+                           "[[dar.parameters]]\nname = 'min_distance'\nvalue = 100\n"
                            "[sfbs]\nmax_walking_distance_m = 500\nwalking_speed_mps = 2\n"
                            "[[sfbs.parameters]]\nname = 'min_distance'\nvalue = 500\n")
         with patch.object(generate, "OPERATION_CFG_PATH", operations), patch.object(
             generate, "FILTERS_PATH", filters
         ), patch.object(generate, "busline_dir", return_value=ROOT / "outputs/buslines/550"):
-            darp = generate.load_config("DARP")
+            dar = generate.load_config("DAR")
             sfbs = generate.load_config("SFBS", "550")
-    assert (darp["vehicle_speed_mps"], darp["detour_factor"],
-            darp["parameters"][0]["value"], darp["request_filters"]) == (
+    assert (dar["vehicle_speed_mps"], dar["detour_factor"],
+            dar["parameters"][0]["value"], dar["request_filters"]) == (
                 10, 1.5, 100, BASE_REQUEST_FILTERS)
     assert (sfbs["vehicle_speed_mps"], sfbs["detour_factor"],
             sfbs["parameters"][0]["value"], sfbs["request_filters"]) == (

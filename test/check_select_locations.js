@@ -61,3 +61,19 @@ assert.equal(runInNewContext(`${shared}\nsfbsRoute(['A', 'C'], new Map([
   ['Stop_A', {name: 'Stop_A', class: 'mandatory', lat: 0, lon: 0}],
   ['Stop_C', {name: 'Stop_C', class: 'mandatory', lat: 0, lon: 2}]
 ])).segments[0].dashArray`), undefined);
+
+const logSource = html.match(/  function flushLogs[\s\S]*?(?=\n  function updateCounts)/)[0];
+const sent = [];
+const logContext = {pendingLogs: [], logging: null, session: 'browser-1', nextLog: 0,
+  status: {textContent: ''}, fetch: async (url, options) => {
+    sent.push({url, ...options});
+    return {ok: true};
+  }};
+const {logChange, flushLogs} = runInNewContext(`${logSource}\n({logChange, flushLogs})`, logContext);
+logChange({action: 'change_location', node: '1', after: true});
+flushLogs().then(() => {
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].url, '/log');
+  assert.equal(JSON.parse(sent[0].body).sequence, 1);
+  assert.equal(logContext.pendingLogs.length, 0);
+}).catch(error => { throw error; });

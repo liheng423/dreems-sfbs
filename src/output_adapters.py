@@ -48,7 +48,7 @@ REQUEST_OUTPUT_FIELDS = (
 )
 SFBS_OUTPUT_FIELDS = tuple(name for name in REQUEST_OUTPUT_FIELDS
                            if name not in ("originnode_drive", "destinationnode_drive"))
-DARP_OUTPUT_FIELDS = tuple(name for name in REQUEST_OUTPUT_FIELDS
+DAR_OUTPUT_FIELDS = tuple(name for name in REQUEST_OUTPUT_FIELDS
                            if not name.startswith(("boarding_", "alighting_")))
 
 

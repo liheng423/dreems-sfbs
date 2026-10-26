@@ -3,12 +3,14 @@
 
 import argparse
 import csv
+from datetime import datetime, timezone
 from html import escape
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import math
 from pathlib import Path
 import sys
+from threading import Lock
 import traceback
 import webbrowser
 
@@ -19,10 +21,24 @@ from src.output_adapters import busline_dir, busline_path, graph_dir, graph_path
 
 PAGE_PATH = Path(__file__).with_suffix(".html")
 ROUTE_ASSETS = ROOT / "shared"
-LOCATION_FILES = {
-    "parking_locations": "parking_locations.csv",
-    "fixed_charging_stations": "fixed_charging_stations.csv",
+LOCATION_TYPES = {
+    "parking_locations": "parking",
+    "fixed_charging_stations": "charging",
 }
+LEGACY_LOCATION_FILES = {kind: f"{kind}.csv" for kind in LOCATION_TYPES}
+LOG_FILE = "select_locations.jsonl"
+LOG_LOCK = Lock()
+LOG_ACTIONS = {"edit_stop_field", "edit_gtfs_field", "change_stop_class",
+               "remove_bus_stop", "insert_bus_stop", "change_location", "edit_sequence",
+               "select_mode", "select_pattern", "save_attempt"}
+
+
+def append_log(directory, route_directory, event):
+    """Append one timestamped selector action to the map's audit log."""
+    record = {**event, "at": datetime.now(timezone.utc).isoformat(), "map": directory.name,
+              "busline": route_directory.name if route_directory else None}
+    with LOG_LOCK, (directory / LOG_FILE).open("a", encoding="utf-8") as file:
+        file.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
 def drive_nodes(directory):
@@ -36,14 +52,20 @@ def drive_nodes(directory):
 
 def read_locations(directory):
     """Load previous selections, if any."""
-    locations = {}
-    for kind, filename in LOCATION_FILES.items():
+    locations = {kind: [] for kind in LOCATION_TYPES}
+    path = directory / "locations.csv"
+    if path.is_file():
+        with path.open(newline="", encoding="utf-8") as file:
+            for row in csv.DictReader(file):
+                for kind, label in LOCATION_TYPES.items():
+                    if row["type"] == label:
+                        locations[kind].append(row["osmid"])
+        return locations
+    for kind, filename in LEGACY_LOCATION_FILES.items():
         path = directory / filename
         if path.is_file():
             with path.open(newline="", encoding="utf-8") as file:
                 locations[kind] = [row["osmid"] for row in csv.DictReader(file)]
-        else:
-            locations[kind] = []
     return locations
 
 
@@ -157,7 +179,7 @@ def save_locations(directory, locations, route_directory=None, stop_classes=None
                    stops_data=None, patterns_data=None):
     """Validate selections, then save graph locations and route stop classes."""
     nodes = drive_nodes(directory)
-    if not isinstance(locations, dict) or set(locations) != set(LOCATION_FILES):
+    if not isinstance(locations, dict) or set(locations) != set(LOCATION_TYPES):
         raise ValueError("Provide both graph location lists")
     for kind, ids in locations.items():
         if not isinstance(ids, list) or any(not isinstance(node_id, str) or node_id not in nodes
@@ -197,17 +219,22 @@ def save_locations(directory, locations, route_directory=None, stop_classes=None
                     x, y = nodes[name.removeprefix("Stop_OSM_")]
                     stops.append({"name": name, "type": "location", "class": kind,
                                   "lon": float(x), "lat": float(y)})
-    for kind, filename in LOCATION_FILES.items():
-        with (directory / filename).open("w", newline="", encoding="utf-8") as file:
-            writer = csv.writer(file)
-            writer.writerow(("osmid", "x", "y"))
+    with (directory / "locations.csv").open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(("type", "osmid", "x", "y"))
+        for kind, label in LOCATION_TYPES.items():
             for node_id in dict.fromkeys(locations[kind]):
-                writer.writerow((node_id, *nodes[node_id]))
+                writer.writerow((label, node_id, *nodes[node_id]))
+    for filename in LEGACY_LOCATION_FILES.values():
+        (directory / filename).unlink(missing_ok=True)
     if route_directory is not None:
         write_json(stops_path, stops)
         if stops_data is not None:
             write_json(busline_path("businfo", route_directory), businfo)
         (directory / "optional_bus_stops.csv").unlink(missing_ok=True)
+    append_log(directory, route_directory, {"action": "save", "locations": locations,
+                                          **({"stops": stops} if route_directory else {}),
+                                          **({"patterns": patterns_data} if patterns_data is not None else {})})
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -244,14 +271,23 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(404, "Unknown endpoint")
 
     def do_POST(self):
-        if self.path != "/save":
+        if self.path not in ("/save", "/log"):
             self.respond(404, "Unknown endpoint")
             return
         try:
-            payload = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            length = int(self.headers["Content-Length"])
+            if length < 0 or (self.path == "/log" and length > 65536):
+                raise ValueError("Invalid request length")
+            payload = json.loads(self.rfile.read(length))
+            directory = graph_dir(self.map_name)
+            if self.path == "/log":
+                if not isinstance(payload, dict) or payload.get("action") not in LOG_ACTIONS:
+                    raise ValueError("Unknown selector action")
+                append_log(directory, self.route_directory(), payload)
+                self.respond(200, "Logged")
+                return
             if not isinstance(payload, dict) or "locations" not in payload:
                 raise ValueError("Provide graph locations and stop classes")
-            directory = graph_dir(self.map_name)
             save_locations(directory, payload["locations"], self.route_directory(),
                            payload.get("stop_classes"), stops_data=payload.get("stops"),
                            patterns_data=payload.get("patterns"))

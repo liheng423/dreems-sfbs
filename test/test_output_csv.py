@@ -13,13 +13,13 @@ from src.reqreate.adapters.pool_output import write_pool, write_requests_csv
 def test_output_csv():
     with TemporaryDirectory() as directory:
         path = Path(directory) / "requests.csv"
-        write_requests_csv(path, {}, "DARP")
+        write_requests_csv(path, {}, "DAR")
         with path.open(newline="") as file:
             assert list(csv.DictReader(file)) == []
         requests = {"7": {"reqid": 7, "origin": (49.5, 6.1),
                           "destination": [49.6, 6.2], "direct_distance": 123.4,
                           "lt_dynamic": 60}}
-        write_requests_csv(path, requests, "DARP")
+        write_requests_csv(path, requests, "DAR")
         with path.open(newline="") as file:
             row = next(csv.DictReader(file))
         assert row["reqid"] == "7"
@@ -35,14 +35,14 @@ def test_output_csv():
 
 
 def test_operation_profiles():
-    for task in ("DARP", "SFBS"):
+    for task in ("DAR", "SFBS"):
         with TemporaryDirectory() as directory:
             write_pool({"task": task, "seed": 42}, None, "Esch", Path(directory),
                        {"num_data:": 0, "requests": {}})
             instance = Path(directory)
             parameters = (instance / "parameters.txt").read_text()
             assert f"[{task.lower()}.attribute]" in parameters
-            assert f"[{'sfbs' if task == 'DARP' else 'darp'}" not in parameters
+            assert f"[{'sfbs' if task == 'DAR' else 'dar'}" not in parameters
             assert parameters.count("[profiles.") == 1
             assert "[charging_truck_profiles.dummy_mobile_charger]" in parameters
             operations = json.loads((instance / "operations.json").read_text())

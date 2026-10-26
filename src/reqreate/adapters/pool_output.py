@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import tomllib
 
-from src.output_adapters import DARP_OUTPUT_FIELDS, SFBS_OUTPUT_FIELDS, request_path, write_json
+from src.output_adapters import DAR_OUTPUT_FIELDS, SFBS_OUTPUT_FIELDS, request_path, write_json
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -19,7 +19,7 @@ CHARGING_TRUCKS_PATH = ROOT / "src/reqreate/operation/c_truck_profile.toml"
 
 def write_requests_csv(path, requests, task):
     """Write one request per row, preserving array values as JSON text."""
-    base_fields = SFBS_OUTPUT_FIELDS if task == "SFBS" else DARP_OUTPUT_FIELDS
+    base_fields = SFBS_OUTPUT_FIELDS if task == "SFBS" else DAR_OUTPUT_FIELDS
     fields = [*base_fields, *sorted(set().union(*(req.keys() for req in requests.values()))
                                     - set(base_fields))]
     with path.open("w", encoding="utf-8", newline="") as file:
@@ -64,7 +64,7 @@ def write_pool(cfg, busline_name, graph_name, instance_dir, pool):
     ]
     for path in (CFG_PATH, MAPS_CFG_PATH):
         settings.extend(("", f"# {path.relative_to(ROOT)}", path.read_text(encoding="utf-8").rstrip()))
-    other_mode = "sfbs" if mode == "darp" else "darp"
+    other_mode = "sfbs" if mode == "dar" else "dar"
     for path in (FILTERS_PATH, OPERATIONS_PATH):
         source = path.read_text(encoding="utf-8")
         start = source.index(f"[{mode}")

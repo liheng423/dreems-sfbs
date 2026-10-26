@@ -103,6 +103,28 @@
   let sequenceLine = null;
   let sequenceSegments = [];
   let hasBusline = false;
+  const session = crypto.randomUUID();
+  let nextLog = 0;
+  const pendingLogs = [];
+  let logging = null;
+
+  function flushLogs() {
+    if (logging) return logging;
+    logging = (async () => {
+      while (pendingLogs.length) {
+        const response = await fetch('/log', {method: 'POST', keepalive: true,
+          headers: {'Content-Type': 'application/json'}, body: pendingLogs[0]});
+        if (!response.ok) throw new Error(await response.text());
+        pendingLogs.shift();
+      }
+    })().finally(() => { logging = null; });
+    return logging;
+  }
+
+  function logChange(event) {
+    pendingLogs.push(JSON.stringify({session, sequence: ++nextLog, ...event}));
+    flushLogs().catch(error => { status.textContent = `Change log failed: ${error.message}. Retry Save changes.`; });
+  }
 
   function updateCounts() {
     counts.textContent = `mandatory stops: ${[...stops.values()].filter(stop => stop.class === 'mandatory').length}`
@@ -121,8 +143,9 @@
         `${colors[name]} ${index * section}% ${(index + 1) * section}%`).join(', ')})`;
   }
 
-  function changed(redraw = true) {
+  function changed(redraw, event) {
     save.disabled = false;
+    logChange(event);
     updateCounts();
     if (redraw) drawSequence();
   }
@@ -135,7 +158,13 @@
     input.type = numeric ? 'number' : 'text';
     if (numeric) input.step = 'any';
     input.value = value ?? '';
-    input.onchange = () => { onChange(numeric ? input.valueAsNumber : input.value); changed(); };
+    input.onchange = () => {
+      const next = numeric ? input.valueAsNumber : input.value;
+      if (Object.is(value, next)) return;
+      const event = onChange(next, value);
+      value = next;
+      changed(true, event);
+    };
     row.append(input);
     if (help) {
       const note = document.createElement('small');
@@ -169,11 +198,14 @@
         for (const value of ['mandatory', 'optional']) select.add(new Option(value, value));
         select.value = stop.class;
         select.onchange = () => {
+          const before = stop.class;
+          if (before === select.value) return;
           stop.class = select.value;
           const marker = stopMarkers.get(stop.original_name);
           if (marker) marker.setStyle(sfbsStopStyle(stop.class));
           if (stop.original_name.startsWith('Stop_OSM_')) updateNode(stop.original_name.slice(9));
-          changed();
+          changed(true, {action: 'change_stop_class', stop: stop.original_name,
+            before, after: stop.class});
         };
         row.append(select);
         const note = document.createElement('small');
@@ -189,18 +221,26 @@
           note.textContent = 'Internal place type; separate from GTFS location_type below.';
           popup.append(note);
         }
-      } else field(popup, key, stop[key], value => { stop[key] = value; });
+      } else field(popup, key, stop[key], (after, before) => {
+        stop[key] = after;
+        return {action: 'edit_stop_field', stop: stop.original_name, field: key, before, after};
+      });
     }
     if (stop.gtfs) {
       const heading = document.createElement('strong');
       heading.textContent = 'GTFS stop fields';
       popup.append(heading);
       for (const key of Object.keys(stop.gtfs).filter(key => !['stop_id', 'stop_lat', 'stop_lon'].includes(key)))
-        field(popup, key, stop.gtfs[key], value => { stop.gtfs[key] = value; }, false, gtfsHelp[key]);
+        field(popup, key, stop.gtfs[key], (after, before) => {
+          stop.gtfs[key] = after;
+          return {action: 'edit_gtfs_field', stop: stop.original_name, field: key, before, after};
+        }, false, gtfsHelp[key]);
     } else {
       const remove = document.createElement('button');
       remove.textContent = 'Remove bus stop';
       remove.onclick = () => {
+        const affected = patterns.filter(pattern => pattern.stop_ids.includes(stop.name.slice(5)))
+          .map(pattern => ({pattern: pattern.pattern_id, before: [...pattern.stop_ids]}));
         stops.delete(stop.original_name);
         for (const pattern of patterns) pattern.stop_ids = pattern.stop_ids.filter(id => id !== stop.name.slice(5));
         const id = stop.original_name.slice(9);
@@ -210,7 +250,9 @@
         }
         if (markers.has(id)) updateNode(id);
         map.closePopup();
-        changed();
+        changed(true, {action: 'remove_bus_stop', stop: stop.original_name,
+          previous: stop, patterns: affected.map(item => ({...item,
+            after: patterns.find(pattern => pattern.pattern_id === item.pattern).stop_ids}))});
       };
       popup.append(remove);
     }
@@ -265,11 +307,14 @@
         const insert = document.createElement('button');
         insert.textContent = `Insert stop: ${segment.from.label || segment.from.name} → ${segment.to.label || segment.to.name}`;
         insert.onclick = () => {
+          const before = [...pattern.stop_ids];
+          const created = !stops.has(`Stop_OSM_${id}`);
           const added = ensureBusStop(id);
           pattern.stop_ids.splice(segment.index + 1, 0, added.name.slice(5));
           map.closePopup();
           status.textContent = `Stop added. ${pattern.stop_ids.length} stops in this direction.`;
-          changed();
+          changed(true, {action: 'insert_bus_stop', stop: added.name, created,
+            pattern: pattern.pattern_id, before, after: [...pattern.stop_ids]});
         };
         popup.append(insert);
       }
@@ -289,7 +334,8 @@
           selected[name].delete(id);
         }
         updateNode(id);
-        changed();
+        changed(true, {action: 'change_location', type: label, node: id,
+          before: !checkbox.checked, after: checkbox.checked});
         markers.get(id).bindPopup(() => nodePopup(id)).openPopup();
       };
       row.append(checkbox, ` ${label}`);
@@ -323,10 +369,14 @@
       status.textContent = 'Drop on an existing stop or graph node. Route unchanged.';
       return false;
     }
+    const before = [...pattern.stop_ids];
+    const existing = new Set(stops.keys());
     pattern.stop_ids = targets.map(target =>
       (typeof target === 'string' ? ensureBusStop(target) : target).name.slice(5));
     status.textContent = `Route updated. ${pattern.stop_ids.length} stops in this direction.`;
-    changed(false);
+    if (JSON.stringify(before) !== JSON.stringify(pattern.stop_ids))
+      changed(false, {action: 'edit_sequence', pattern: pattern.pattern_id, before,
+        after: [...pattern.stop_ids], created_stops: [...stops.keys()].filter(name => !existing.has(name))});
     return true;
   }
 
@@ -367,8 +417,13 @@
     });
     for (const marker of stopMarkers.values()) marker.bringToFront();
   }
-  patternSelect.onchange = () => { map.closePopup(); drawSequence(); };
-  mode.onchange = () => {
+  patternSelect.onchange = event => {
+    if (event?.isTrusted) logChange({action: 'select_pattern', pattern: patternSelect.value});
+    map.closePopup();
+    drawSequence();
+  };
+  mode.onchange = event => {
+    if (event?.isTrusted) logChange({action: 'select_mode', mode: mode.value});
     direction.hidden = mode.value !== 'busline';
     document.querySelector('#hint').textContent = mode.value === 'busline'
       ? 'Add a stop: drag a route midpoint to a graph node, or click a graph node and choose Insert stop. Then save.'
@@ -384,6 +439,8 @@
     save.disabled = true;
     status.textContent = 'Saving…';
     try {
+      logChange({action: 'save_attempt'});
+      await flushLogs();
       const response = await fetch('/save', {method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({locations: Object.fromEntries(Object.entries(selected)

@@ -118,7 +118,7 @@ function is_sfbs(req) {
   return 'boarding_stop_id' in req && 'alighting_stop_id' in req;
 }
 
-/** SFBS uses its saved stop pair; DARP has no bus access stops. */
+/** SFBS uses its saved stop pair; DAR has no bus access stops. */
 function walk_access(req) {
   if (!is_sfbs(req)) return { trip: null, boarding: null, alighting: null };
   const boarding = walking_stops.find((stop) => stop.name === `Stop_${req.boarding_stop_id}`);
@@ -367,7 +367,7 @@ function show_req(req, fit_map = true) {
     'Saved energy estimate for this request.';
   $('req-details').hidden = false;
   $('req-details').textContent =
-    `${is_sfbs(req) ? 'SFBS' : 'DARP'} request #${req.reqid} · ${req.is_prebooked ? 'Pre-booked' : 'Dynamic'}\n` +
+    `${is_sfbs(req) ? 'SFBS' : 'DAR'} request #${req.reqid} · ${req.is_prebooked ? 'Pre-booked' : 'Dynamic'}\n` +
     `${place_label(req, 'origin')} → ${place_label(req, 'destination')}\n` +
     `Earliest departure ${sec_label(req.earliest_departure)} · Latest arrival ${sec_label(req.latest_arrival)}\n` +
     `Booked ${sec_label(req.order_place_time)} · Lead ${Math.round(req.lead_time / 60)} min\n` +
@@ -523,7 +523,7 @@ function load_reqs(data, file_name) {
   $('fit-button').disabled = false;
   $('file-name').textContent = file_name;
   $('file-error').hidden = true;
-  $('map-title').textContent = `${reqs[0] && is_sfbs(reqs[0]) ? 'SFBS' : 'DARP'} requests`;
+  $('map-title').textContent = `${reqs[0] && is_sfbs(reqs[0]) ? 'SFBS' : 'DAR'} requests`;
   draw_map();
   show_initial_req();
   map.fitBounds(demand_bounds.pad(.12));

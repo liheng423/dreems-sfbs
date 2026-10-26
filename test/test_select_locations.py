@@ -48,8 +48,12 @@ def test_edit_stops_and_locations():
         assert [(stop["name"], stop["class"]) for stop in stops] == list(classes.items())
         assert stops[2]["lon"] == 6.2 and stops[2]["lat"] == 49.5
         assert not (graph / "optional_bus_stops.csv").exists()
-        with (graph / "parking_locations.csv").open(newline="") as file:
-            assert list(csv.DictReader(file)) == [{"osmid": "1", "x": "6.2", "y": "49.5"}]
+        with (graph / "locations.csv").open(newline="") as file:
+            assert list(csv.DictReader(file)) == [
+                {"type": "parking", "osmid": "1", "x": "6.2", "y": "49.5"},
+                {"type": "charging", "osmid": "2", "x": "6.21", "y": "49.51"},
+            ]
+        assert select_locations.read_locations(graph) == locations
         select_locations.save_locations(graph, locations, route,
                                        {name: kind for name, kind in classes.items()
                                         if name != "Stop_OSM_2"})
@@ -83,6 +87,19 @@ def test_standalone_endpoints():
             response.assert_called_once_with(200)
             assert json.loads(handler.wfile.getvalue())["stops"][0]["name"] == "Stop_A"
 
+            event = {"action": "change_location", "session": "browser-1", "sequence": 1,
+                     "type": "parking", "node": "1", "before": False, "after": True}
+            log_body = json.dumps(event).encode()
+            handler.path = "/log"
+            handler.headers = {"Content-Length": str(len(log_body))}
+            handler.rfile = BytesIO(log_body)
+            handler.wfile = BytesIO()
+            with patch.object(handler, "send_response") as response, patch.object(
+                handler, "send_header"
+            ), patch.object(handler, "end_headers"):
+                handler.do_POST()
+            response.assert_called_once_with(200)
+
             body = json.dumps({"locations": {"parking_locations": ["1"],
                                              "fixed_charging_stations": []},
                                "location_details": {"parking_locations": [
@@ -98,8 +115,15 @@ def test_standalone_endpoints():
                 handler.do_POST()
             response.assert_called_once_with(200)
             assert json.loads((route / "stops.json").read_text())[0]["class"] == "optional"
-            with (graph / "parking_locations.csv").open(newline="") as file:
-                assert list(csv.DictReader(file)) == [{"osmid": "1", "x": "6.2", "y": "49.5"}]
+            with (graph / "locations.csv").open(newline="") as file:
+                assert list(csv.DictReader(file)) == [
+                    {"type": "parking", "osmid": "1", "x": "6.2", "y": "49.5"}]
+            events = [json.loads(line) for line in (graph / select_locations.LOG_FILE).read_text().splitlines()]
+            assert [item["action"] for item in events] == ["change_location", "save"]
+            assert events[0]["node"] == "1" and events[0]["session"] == "browser-1"
+            assert events[1]["locations"]["parking_locations"] == ["1"]
+            assert all(item["map"] == "550" and item["busline"] == "550" and item["at"]
+                       for item in events)
 
 
 def test_edit_stop_metadata_and_bus_sequence():
@@ -125,8 +149,9 @@ def test_edit_stop_metadata_and_bus_sequence():
         assert businfo["patterns"][0]["stop_ids"] == ["A", "B"]
         assert businfo["patterns"][0]["selected_stop_ids"] == ["B", "OSM_1", "A"]
         assert businfo["patterns"][0]["trips"][0]["stop_times"][0]["stop_id"] == "A"
-        with (graph / "parking_locations.csv").open(newline="") as file:
-            assert list(csv.DictReader(file))[0] == {"osmid": "1", "x": "6.2", "y": "49.5"}
+        with (graph / "locations.csv").open(newline="") as file:
+            assert list(csv.DictReader(file))[0] == {
+                "type": "parking", "osmid": "1", "x": "6.2", "y": "49.5"}
         before = (route / "buslines.json").read_bytes()
         try:
             select_locations.save_locations(graph, locations, route, stops_data=stops,
@@ -176,9 +201,22 @@ def test_graph_stop_uses_current_node_coordinates():
         (route / "stops.json").write_text(json.dumps(saved))
         data = select_locations.location_data(graph, route)
         assert (data["stops"][-1]["lon"], data["stops"][-1]["lat"]) == (6.2, 49.5)
-        select_locations.save_locations(graph, {kind: [] for kind in select_locations.LOCATION_FILES},
+        select_locations.save_locations(graph, {kind: [] for kind in select_locations.LOCATION_TYPES},
                                         route, stops_data=data["stops"], patterns_data=data["patterns"])
         assert json.loads((route / "stops.json").read_text())[-1]["lon"] == 6.2
+
+
+def test_legacy_location_files_are_combined_on_save():
+    with TemporaryDirectory() as tmp:
+        graph, _ = fixture(Path(tmp))
+        (graph / "parking_locations.csv").write_text("osmid,x,y\n1,6.2,49.5\n")
+        (graph / "fixed_charging_stations.csv").write_text("osmid,x,y\n2,6.21,49.51\n")
+        locations = select_locations.location_data(graph)["locations"]
+        assert locations == {"parking_locations": ["1"], "fixed_charging_stations": ["2"]}
+        select_locations.save_locations(graph, locations)
+        assert select_locations.read_locations(graph) == locations
+        assert all(not (graph / filename).exists()
+                   for filename in select_locations.LEGACY_LOCATION_FILES.values())
 
 
 def test_command_passes_busline():
@@ -209,5 +247,6 @@ if __name__ == "__main__":
     test_edit_stop_metadata_and_bus_sequence()
     test_reject_changed_stop_identity_or_coordinates()
     test_graph_stop_uses_current_node_coordinates()
+    test_legacy_location_files_are_combined_on_save()
     test_command_passes_busline()
     test_map_without_route()

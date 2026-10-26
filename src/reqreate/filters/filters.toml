@@ -1,9 +1,9 @@
-# DARP uses road-trip filters without a scheduled bus route.
-[darp]
+# DAR uses road-trip filters without a scheduled bus route.
+[dar]
 max_walking_distance_m = 1500
 walking_speed_mps = 1.4
 
-[[darp.parameters]]
+[[dar.parameters]]
 name = "min_distance"
 type = "integer"
 value = 100
