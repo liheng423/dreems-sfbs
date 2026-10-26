@@ -89,7 +89,7 @@ python main.py generate-demand SFBS --map 550 --busline 550
 
 ### Plot a request map
 
-From the repository root, choose a saved map and request instance by folder name. Either command saves one PNG under `visualizations/` showing requests, the road network, POIs, depot, and service area. SFBS maps also show the selected bus route as straight links between consecutive GTFS stops; the feed snapshot does not store the route's road geometry.
+From the repository root, choose a saved map and request instance by folder name. Either command saves one PNG under `visualizations/` showing requests, the road network, POIs, depot, service area, and any saved parking locations or fixed charging stations. SFBS maps also show the selected bus route as straight links between consecutive GTFS stops; the feed snapshot does not store the route's road geometry.
 
 ```bash
 python visualize_requests.py --map Esch --instance dar_Esch_0001

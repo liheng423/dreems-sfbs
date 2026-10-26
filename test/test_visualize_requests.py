@@ -37,6 +37,8 @@ def test_requests_map():
             requests_map.ROOT = root
             output = requests_map.draw_requests_map("test", "sample", root / "map.png")
             assert output.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+            (graph / "locations.csv").write_text(
+                "type,osmid,x,y\nparking,1,6.0,49.5\ncharging,2,6.01,49.51\n")
 
             busline_dir = root / "outputs" / "buslines" / "550"
             busline_dir.mkdir(parents=True)
@@ -56,6 +58,10 @@ def test_requests_map():
             assert len(routes) == 1
             assert routes[0].get_segments()[0].tolist() == [[6.0, 49.5], [6.01, 49.51]]
             assert [item.get_text() for item in figure.axes[0].get_legend().texts].count("Depot") == 1
+            markers = {item.get_label(): item.get_offsets().tolist()
+                       for item in figure.axes[0].collections if item.get_label() in ("Parking (1)", "Charging (1)")}
+            assert markers == {"Parking (1)": [[6.0, 49.5]],
+                               "Charging (1)": [[6.01, 49.51]]}
             requests_map.plt.close(figure)
         finally:
             requests_map.ROOT = old_root

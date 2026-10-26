@@ -46,6 +46,13 @@ def draw_requests_map(graph_name, instance, output_file=None):
             roads.append(list(wkt.loads(edge["geometry"]).coords) if edge.get("geometry")
                          else [nodes[edge["u"]], nodes[edge["v"]]])
     pois = json.loads((graph_dir / "pois.json").read_text())["features"]
+    locations = {"parking": [], "charging": []}
+    locations_path = graph_dir / "locations.csv"
+    if locations_path.is_file():
+        with locations_path.open(newline="", encoding="utf-8") as source:
+            for row in csv.DictReader(source):
+                if row["type"] in locations:
+                    locations[row["type"]].append((float(row["x"]), float(row["y"])))
     depot = json.loads((graph_dir / "depot.json").read_text())
     depot_lat, depot_lon = depot["drive_point"]
     area = json.loads((graph_dir / "service_area.geojson").read_text())["geometry"]
@@ -74,6 +81,13 @@ def draw_requests_map(graph_name, instance, output_file=None):
         ax.scatter([poi["lon"] for poi in pois], [poi["lat"] for poi in pois],
                    s=7, color="#d8c895", alpha=0.65, linewidths=0,
                    label=f"POIs ({len(pois)})", zorder=4)
+    for kind, label, color, marker in (("parking", "Parking", "#b56a18", "s"),
+                                        ("charging", "Charging", "#a33375", "D")):
+        points = locations[kind]
+        if points:
+            ax.scatter(*zip(*points), s=95 if kind == "parking" else 45, marker=marker, color=color,
+                       edgecolors="white", linewidths=0.6,
+                       label=f"{label} ({len(points)})", zorder=6)
     if requests:
         ax.scatter(*zip(*origins), s=18, color="#008f85", edgecolors="white",
                    linewidths=0.25, label=f"Origins ({len(requests)})", zorder=5)

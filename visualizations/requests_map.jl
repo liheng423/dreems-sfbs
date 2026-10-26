@@ -54,6 +54,17 @@ function draw_requests_map(graph_name::AbstractString, instance::AbstractString,
         end
     end
     pois = JSON3.read(read(joinpath(graph_dir, "pois.json"), String)).features
+    parking = Tuple{Float64, Float64}[]
+    charging = Tuple{Float64, Float64}[]
+    locations_path = joinpath(graph_dir, "locations.csv")
+    if isfile(locations_path)
+        for row in Iterators.drop(eachline(locations_path), 1)
+            fields = split(row, ',')
+            point = (parse(Float64, fields[3]), parse(Float64, fields[4]))
+            fields[1] == "parking" && push!(parking, point)
+            fields[1] == "charging" && push!(charging, point)
+        end
+    end
     depot = JSON3.read(read(joinpath(graph_dir, "depot.json"), String))
     area = JSON3.read(read(joinpath(graph_dir, "service_area.geojson"), String)).geometry
     polygons = area.type == "Polygon" ? (area.coordinates,) : area.coordinates
@@ -108,6 +119,16 @@ function draw_requests_map(graph_name::AbstractString, instance::AbstractString,
         circle(to_point((Float64(poi.lon), Float64(poi.lat))), 2, :fill)
     end
     setopacity(1)
+    sethue("#b56a18")
+    for point in parking
+        box(to_point(point), 16, 16, :fill)
+    end
+    sethue("#a33375")
+    for point in charging
+        center = to_point(point)
+        poly([Point(center.x, center.y - 6), Point(center.x + 6, center.y),
+              Point(center.x, center.y + 6), Point(center.x - 6, center.y)], :fill; close=true)
+    end
     for (points, color) in ((origins, "#008f85"), (destinations, "#d96845"))
         sethue(color)
         for point in points
@@ -149,6 +170,20 @@ function draw_requests_map(graph_name::AbstractString, instance::AbstractString,
     line(Point(-width / 2 + 1160, height / 2 - 38), Point(-width / 2 + 1185, height / 2 - 38), :stroke)
     sethue("#27343d")
     text("service area", Point(-width / 2 + 1195, height / 2 - 32))
+    if !isempty(parking)
+        sethue("#b56a18")
+        box(Point(-width / 2 + 640, height / 2 - 73), 10, 10, :fill)
+        sethue("#27343d")
+        text("parking ($(length(parking)))", Point(-width / 2 + 655, height / 2 - 67))
+    end
+    if !isempty(charging)
+        sethue("#a33375")
+        center = Point(-width / 2 + 870, height / 2 - 73)
+        poly([Point(center.x, center.y - 7), Point(center.x + 7, center.y),
+              Point(center.x, center.y + 7), Point(center.x - 7, center.y)], :fill; close=true)
+        sethue("#27343d")
+        text("charging ($(length(charging)))", Point(-width / 2 + 885, height / 2 - 67))
+    end
     if !isnothing(busline)
         sethue("#1268a3")
         setline(3)
