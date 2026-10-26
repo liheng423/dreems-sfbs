@@ -25,10 +25,14 @@ def draw_requests_map(graph_name, instance, output_file=None):
                     (requests_file.parent / "parameters.txt").read_text().splitlines()[:3])
     busline = json.loads(settings["busline"]) if json.loads(settings["task"]) == "SFBS" else None
     if busline:
-        info = json.loads((busline_dir(busline, ROOT / "data" / "buslines") / "businfo.json").read_text())
+        info = json.loads((busline_dir(busline, ROOT / "outputs" / "buslines") / "buslines.json").read_text())
         stops = {stop["stop_id"]: (stop["stop_lon"], stop["stop_lat"])
                  for stop in info["stops"]}
-        route_lines = [[stops[stop_id] for stop_id in pattern["stop_ids"]]
+        stops_path = busline_dir(busline, ROOT / "outputs" / "buslines") / "stops.json"
+        if stops_path.is_file():
+            for stop in json.loads(stops_path.read_text()):
+                stops[stop["name"].removeprefix("Stop_")] = (stop["lon"], stop["lat"])
+        route_lines = [[stops[stop_id] for stop_id in pattern.get("selected_stop_ids", pattern["stop_ids"])]
                        for pattern in info["patterns"]]
     graph_dir = ROOT / "outputs" / "graphs" / graph_name
     output_file = Path(output_file) if output_file else ROOT / "visualizations" / f"{requests_file.parent.name}_requests_map.png"

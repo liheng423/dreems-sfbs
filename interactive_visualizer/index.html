@@ -6,6 +6,7 @@
   <title>REQreate request explorer</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="../shared/sfbs_route.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <script src="reqreate.js" defer></script>
 </head>
@@ -50,9 +51,9 @@
 
       <section aria-labelledby="busline-heading">
         <div class="section-heading"><h2 id="busline-heading">Busline stops</h2><span id="busline-count">—</span></div>
-        <label class="field-label" for="busline-folder">data/buslines/</label>
+        <label class="field-label" for="busline-folder">outputs/buslines/</label>
         <select id="busline-folder"><option value="">Choose a busline folder</option></select>
-        <p class="hint">Mandatory stops have a larger marker. Selecting an SFBS request highlights its saved boarding and alighting stops and the straight-line walks to them.</p>
+        <p class="hint">Mandatory stops are dark and solid; optional stops are pale with dashed outlines. Selecting an SFBS request highlights its saved boarding and alighting stops and the straight-line walks to them.</p>
         <p id="busline-error" class="error" role="alert" hidden></p>
         <div id="busline-list" class="busline-list"></div>
         <p id="energy-name" class="file-name"></p>
@@ -103,10 +104,11 @@
     <div class="map-shell">
       <div id="map" aria-label="Interactive map of requests, points of interest, routes, and service areas"></div>
       <div class="map-title"><span id="map-kicker">LUXEMBOURG / REQUEST VIEW</span><strong id="map-title">Choose a request folder</strong></div>
-      <div class="map-legend"><span><i class="circle-key"></i> Passenger endpoints</span><span><i class="node-key"></i> Graph nodes</span><span><i class="snap-key"></i> DARP drive pickup/dropoff</span><span><i class="line-key"></i> OD flows</span><span><i class="poi-key"></i> POIs (colors by type)</span><span><i class="graph-key"></i> Service area</span><span><i class="busline-key"></i> Busline stops; selected SFBS stops highlighted</span><span><i class="walk-key"></i> SFBS walk</span></div>
+      <div class="map-legend"><span><i class="circle-key"></i> Passenger endpoints</span><span><i class="node-key"></i> Graph nodes</span><span><i class="snap-key"></i> DARP drive pickup/dropoff</span><span><i class="line-key"></i> OD flows</span><span><i class="poi-key"></i> POIs (colors by type)</span><span><i class="graph-key"></i> Service area</span><span><i class="busline-key"></i> SFBS route</span><span><i class="sfbs-stop-key sfbs-mandatory"></i><b class="sfbs-number-key sfbs-mandatory">1</b> Mandatory stop</span><span><i class="sfbs-stop-key sfbs-optional"></i><b class="sfbs-number-key sfbs-optional">2</b> Optional stop</span><span><i class="sfbs-optional-key"></i> Optional stop link</span><span><i class="walk-key"></i> SFBS walk</span></div>
       <button id="fit-button" class="fit-button" type="button" disabled>Fit demand ↗</button>
     </div>
   </main>
+  <script src="../shared/sfbs_route.js" defer></script>
   <script src="busline.js" defer></script>
   <script src="sources.js" defer></script>
 </body>

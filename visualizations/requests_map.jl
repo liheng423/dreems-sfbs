@@ -22,11 +22,17 @@ function draw_requests_map(graph_name::AbstractString, instance::AbstractString,
     route_stops = Tuple{Float64, Float64}[]
     if !isnothing(busline)
         occursin(r"^[A-Za-z0-9-]+$", busline) || error("Invalid busline name")
-        info = JSON3.read(read(joinpath(ROOT, "data", "buslines", busline, "businfo.json"), String))
+        info = JSON3.read(read(joinpath(ROOT, "outputs", "buslines", busline, "buslines.json"), String))
         stops = Dict(String(stop.stop_id) => (Float64(stop.stop_lon), Float64(stop.stop_lat))
                      for stop in info.stops)
+        stops_path = joinpath(ROOT, "outputs", "buslines", busline, "stops.json")
+        if isfile(stops_path)
+            for stop in JSON3.read(read(stops_path, String))
+                stops[replace(String(stop.name), r"^Stop_" => "")] = (Float64(stop.lon), Float64(stop.lat))
+            end
+        end
         route_stops = collect(values(stops))
-        route_lines = [[stops[String(id)] for id in pattern.stop_ids] for pattern in info.patterns]
+        route_lines = [[stops[String(id)] for id in (hasproperty(pattern, :selected_stop_ids) ? pattern.selected_stop_ids : pattern.stop_ids)] for pattern in info.patterns]
     end
     graph_dir = joinpath(ROOT, "outputs", "graphs", graph_name)
     output_file = isnothing(output_file) ? joinpath(ROOT, "visualizations", "$(basename(dirname(requests_file)))_requests_map.png") : abspath(output_file)

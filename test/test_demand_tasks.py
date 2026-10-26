@@ -51,7 +51,7 @@ def test_demand_tasks():
                            "[[sfbs.parameters]]\nname = 'min_distance'\nvalue = 500\n")
         with patch.object(generate, "OPERATION_CFG_PATH", operations), patch.object(
             generate, "FILTERS_PATH", filters
-        ), patch.object(generate, "busline_dir", return_value=ROOT / "data/buslines/550"):
+        ), patch.object(generate, "busline_dir", return_value=ROOT / "outputs/buslines/550"):
             darp = generate.load_config("DARP")
             sfbs = generate.load_config("SFBS", "550")
     assert (darp["vehicle_speed_mps"], darp["detour_factor"],

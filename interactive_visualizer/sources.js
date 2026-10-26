@@ -4,7 +4,7 @@ let graph_layer = null;
 
 /** Read folder names from Python's local directory listing. */
 async function folder_names(kind) {
-  const base = kind === 'requests' ? 'outputs/requests' : kind === 'graphs' ? 'outputs/graphs' : `data/${kind}`;
+  const base = `outputs/${kind}`;
   const response = await fetch(`../${base}/`);
   if (!response.ok) throw new Error(`Cannot list ${base}/`);
   const listing = new DOMParser().parseFromString(await response.text(), 'text/html');
@@ -16,7 +16,7 @@ async function folder_names(kind) {
 }
 
 async function folder_json(kind, folder, file) {
-  const base = kind === 'requests' ? 'outputs/requests' : kind === 'graphs' ? 'outputs/graphs' : `data/${kind}`;
+  const base = `outputs/${kind}`;
   const response = await fetch(`../${base}/${encodeURIComponent(folder)}/${file}`);
   if (!response.ok) throw new Error(`Cannot load ${base}/${folder}/${file}`);
   return response.json();
@@ -116,15 +116,15 @@ $('busline-folder').addEventListener('change', async (event) => {
   try {
     const [stops, businfo] = await Promise.all([
       folder_json('buslines', folder, 'stops.json'),
-      folder_json('buslines', folder, 'businfo.json')
+      folder_json('buslines', folder, 'buslines.json')
     ]);
     if (event.target.value !== folder) return;
     load_busline(stops, `stops_${folder}.json`);
     load_busline_patterns(businfo, `crawled_${folder}.json`);
     $('busline-error').hidden = true;
-    const response = await fetch(`../data/buslines/${encodeURIComponent(folder)}/energy.json`);
+    const response = await fetch(`../outputs/buslines/${encodeURIComponent(folder)}/energy.json`);
     if (event.target.value !== folder) return;
-    if (response.ok) load_energy(await response.json(), `data/buslines/${folder}/energy.json`);
+    if (response.ok) load_energy(await response.json(), `outputs/buslines/${folder}/energy.json`);
     else $('energy-name').textContent = 'No energy.json in this folder';
   } catch (error) {
     show_source_error('busline-error', error);

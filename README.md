@@ -22,7 +22,7 @@ Features:
 
 - An operation area for road networks and a service area inside it for POIs and request endpoints, selected in the browser map.
 - Demand settings in [request_gen.toml](src/reqreate/request_gen.toml), plus [map](src/reqreate/maps/map_config.toml), [filter](src/reqreate/filters/filters.toml), and [operation](src/reqreate/operation/operation_profile.toml) settings.
-- For SFBS, GTFS stops and schedules saved under `data/buslines/<route>/` by [crawl_busline.py](crawl_busline.py).
+- For SFBS, GTFS stops and schedules saved under `outputs/buslines/<route>/` by [crawl_busline.py](crawl_busline.py).
 
 ### Outputs
 
@@ -41,6 +41,7 @@ uv pip install --python python -r requirements.txt
 python check_dependencies.py
 ```
 
+### Creating a New Map
 To create a new map, run:
 
 ```bash
@@ -49,13 +50,17 @@ python main.py select-area my_area
 
 In the browser, draw the **operation area** to download its road networks. The **service area** initially matches it; adjust the service area inside it if requests and POIs should cover a smaller region. Click **Save**, wait for the download to finish, then stop the area selector with Ctrl+C.
 
+### Adding New Bus Stops and Charging Locations
+// TODO: Review this
 To choose locations on an existing map's driving graph, run:
 
 ```bash
-python main.py select-locations my_area
+python main.py select-locations my_area --busline my_route
 ```
 
-The separate location selector shows every driving graph node. Click a node and check any combination of **Optional SFBS bus stops**, **DARP + SFBS parking locations**, and **Fixed charging stations**. Every node circle is the same size; a node assigned to several types splits its circle into their colors. Click **Save location CSVs**; reopen this command to edit saved choices. Stop it with Ctrl+C.
+The location selector has **Bus line** and **Parking and charging** modes. To insert a bus stop, choose its direction, zoom into the route, click a pale graph-node circle, and click **Insert stop** in the popup. The button names the two stops it will go between. Then click **Save changes**. You can also drag a route-line midpoint onto a graph node; its handle is hidden until hovered, and [Leaflet-Geoman Free](https://geoman.io/docs/leaflet/modes/edit-mode) handles snapping. Clicking a midpoint alone does nothing, and a drag that misses a stop or graph node leaves the route unchanged. Click a stop to edit its class or GTFS description; stop IDs and coordinates are read-only. The selected order is saved as `selected_stop_ids` in `buslines.json`; imported GTFS trip times remain in their original order. In the other mode, click graph nodes to select parking and charging locations; their IDs and coordinates come from the saved graph. Saving writes the route's `stops.json` and `buslines.json` and the map's parking and charging CSVs. Omit `--busline` when the route name matches the map name, or when selecting only parking and charging locations. Stop classes and the displayed sequence do not change timetable feasibility; new stops need scheduled trip times before requests can board or alight there. Stop the selector with Ctrl+C.
+
+### Generating Requests
 
 Generate a DARP instance and open the viewer:
 
@@ -92,9 +97,9 @@ The input format follows [GTFS Schedule ZIP](https://gtfs.org/documentation/sche
 python crawl_busline.py --gtfs-zip path/to/feed.zip --service-date 2026-10-19 --route 12 --name tec-12
 ```
 
-Replace the example path, date, route, and output name with values from your feed. For a downloadable feed, use `--gtfs-url URL` in place of `--gtfs-zip path/to/feed.zip`. Use `--route-id ID` instead of `--route 12` if the feed has no short name, or add it when several routes share that name. `--name` sets the folder under `data/buslines/`; use an operator prefix such as `tec-12` when route numbers may overlap. If omitted, the folder uses the route's short name or ID. For a local ZIP, `--source-url URL` records its original source; `--license TEXT` records the feed's license when known.
+Replace the example path, date, route, and output name with values from your feed. For a downloadable feed, use `--gtfs-url URL` in place of `--gtfs-zip path/to/feed.zip`. Use `--route-id ID` instead of `--route 12` if the feed has no short name, or add it when several routes share that name. `--name` sets the folder under `outputs/buslines/`; use an operator prefix such as `tec-12` when route numbers may overlap. If omitted, the folder uses the route's short name or ID. For a local ZIP, `--source-url URL` records its original source; `--license TEXT` records the feed's license when known.
 
-The crawler writes `data/buslines/<name>/businfo.json` with the selected day's stops, trip times, and route patterns, plus `stops.json` for REQreate. 
+The crawler writes `outputs/buslines/<name>/buslines.json` with the selected day's stops, trip times, and route patterns, plus `stops.json` for REQreate. Re-importing a route preserves edited stop classes and graph-node stops already saved in `stops.json`.
 
 For example, to import the timetable for Luxembourg bus route 550, run:
 ```
@@ -166,7 +171,7 @@ See [Request Outputs](#request-outputs) for the saved field definitions.
 | --- | --- |
 | `crawl_busline.py`, `src/crawler/` | Read GTFS; save routes, stops, service areas, OSM graphs, and POIs. |
 | `main.py`, `src/reqreate/` | Run demand generation, filters, and calculations; configure them in `*.toml`. |
-| `data/buslines/` | Saved GTFS route data. |
+| `outputs/buslines/` | Saved route timetables and editable stop lists. |
 | `outputs/graphs/`, `outputs/requests/` | Saved maps and generated request JSON/CSV with parameters. |
 | `interactive_visualizer/` | Browser viewer for generated results. |
 
@@ -188,7 +193,7 @@ See [vehicle profile details](src/reqreate/operation/README.md) for the supplied
 
 Each `outputs/graphs/<map>/` folder contains the selected `service_area.geojson`, `pois.json`, `depot.json`, and two road networks. `drive.graphml` and `walk.graphml` are the complete OSMnx graphs used by demand generation. The matching csvs are tables of those same graphs for spreadsheet or data-frame use. The graphs (graphml) cover the selected operation area; the GeoJSON boundary is the service area.
 
-The separate `select-locations` command writes `optional_bus_stops.csv`, `parking_locations.csv`, and `fixed_charging_stations.csv` in the same folder. Each has `osmid,x,y` columns, using original driving graph node IDs, longitude, and latitude. A node may appear in more than one file. If the graph is regenerated, reopen the location selector to review and save the choices against its new nodes.
+The separate `select-locations` command writes `parking_locations.csv` and `fixed_charging_stations.csv` in the graph folder. Each has `osmid,x,y` columns, using original driving graph node IDs, longitude, and latitude. Bus stop choices and classes go into the selected route's `outputs/buslines/<route>/stops.json`. New graph-node stops use names `Stop_OSM_<osmid>`. If the graph is regenerated, reopen the location selector to review its saved choices against the new nodes.
 
 Saving a map with `python main.py select-area <map>` writes the GraphML and CSV files together. Saving the same map again regenerates all four CSVs alongside the new GraphML files.
 
@@ -212,7 +217,7 @@ In the nodes file, `street_count` gives the number of physical streets connected
 
 ## Generated demand outputs
 
-Each `generate-demand` run writes a new numbered directory at `outputs/requests/<task>_<map>_<number>/` (for example, `darp_my_area_0001`). DARP uses the saved map in `outputs/graphs/`; SFBS also uses its route data in `data/buslines/`.
+Each `generate-demand` run writes a new numbered directory at `outputs/requests/<task>_<map>_<number>/` (for example, `darp_my_area_0001`). DARP uses the saved map in `outputs/graphs/`; SFBS also uses its route data in `outputs/buslines/`.
 
 | File | What it contains |
 | --- | --- |

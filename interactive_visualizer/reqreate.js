@@ -343,7 +343,13 @@ function show_req(req, fit_map = true) {
         .addTo(sel_layer);
       if (trip) {
         const stops = new Map(walking_stops.map((stop) => [stop.name, stop]));
-        const ride_xy = trip.pattern.stop_ids.slice(trip.boarding_index, trip.alighting_index + 1)
+        const selected_order = trip.pattern.selected_stop_ids || trip.pattern.stop_ids;
+        const boarding = selected_order.indexOf(req.boarding_stop_id);
+        const alighting = selected_order.indexOf(req.alighting_stop_id, boarding + 1);
+        const ride_ids = alighting > boarding && boarding >= 0
+          ? selected_order.slice(boarding, alighting + 1)
+          : trip.pattern.stop_ids.slice(trip.boarding_index, trip.alighting_index + 1);
+        const ride_xy = ride_ids
           .map((id) => stops.get(`Stop_${id}`)).map((stop) => [stop.lat, stop.lon]);
         L.polyline(ride_xy, { color: '#246b59', weight: 5, opacity: .85 })
           .bindPopup('Estimated bus ride between the selected stops').addTo(sel_layer);

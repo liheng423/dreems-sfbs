@@ -30,7 +30,7 @@ assert.equal(vm.runInContext('is_sfbs(Object.values(darp.requests)[0])', context
 vm.runInContext('show_req(sfbs.requests[1], false)', context);
 assert.match(elements.get('req-details').textContent, /Board at .*Alight at/s);
 assert.doesNotMatch(elements.get('req-details').textContent, /drive pickup node/);
-const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'stops.json')));
+const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'outputs', 'buslines', '550', 'stops.json')));
 context.stops = stops;
 vm.runInContext('load_busline(stops, "stops_550.json"); show_req(sfbs.requests[1], false)', context);
 assert.ok(vm.runInContext('sel_layer.layers.length', context) >= 7);

@@ -44,7 +44,8 @@ def estimate_busline_energy(graph: nx.MultiDiGraph, businfo: dict, config: dict)
     }
     segments = []
     for pattern in businfo["patterns"]:
-        for origin, destination in zip(pattern["stop_ids"], pattern["stop_ids"][1:]):
+        route_stops = pattern.get("selected_stop_ids", pattern["stop_ids"])
+        for origin, destination in zip(route_stops, route_stops[1:]):
             path = nx.shortest_path(graph, stop_nodes[origin], stop_nodes[destination], weight="length")
             distance_m = sum(min(edge["length"] for edge in graph[start][end].values())
                              for start, end in zip(path, path[1:]))
@@ -83,6 +84,14 @@ def main():
     route_dir = busline_dir(args.route)
     drive_path = graph_path("drive_graph", graph_dir(args.route))
     businfo = json.loads(busline_path("businfo", route_dir).read_text())
+    stops_path = busline_path("stops", route_dir)
+    if stops_path.is_file():
+        source_ids = {source["stop_id"] for source in businfo["stops"]}
+        for stop in json.loads(stops_path.read_text()):
+            stop_id = stop["name"].removeprefix("Stop_")
+            if stop_id not in source_ids:
+                businfo["stops"].append({"stop_id": stop_id, "stop_name": stop["name"],
+                                         "stop_lat": stop["lat"], "stop_lon": stop["lon"]})
     graph = ox.load_graphml(drive_path)
     segments = estimate_busline_energy(graph, businfo, config)
     result = {

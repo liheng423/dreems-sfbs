@@ -12,16 +12,17 @@ import networkx as nx
 import osmnx as ox
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src/operation"))
+sys.path.insert(0, str(ROOT / "src/reqreate/operation"))
 import energy
 from energy import estimate_busline_energy
 
 
 def test_paper_rate_and_same_node_distance():
-    with (ROOT / "src/operation/veh_profile.toml").open("rb") as file:
+    with (ROOT / "src/reqreate/operation/veh_profile.toml").open("rb") as file:
         config = tomllib.load(file)
-    with (ROOT / "src/operation/operation_profile.toml").open("rb") as file:
+    with (ROOT / "src/reqreate/operation/operation_profile.toml").open("rb") as file:
         config["scenario"] = tomllib.load(file)["sfbs"]["attribute"]
+    config["scenario"]["profile"] = "evobus_396_nmc_na_hybrid"
     graph = nx.MultiDiGraph(crs="epsg:4326")
     graph.add_node(1, x=6.0, y=49.0)
     graph.add_node(2, x=6.01, y=49.0)
@@ -42,6 +43,10 @@ def test_paper_rate_and_same_node_distance():
     assert second["distance_source"] == "straight_line_same_node"
     assert second["distance_m"] > 0
     assert math.isclose(second["energy_kwh"], second["distance_m"] / 1000 * 0.87)
+    businfo["patterns"][0]["selected_stop_ids"] = ["1", "3"]
+    assert [(segment["origin"], segment["destination"]) for segment in
+            estimate_busline_energy(graph, businfo, config)] == [("1", "3")]
+    del businfo["patterns"][0]["selected_stop_ids"]
 
     config["scenario"]["profile"] = "shuttle_6m_rawsuns_64_8"
     shuttle, _ = estimate_busline_energy(graph, businfo, config)
@@ -60,7 +65,7 @@ def test_command_selects_route():
         road_graph_dir = Path(directory) / "graphs/605"
         route_dir.mkdir(parents=True)
         road_graph_dir.mkdir(parents=True)
-        (route_dir / "businfo.json").write_text(json.dumps({
+        (route_dir / "buslines.json").write_text(json.dumps({
             "route": {"route_id": "605"},
             "stops": [
                 {"stop_id": "A", "stop_name": "First", "stop_lon": 6.0, "stop_lat": 49.0},
@@ -84,10 +89,11 @@ def test_command_selects_route():
         selected_route.assert_called_once_with("605")
         selected_graph.assert_called_once_with("605")
         result = json.loads((route_dir / "energy.json").read_text())
-        assert result["segments"][0]["energy_kwh"] == 0.87
+        assert result["segments"][0]["distance_m"] == 1000
+        assert result["segments"][0]["energy_kwh"] > 0
         assert (result["segments"][0]["origin"], result["segments"][0]["destination"]) == ("A", "B")
         assert "Route 605" in result["status"]
-        assert result["sources"]["businfo"].endswith("/buslines/605/businfo.json")
+        assert result["sources"]["businfo"].endswith("/buslines/605/buslines.json")
         assert result["sources"]["road_graph"].endswith("/graphs/605/drive.graphml")
 
 

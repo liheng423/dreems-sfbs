@@ -88,7 +88,8 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, 'sources.js'), 'utf8'), con
   const busline = element('busline-folder');
   busline.value = '550';
   await busline.listeners.change({ target: busline });
-  assert.deepEqual(loaded.slice(4).map(([kind]) => kind), ['stops', 'businfo', 'energy']);
+  assert.deepEqual(loaded.slice(4).map(([kind]) => kind), ['stops', 'businfo']);
+  assert.equal(element('energy-name').textContent, 'No energy.json in this folder');
   busline.value = '605';
   await busline.listeners.change({ target: busline });
   assert.ok(removed.length);

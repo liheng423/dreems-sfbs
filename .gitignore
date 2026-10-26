@@ -3,12 +3,12 @@
 .DS_Store
 __pycache__/
 data/*
-!data/buslines/
 !data/requests/
 data/requests/*
 !data/requests/*
 outputs/*
 !outputs/graphs/
+!outputs/buslines/
 !outputs/requests/
 !outputs/requests/README.md
 src/.deprecrated_demand_gen

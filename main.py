@@ -55,6 +55,7 @@ def main():
     area.add_argument("--busline")
     locations = commands.add_parser("select-locations", help="Choose locations on an existing driving graph")
     locations.add_argument("map")
+    locations.add_argument("--busline", help="Route whose stops should be edited")
     recrawl = commands.add_parser("recrawl-pois", help="Update POIs for a saved graph area")
     recrawl.add_argument("map")
     demand = commands.add_parser("generate-demand")
@@ -80,7 +81,7 @@ def main():
     step_args = ["--map", args.map]
     if args.command == "recrawl-pois":
         step_args.append("--recrawl-pois")
-    elif args.command == "select-area" and args.busline:
+    elif args.command in ("select-area", "select-locations") and args.busline:
         step_args.extend(["--busline", args.busline])
     subprocess.run([sys.executable, str(COMMANDS[args.command]), *step_args], check=True)
 

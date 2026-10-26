@@ -76,7 +76,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--route", required=True)
     parser.add_argument("--gtfs-json", type=Path)
-    parser.add_argument("--output", type=Path, help="Defaults to data/buslines/<route>/distance_matrix.json")
+    parser.add_argument("--output", type=Path, help="Defaults to outputs/buslines/<route>/distance_matrix.json")
     parser.add_argument("--osrm-url", default="https://router.project-osrm.org")
     parser.add_argument("--profile", default="driving", help="URL profile; must match the server's prepared data")
     args = parser.parse_args()

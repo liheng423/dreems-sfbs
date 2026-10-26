@@ -356,7 +356,7 @@ def main() -> None:
     parser.add_argument("--license", default="", help="Dataset license, if known")
     parser.add_argument("--mandatory-stop-id", action="append", default=[],
                         help="Mark an additional GTFS stop ID as mandatory")
-    parser.add_argument("--output", type=Path, help="Override the businfo.json path")
+    parser.add_argument("--output", type=Path, help="Override the buslines.json path")
     parser.add_argument("--stops-output", type=Path, help="Override the stops.json path")
     args = parser.parse_args()
     if not (args.route or args.route_id):
@@ -377,8 +377,16 @@ def main() -> None:
     businfo_path = args.output or busline_path("businfo", route_dir)
     stops_path = args.stops_output or (businfo_path.with_name("stops.json") if args.output
                                        else busline_path("stops", route_dir))
+    stops = build_stops(result, args.mandatory_stop_id)
+    if stops_path.is_file():
+        previous = json.loads(stops_path.read_text())
+        classes = {stop["name"]: stop["class"] for stop in previous}
+        stops = [{**stop, "class": classes.get(stop["name"], stop["class"])} for stop in stops]
+        names = {stop["name"] for stop in stops}
+        stops.extend(stop for stop in previous if stop["name"].startswith("Stop_OSM_")
+                     and stop["name"] not in names)
     write_json(businfo_path, result)
-    write_json(stops_path, build_stops(result, args.mandatory_stop_id))
+    write_json(stops_path, stops)
     print(f"Wrote {len(result['stops'])} stops and {len(result['patterns'])} patterns to {businfo_path}")
     print(f"Wrote REQreate stop places to {stops_path}")
 

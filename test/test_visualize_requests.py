@@ -38,9 +38,9 @@ def test_requests_map():
             output = requests_map.draw_requests_map("test", "sample", root / "map.png")
             assert output.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
 
-            busline_dir = root / "data" / "buslines" / "550"
+            busline_dir = root / "outputs" / "buslines" / "550"
             busline_dir.mkdir(parents=True)
-            (busline_dir / "businfo.json").write_text(json.dumps({
+            (busline_dir / "buslines.json").write_text(json.dumps({
                 "stops": [{"stop_id": "a", "stop_lon": 6.0, "stop_lat": 49.5},
                           {"stop_id": "b", "stop_lon": 6.01, "stop_lat": 49.51}],
                 "patterns": [{"stop_ids": ["a", "b"]}]}))

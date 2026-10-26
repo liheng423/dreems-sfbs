@@ -4,28 +4,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Select locations · __MAP__</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.20.0/dist/leaflet-geoman.css">
+<link rel="stylesheet" href="/sfbs_route.css">
 <style>
   body { margin: 0; height: 100vh; display: flex; flex-direction: column; font: 15px sans-serif; }
   header { padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
   h1 { font-size: 18px; margin: 0; }
   #counts, #status, #legend { font-size: 13px; }
-  #legend { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-  #legend span { display: inline-flex; align-items: center; gap: 4px; }
   #legend i, .location-node { width: 10px; height: 10px; box-sizing: border-box; border: 1px solid #526c63; border-radius: 50%; }
   #legend i { display: inline-block; }
-  #map { flex: 1; min-height: 0; }
+  #map-shell { position: relative; flex: 1; min-height: 0; }
+  #map { position: absolute; inset: 0; }
+  #legend { position: absolute; top: 12px; right: 12px; z-index: 1000; background: #fff;
+    border: 1px solid #c7d2ca; border-radius: 7px; box-shadow: 0 2px 12px #243d3626; }
+  #legend summary { display: flex; align-items: center; gap: 7px; padding: 8px 10px;
+    cursor: pointer; font-weight: 600; list-style: none; }
+  #legend summary::-webkit-details-marker { display: none; }
+  #legend svg { width: 18px; height: 18px; }
+  #legend .legend-items { display: grid; gap: 7px; padding: 4px 12px 12px; }
+  #legend .legend-items span { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  #legend .route-key { width: 20px; height: 0; border: 0; border-top: 3px solid #ba4f79; border-radius: 0; }
+  #map .marker-icon-middle {
+    opacity: 0 !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin: -10px 0 0 -10px !important;
+    cursor: grab !important;
+  }
+  #map .marker-icon-middle:hover { opacity: .45 !important; }
+  #direction[hidden] { display: none; }
+  .field { display: block; margin: 5px 0; }
+  .field input, .field select { display: block; width: 100%; box-sizing: border-box; }
+  .field-help { display: block; margin-top: 2px; color: #536861; font-size: 11px; line-height: 1.35; }
+  .stop-popup { width: 240px; max-height: min(75vh, 610px); overflow: auto; }
+  .stop-popup strong { display: block; margin: 4px 0; }
   button { font: inherit; }
 </style>
 <header>
   <h1>Graph locations · __MAP__</h1>
-  <span>Click a node and choose any combination of location types.</span>
-  <span id="legend"><span><i style="background:#174b9b"></i> Optional SFBS bus stops</span><span><i style="background:#b56a18"></i> DARP + SFBS parking</span><span><i style="background:#a33375"></i> Fixed charging stations</span></span>
+  <label>Mode <select id="mode"><option value="busline">Bus line</option><option value="locations">Parking and charging</option></select></label>
+  <label id="direction">Direction <select id="pattern"></select></label>
+  <span id="hint">Add a stop: drag a route midpoint to a graph node, or click a graph node and choose Insert stop. Then save.</span>
   <span id="counts"></span>
-  <button id="save" disabled>Save location CSVs</button>
+  <button id="save" disabled>Save changes</button>
   <span id="status" role="status">Loading saved graph nodes…</span>
 </header>
-<div id="map" aria-label="Map of selectable driving graph nodes"></div>
+<div id="map-shell">
+  <div id="map" aria-label="Map of selectable driving graph nodes"></div>
+  <details id="legend">
+    <summary><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="4" cy="4" r="2" fill="#174b9b"/><circle cx="14" cy="14" r="2" fill="#6baddb"/><path d="M6 6L12 12" stroke="#ba4f79" stroke-width="2" stroke-dasharray="2 2"/></svg> Legend</summary>
+    <div class="legend-items">
+      <span><i style="background:#dce8df"></i> Graph node</span>
+      <span><i class="sfbs-stop-key sfbs-mandatory"></i><b class="sfbs-number-key sfbs-mandatory">1</b> Mandatory stop</span>
+      <span><i class="sfbs-stop-key sfbs-optional"></i><b class="sfbs-number-key sfbs-optional">2</b> Optional stop</span>
+      <span><i class="route-key"></i> Mandatory-only link</span>
+      <span><i class="sfbs-optional-key"></i> Link to optional stop</span>
+      <span>Numbers show position in selected direction</span>
+      <span><i style="background:#b56a18"></i> Parking</span>
+      <span><i style="background:#a33375"></i> Charging</span>
+    </div>
+  </details>
+</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.20.0/dist/leaflet-geoman.js"></script>
+<script src="/sfbs_route.js"></script>
 <script>
   const map = L.map('map').setView([49.61, 6.13], 10);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -36,28 +78,178 @@
   const counts = document.querySelector('#counts');
   const save = document.querySelector('#save');
   const status = document.querySelector('#status');
-  const names = {
-    optional_bus_stops: 'bus stops',
-    parking_locations: 'parking',
-    fixed_charging_stations: 'charging'
-  };
+  const mode = document.querySelector('#mode');
+  const direction = document.querySelector('#direction');
+  const patternSelect = document.querySelector('#pattern');
+  const names = {parking_locations: 'parking', fixed_charging_stations: 'charging'};
   const colors = {
-    optional_bus_stops: '#174b9b',
+    mandatory: '#174b9b',
+    optional: '#6baddb',
     parking_locations: '#b56a18',
     fixed_charging_stations: '#a33375'
   };
+  const gtfsHelp = {
+    stop_name: 'Name shown to passengers.',
+    parent_station: 'Parent ID in stops.txt: station for a platform, or platform for a boarding area. Blank for a standalone stop.',
+    location_type: '0 or blank: stop/platform · 1: station · 2: entrance/exit · 3: station pathway node · 4: boarding area.',
+    wheelchair_boarding: '0 or blank: unknown/inherit · 1: wheelchair boarding or access available · 2: unavailable.'
+  };
   const markers = new Map();
+  const stopMarkers = new Map();
+  const nodePositions = new Map();
   let selected = Object.fromEntries(Object.keys(names).map(name => [name, new Set()]));
+  let stops = new Map();
+  let patterns = [];
+  let sequenceLine = null;
+  let sequenceSegments = [];
+  let hasBusline = false;
+
+  function updateCounts() {
+    counts.textContent = `mandatory stops: ${[...stops.values()].filter(stop => stop.class === 'mandatory').length}`
+      + ` · optional stops: ${[...stops.values()].filter(stop => stop.class === 'optional').length}`
+      + ` · parking: ${selected.parking_locations.size} · charging: ${selected.fixed_charging_stations.size}`;
+  }
 
   function updateNode(id) {
-    const chosen = Object.keys(names).filter(name => selected[name].has(id));
+    const stopClass = stops.get(`Stop_OSM_${id}`)?.class;
+    const chosen = [...(stopClass ? [stopClass] : []),
+      ...Object.keys(names).filter(name => selected[name].has(id))];
     const section = 100 / chosen.length;
     markers.get(id).getElement().style.background = chosen.length < 2
       ? (chosen.length ? colors[chosen[0]] : '#dce8df')
       : `conic-gradient(${chosen.map((name, index) =>
         `${colors[name]} ${index * section}% ${(index + 1) * section}%`).join(', ')})`;
-    counts.textContent = Object.entries(names)
-      .map(([name, label]) => `${label}: ${selected[name].size}`).join(' · ');
+  }
+
+  function changed(redraw = true) {
+    save.disabled = false;
+    updateCounts();
+    if (redraw) drawSequence();
+  }
+
+  function field(parent, label, value, onChange, numeric = false, help = '') {
+    const row = document.createElement('label');
+    row.className = 'field';
+    row.append(label);
+    const input = document.createElement('input');
+    input.type = numeric ? 'number' : 'text';
+    if (numeric) input.step = 'any';
+    input.value = value ?? '';
+    input.onchange = () => { onChange(numeric ? input.valueAsNumber : input.value); changed(); };
+    row.append(input);
+    if (help) {
+      const note = document.createElement('small');
+      note.className = 'field-help';
+      note.textContent = help;
+      row.append(note);
+    }
+    parent.append(row);
+    return input;
+  }
+
+  function staticField(parent, label, value) {
+    const row = document.createElement('div');
+    row.className = 'field';
+    row.textContent = `${label}: ${value}`;
+    parent.append(row);
+  }
+
+  function stopEditor(stop) {
+    const popup = document.createElement('div');
+    popup.className = 'stop-popup';
+    const title = document.createElement('strong');
+    title.textContent = stop.label || stop.name;
+    popup.append(title);
+    for (const key of Object.keys(stop).filter(key => !['original_name', 'label', 'gtfs'].includes(key))) {
+      if (key === 'class') {
+        const row = document.createElement('label');
+        row.className = 'field';
+        row.append('class');
+        const select = document.createElement('select');
+        for (const value of ['mandatory', 'optional']) select.add(new Option(value, value));
+        select.value = stop.class;
+        select.onchange = () => {
+          stop.class = select.value;
+          const marker = stopMarkers.get(stop.original_name);
+          if (marker) marker.setStyle(sfbsStopStyle(stop.class));
+          if (stop.original_name.startsWith('Stop_OSM_')) updateNode(stop.original_name.slice(9));
+          changed();
+        };
+        row.append(select);
+        const note = document.createElement('small');
+        note.className = 'field-help';
+        note.textContent = 'SFBS stop class. Both classes keep their sequence number; links touching optional stops are dashed.';
+        row.append(note);
+        popup.append(row);
+      } else if (['name', 'type', 'lat', 'lon'].includes(key)) {
+        staticField(popup, key, stop[key]);
+        if (key === 'type') {
+          const note = document.createElement('small');
+          note.className = 'field-help';
+          note.textContent = 'Internal place type; separate from GTFS location_type below.';
+          popup.append(note);
+        }
+      } else field(popup, key, stop[key], value => { stop[key] = value; });
+    }
+    if (stop.gtfs) {
+      const heading = document.createElement('strong');
+      heading.textContent = 'GTFS stop fields';
+      popup.append(heading);
+      for (const key of Object.keys(stop.gtfs).filter(key => !['stop_id', 'stop_lat', 'stop_lon'].includes(key)))
+        field(popup, key, stop.gtfs[key], value => { stop.gtfs[key] = value; }, false, gtfsHelp[key]);
+    } else {
+      const remove = document.createElement('button');
+      remove.textContent = 'Remove bus stop';
+      remove.onclick = () => {
+        stops.delete(stop.original_name);
+        for (const pattern of patterns) pattern.stop_ids = pattern.stop_ids.filter(id => id !== stop.name.slice(5));
+        const id = stop.original_name.slice(9);
+        if (stopMarkers.has(stop.original_name)) {
+          layer.removeLayer(stopMarkers.get(stop.original_name));
+          stopMarkers.delete(stop.original_name);
+        }
+        if (markers.has(id)) updateNode(id);
+        map.closePopup();
+        changed();
+      };
+      popup.append(remove);
+    }
+    return popup;
+  }
+
+  function addStopMarker(stop) {
+    const marker = L.circleMarker([stop.lat, stop.lon], sfbsStopStyle(stop.class))
+      .bindPopup(() => stopEditor(stop)).addTo(layer);
+    stopMarkers.set(stop.original_name, marker);
+  }
+
+  function ensureBusStop(id) {
+    const name = `Stop_OSM_${id}`;
+    if (!stops.has(name)) {
+      const [lat, lon] = nodePositions.get(id);
+      const stop = {name, original_name: name, type: 'location', class: 'optional',
+        lat, lon, gtfs: null};
+      stops.set(name, stop);
+      addStopMarker(stop);
+      updateNode(id);
+    }
+    return stops.get(name);
+  }
+
+  function nearestSegment(point, pattern) {
+    const route = pattern.stop_ids.map(id =>
+      [...stops.values()].find(stop => stop.name === `Stop_${id}`));
+    const target = map.latLngToContainerPoint(point);
+    let best = null, distance = Infinity;
+    for (let index = 0; index < route.length - 1; index++) {
+      const from = route[index], to = route[index + 1];
+      if (!from || !to) continue;
+      const away = L.LineUtil.pointToSegmentDistance(target,
+        map.latLngToContainerPoint([from.lat, from.lon]),
+        map.latLngToContainerPoint([to.lat, to.lon]));
+      if (away < distance) { best = {index, from, to}; distance = away; }
+    }
+    return best;
   }
 
   function nodePopup(id) {
@@ -65,6 +257,25 @@
     const title = document.createElement('strong');
     title.textContent = `Drive graph node ${id}`;
     popup.append(title);
+    if (mode.value === 'busline') {
+      const stop = stops.get(`Stop_OSM_${id}`);
+      const pattern = patterns[patternSelect.selectedIndex];
+      const segment = pattern && nearestSegment(nodePositions.get(id), pattern);
+      if (segment && !pattern.stop_ids.includes(stop?.name.slice(5))) {
+        const insert = document.createElement('button');
+        insert.textContent = `Insert stop: ${segment.from.label || segment.from.name} → ${segment.to.label || segment.to.name}`;
+        insert.onclick = () => {
+          const added = ensureBusStop(id);
+          pattern.stop_ids.splice(segment.index + 1, 0, added.name.slice(5));
+          map.closePopup();
+          status.textContent = `Stop added. ${pattern.stop_ids.length} stops in this direction.`;
+          changed();
+        };
+        popup.append(insert);
+      }
+      if (stop) popup.append(stopEditor(stop));
+      return popup;
+    }
     for (const [name, label] of Object.entries(names)) {
       const row = document.createElement('label');
       row.style.display = 'block';
@@ -72,26 +283,115 @@
       checkbox.type = 'checkbox';
       checkbox.checked = selected[name].has(id);
       checkbox.onchange = () => {
-        if (checkbox.checked) selected[name].add(id);
-        else selected[name].delete(id);
+        if (checkbox.checked) {
+          selected[name].add(id);
+        } else {
+          selected[name].delete(id);
+        }
         updateNode(id);
-        save.disabled = false;
+        changed();
+        markers.get(id).bindPopup(() => nodePopup(id)).openPopup();
       };
       row.append(checkbox, ` ${label}`);
       popup.append(row);
+      if (selected[name].has(id)) {
+        const [lat, lon] = nodePositions.get(id);
+        staticField(popup, `${label} osmid`, id);
+        staticField(popup, `${label} x`, lon);
+        staticField(popup, `${label} y`, lat);
+      }
     }
     return popup;
   }
+
+  function matchingStop(point) {
+    return [...stops.values()].find(stop =>
+      Math.abs(stop.lat - point.lat) < 1e-7 && Math.abs(stop.lon - point.lng) < 1e-7);
+  }
+
+  function applySequence(points) {
+    const pattern = patterns[patternSelect.selectedIndex];
+    if (!pattern || points.length < 2) return false;
+    const targets = points.map(point => {
+      const stop = matchingStop(point);
+      if (stop) return stop;
+      const node = [...nodePositions].find(([, [lat, lon]]) =>
+        Math.abs(lat - point.lat) < 1e-7 && Math.abs(lon - point.lng) < 1e-7);
+      return node?.[0] ?? null;
+    });
+    if (targets.includes(null)) {
+      status.textContent = 'Drop on an existing stop or graph node. Route unchanged.';
+      return false;
+    }
+    pattern.stop_ids = targets.map(target =>
+      (typeof target === 'string' ? ensureBusStop(target) : target).name.slice(5));
+    status.textContent = `Route updated. ${pattern.stop_ids.length} stops in this direction.`;
+    changed(false);
+    return true;
+  }
+
+  function drawSequence() {
+    if (sequenceLine) {
+      sequenceLine.pm.disable();
+      map.removeLayer(sequenceLine);
+      sequenceLine = null;
+    }
+    for (const segment of sequenceSegments) map.removeLayer(segment);
+    sequenceSegments = [];
+    const pattern = patterns[patternSelect.selectedIndex];
+    if (!pattern || mode.value !== 'busline') {
+      sfbsNumberStops(stopMarkers, []);
+      return;
+    }
+    const route = sfbsRoute(pattern.stop_ids,
+      new Map([...stops.values()].map(stop => [stop.name, stop])));
+    sfbsNumberStops(stopMarkers, [route]);
+    if (route.points.length < 2) return;
+    sequenceSegments = route.segments.map(segment =>
+      L.polyline(segment.coordinates, {color: '#ba4f79', weight: 4,
+        dashArray: segment.dashArray, interactive: false, snapIgnore: true}).addTo(map));
+    sequenceLine = L.polyline(route.points.map(point => point.coordinates),
+      {color: '#ba4f79', weight: 10, opacity: 0, snapIgnore: true,
+        smoothFactor: 0}).addTo(map);
+    sequenceLine.pm.enable({snappable: true, snapDistance: 20, snapSegment: false,
+      addVertexOn: 'dragstart', removeLayerBelowMinVertexCount: false});
+    const line = sequenceLine;
+    line.on('pm:vertexclick', ({indexPath}) => {
+      stopMarkers.get(`Stop_${pattern.stop_ids[indexPath]}`)?.openPopup();
+    });
+    line.on('pm:markerdragend pm:vertexremoved pm:dragend', () => {
+      if (line === sequenceLine) {
+        applySequence(line.getLatLngs());
+        drawSequence();
+      }
+    });
+    for (const marker of stopMarkers.values()) marker.bringToFront();
+  }
+  patternSelect.onchange = () => { map.closePopup(); drawSequence(); };
+  mode.onchange = () => {
+    direction.hidden = mode.value !== 'busline';
+    document.querySelector('#hint').textContent = mode.value === 'busline'
+      ? 'Add a stop: drag a route midpoint to a graph node, or click a graph node and choose Insert stop. Then save.'
+      : 'Click a graph node to select parking and charging locations.';
+    for (const marker of stopMarkers.values()) {
+      if (mode.value === 'busline') marker.addTo(layer);
+      else layer.removeLayer(marker);
+    }
+    map.closePopup();
+    drawSequence();
+  };
   save.onclick = async () => {
     save.disabled = true;
-    status.textContent = 'Saving location CSVs…';
+    status.textContent = 'Saving…';
     try {
       const response = await fetch('/save', {method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(Object.fromEntries(Object.entries(selected)
-          .map(([name, ids]) => [name, [...ids]])))});
+        body: JSON.stringify({locations: Object.fromEntries(Object.entries(selected)
+          .map(([name, ids]) => [name, [...ids]])),
+          ...(hasBusline ? {stops: [...stops.values()], patterns} : {})})});
       status.textContent = await response.text();
       if (!response.ok) save.disabled = false;
+      else window.location.reload();
     } catch (error) {
       status.textContent = error.message;
       save.disabled = false;
@@ -102,17 +402,36 @@
     const response = await fetch('/data');
     if (!response.ok) throw new Error(await response.text());
     const data = await response.json();
+    hasBusline = data.has_busline;
+    mode.querySelector('[value="busline"]').disabled = !hasBusline;
+    if (!hasBusline) mode.value = 'locations';
+    stops = new Map(data.stops.map(stop => [stop.original_name, stop]));
+    patterns = data.patterns;
+    patternSelect.replaceChildren();
+    for (const pattern of patterns) {
+      const option = document.createElement('option');
+      option.value = pattern.pattern_id;
+      option.textContent = pattern.label;
+      patternSelect.append(option);
+    }
     selected = Object.fromEntries(Object.keys(names)
       .map(name => [name, new Set(data.locations[name])]));
     for (const [id, lat, lon] of data.nodes) {
       const point = [Number(lat), Number(lon)];
+      nodePositions.set(id, point);
       const marker = L.marker(point, {icon: L.divIcon({className: 'location-node',
         iconSize: [10, 10], iconAnchor: [5, 5]})})
         .bindPopup(() => nodePopup(id)).addTo(layer);
       markers.set(id, marker);
       updateNode(id);
     }
-    status.textContent = `${markers.size} drive graph nodes available.`;
+    for (const stop of data.stops) {
+      addStopMarker(stop);
+    }
+    status.textContent = `${markers.size} drive graph nodes available.`
+      + (hasBusline ? '' : ' Pass --busline to edit route stops.');
+    updateCounts();
+    mode.onchange();
     if (markers.size) map.fitBounds(layer.getBounds().pad(0.1));
   }
   load().catch(error => { status.textContent = error.message; });

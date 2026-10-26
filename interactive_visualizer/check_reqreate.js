@@ -77,9 +77,9 @@ assert.match(elements.get('req-timeline').innerHTML, /Boarding and alighting ser
 context.newPool = { 'num_data:': 1, requests: { [context.windowReq.reqid]: context.windowReq } };
 assert.equal(vm.runInContext('read_reqs(newPool).length', context), 1);
 assert.match(elements.get('selected-energy-note').textContent, /Load the bus energy JSON/);
-const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'stops.json'), 'utf8'));
-const businfo = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'businfo.json'), 'utf8'));
-const energy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'buslines', '550', 'energy.json'), 'utf8'));
+const stops = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'outputs', 'buslines', '550', 'stops.json'), 'utf8'));
+const businfo = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'outputs', 'buslines', '550', 'buslines.json'), 'utf8'));
+const energy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'outputs', 'buslines', '550', 'energy.json'), 'utf8'));
 context.stops = stops;
 context.businfo = businfo;
 context.energy = energy;

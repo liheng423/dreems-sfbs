@@ -6,12 +6,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT / "data"
-BUSLINES_DIR = DATA_DIR / "buslines"
+BUSLINES_DIR = ROOT / "outputs" / "buslines"
 GRAPHS_DIR = ROOT / "outputs" / "graphs"
 REQUESTS_DIR = ROOT / "outputs" / "requests"
 BUSLINE_FILES = {
-    "businfo": "businfo.json",
+    "businfo": "buslines.json",
     "stops": "stops.json",
     "energy": "energy.json",
     "distance_matrix": "distance_matrix.json",
