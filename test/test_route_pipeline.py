@@ -332,8 +332,8 @@ def test_generate_with_busline_saves_stop_points():
         "max_walking_distance_m": 1000, "simulation_end_s": 43200,
         "distributions": {"radial_direction": {"type": "uniform", "loc": 0, "scale": 360},
                           "radial_distance": {"type": "uniform", "loc": 500, "scale": 0}},
-        "attributes": {"origin": {}, "destination": {}, "time_stamp": {}},
-        "parameters": [], "method_pois": {"rows": 1, "columns": 1},
+        "attributes": {"origin": {}, "destination": {}, "order_place_time": {}},
+        "parameters": [], "method_pois": {"cell_size_m": 500},
     }
     drive = nx.DiGraph()
     drive.add_node(1, x=6.1, y=49.5)
@@ -361,7 +361,7 @@ def test_generate_with_busline_saves_stop_points():
 
 
 def test_demand_time_window():
-    """Departure times stay in one day; request appearance may be earlier."""
+    """Departure times stay in one day; order placement may be earlier."""
     assert generate.clock_seconds("07:30") == 27000
     assert generate.clock_seconds("23:59:59") == 86399
     defaults = generate.load_config("DARP")
@@ -405,9 +405,9 @@ def test_demand_time_window():
     drive.add_node(2, x=0.71, y=0.72)
     early = {"reqid": 0, "origin": [0.5, 0.5], "destination": [0.7, 0.7],
              "originnode_drive": 1, "destinationnode_drive": 2,
-             "direct_distance": 200, "direct_travel_time": 30, "time_stamp": -3600,
+             "direct_distance": 200, "direct_travel_time": 30, "order_place_time": -3600,
              "latest_arrival": 7100}
-    on_time = early | {"reqid": 1, "time_stamp": 3000}
+    on_time = early | {"reqid": 1, "order_place_time": 3000}
     late_arrival = on_time | {"reqid": 2, "latest_arrival": 7201}
     with patch.object(generate, "build_area_net", return_value=SimpleNamespace(
         polygon=box(0, 0, 1, 1), G_drive=drive
@@ -429,8 +429,8 @@ def test_request_distributions_from_toml():
     source = re.sub(r'^lt_dynamic = .*$',
                     'lt_dynamic = { type = "uniform", loc = 60, scale = 120 }',
                     source, count=1, flags=re.MULTILINE)
-    source = re.sub(r'^dynamic_time_stamp = .*$',
-                    'dynamic_time_stamp = { type = "poisson", rate_per_hour = 10 }',
+    source = re.sub(r'^dynamic_order_place_time = .*$',
+                    'dynamic_order_place_time = { type = "poisson", rate_per_hour = 10 }',
                     source, count=1, flags=re.MULTILINE)
     with TemporaryDirectory() as directory:
         cfg_path = Path(directory) / "request_gen.toml"
@@ -439,15 +439,15 @@ def test_request_distributions_from_toml():
             cfg = generate.load_config("DARP")
     assert cfg["attributes"]["lt_dynamic"]["pdf"] == [
         {"type": "uniform", "loc": 60, "scale": 120}]
-    assert cfg["distributions"]["dynamic_time_stamp"] == {
+    assert cfg["distributions"]["dynamic_order_place_time"] == {
         "type": "poisson", "rate_per_hour": 10}
     assert cfg["requests"] == 90
 
 
 def test_event_time_distribution_requires_poisson():
     source = generate.CFG_PATH.read_text()
-    source = re.sub(r'^dynamic_time_stamp = .*$',
-                    'dynamic_time_stamp = { type = "uniform", rate_per_hour = 10 }',
+    source = re.sub(r'^dynamic_order_place_time = .*$',
+                    'dynamic_order_place_time = { type = "uniform", rate_per_hour = 10 }',
                     source, count=1, flags=re.MULTILINE)
     with TemporaryDirectory() as directory:
         cfg_path = Path(directory) / "request_gen.toml"
@@ -472,7 +472,7 @@ def test_poisson_arrival_windows():
     assert all(cfg["simulation_start_s"] <= time < cfg["simulation_end_s"] for time in dynamic)
     assert all(cfg["demand_start_s"] <= time < cfg["simulation_end_s"] for time in prebooked)
     assert 30 < len(dynamic) < 70 and 30 < len(prebooked) < 70
-    cfg["distributions"]["dynamic_time_stamp"]["rate_per_hour"] = 0
+    cfg["distributions"]["dynamic_order_place_time"]["rate_per_hour"] = 0
     cfg["distributions"]["prebooked_earliest_departure"]["rate_per_hour"] = 0
     assert len(generate.sample_arrivals(cfg)[0]) == 0
 
@@ -491,7 +491,7 @@ def test_retry_if_filtered_keeps_sampled_request_count():
     ):
         requests = generate.generate_candidates(cfg, SimpleNamespace())
     assert list(requests) == ["0", "1"]
-    assert requests["0"]["time_stamp"] == 30000
+    assert requests["0"]["order_place_time"] == 30000
     assert cfg["generated_candidate_count"] == 3
 
 
@@ -510,7 +510,7 @@ def test_distance_distribution_from_request_config():
         "type": "normal", "loc": 900, "scale": 100}
     assert "pdf" not in cfg["method_pois"]
     cfg["requests"] = 1
-    req = {"time_stamp": 0, "latest_arrival": 18000,
+    req = {"order_place_time": 0, "latest_arrival": 18000,
            "originnode_drive": 1, "destinationnode_drive": 2}
     drive = nx.DiGraph()
     drive.add_node(1, x=6.1, y=49.5)

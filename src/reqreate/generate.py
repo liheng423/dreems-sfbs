@@ -98,7 +98,7 @@ def sample_arrivals(cfg):
         distributions["prebooked_earliest_departure"],
         cfg["demand_start_s"], cfg["simulation_end_s"])))
     dynamic_count = int(rng.poisson(expected_events(
-        distributions["dynamic_time_stamp"],
+        distributions["dynamic_order_place_time"],
         cfg["simulation_start_s"], cfg["simulation_end_s"])))
     prebooked = np.array([True] * prebooked_count + [False] * dynamic_count, dtype=bool)
     rng.shuffle(prebooked)
@@ -128,10 +128,10 @@ def set_request_times(req, prebooked, time, cfg):
     """Add booking time, permitted stop-service windows, and the arrival deadline."""
     if prebooked:
         req["earliest_departure"] = int(time)
-        req["time_stamp"] = req["earliest_departure"] - req["lead_time"]
+        req["order_place_time"] = req["earliest_departure"] - req["lead_time"]
     else:
-        req["time_stamp"] = int(time)
-        req["earliest_departure"] = req["time_stamp"] + req["lead_time"]
+        req["order_place_time"] = int(time)
+        req["earliest_departure"] = req["order_place_time"] + req["lead_time"]
     distributions = cfg["distributions"]
     req["service_time"] = sample_duration(distributions["service_time"])
     req["pickup_from"] = req["earliest_departure"]
@@ -185,7 +185,7 @@ def load_config(task, busline_name=None):
     cfg["simulation_end_s"] = end_s
     cfg["demand_start_s"] = demand_start_s
     distributions = cfg["distributions"]
-    expected_dynamic = expected_events(distributions["dynamic_time_stamp"], start_s, end_s)
+    expected_dynamic = expected_events(distributions["dynamic_order_place_time"], start_s, end_s)
     expected_prebooked = expected_events(distributions["prebooked_earliest_departure"],
                                          demand_start_s, end_s)
     cfg["requests"] = expected_dynamic + expected_prebooked
@@ -210,7 +210,7 @@ def prepare_network(cfg, area_path, poi_path):
             json.loads(busline_path("businfo", busline_dir(cfg["busline_name"])).read_text())
         )
     pois = load_pois(poi_path)
-    set_poi_zones(net, pois, cfg["method_pois"]["rows"], cfg["method_pois"]["columns"])
+    set_poi_zones(net, pois, cfg["method_pois"]["cell_size_m"])
     return net
 
 
@@ -272,7 +272,7 @@ def filter_requests(cfg, net, reqs):
         req_id: req for req_id, req in reqs.items()
         if cfg["demand_start_s"] <= req["earliest_departure"] <= cfg["simulation_end_s"]
         and req["latest_arrival"] <= cfg["simulation_end_s"]
-        and (not req["is_prebooked"] or req["time_stamp"] < cfg["simulation_start_s"])
+        and (not req["is_prebooked"] or req["order_place_time"] < cfg["simulation_start_s"])
         and passes_filters(req, cfg["request_filters"], net, cfg)
     }
     if cfg["task"] == "SFBS":

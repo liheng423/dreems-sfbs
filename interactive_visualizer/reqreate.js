@@ -188,12 +188,12 @@ function draw_req_timeline(req) {
   const timeline = $('req-timeline');
   timeline.hidden = false;
   if (req.pickup_from === undefined) {
-    timeline.innerHTML = `<h3>Request timeline</h3><div class="timeline-track" role="img" aria-label="Order placed ${sec_label(req.time_stamp)}; earliest departure ${sec_label(req.earliest_departure)}; latest arrival ${sec_label(req.latest_arrival)}"><span class="timeline-order"></span></div>
-      <div class="timeline-axis"><span>Order placed<br><strong>${sec_label(req.time_stamp)}</strong></span><span>Latest arrival<br><strong>${sec_label(req.latest_arrival)}</strong></span></div>
+    timeline.innerHTML = `<h3>Request timeline</h3><div class="timeline-track" role="img" aria-label="Order placed ${sec_label(req.order_place_time)}; earliest departure ${sec_label(req.earliest_departure)}; latest arrival ${sec_label(req.latest_arrival)}"><span class="timeline-order"></span></div>
+      <div class="timeline-axis"><span>Order placed<br><strong>${sec_label(req.order_place_time)}</strong></span><span>Latest arrival<br><strong>${sec_label(req.latest_arrival)}</strong></span></div>
       <p>Pickup and dropoff windows are absent from this saved instance. Regenerate demand to include them.</p>`;
     return;
   }
-  const { time_stamp: booked, pickup_from, pickup_to, dropoff_from, dropoff_to, service_time } = req;
+  const { order_place_time: booked, pickup_from, pickup_to, dropoff_from, dropoff_to, service_time } = req;
   const broken = pickup_from - booked > 3 * (dropoff_to - pickup_from);
   const position = (second) => broken && second > pickup_from
     ? 28 + 72 * (second - pickup_from) / (dropoff_to - pickup_from)
@@ -224,7 +224,7 @@ function read_reqs(data) {
         ('energy_kwh' in req && !Number.isFinite(req.energy_kwh)) ||
         !['origin', 'destination'].every((endpoint) => Array.isArray(req[endpoint]) &&
           req[endpoint].length === 2 && req[endpoint].every(Number.isFinite)) ||
-        !['earliest_departure', 'latest_arrival', 'time_stamp', 'lead_time',
+        !['earliest_departure', 'latest_arrival', 'order_place_time', 'lead_time',
           'direct_distance', 'direct_travel_time'].every((field) => Number.isFinite(req[field]))) {
       throw new Error(`Request ${key} does not match the REQreate output format.`);
     }
@@ -364,7 +364,7 @@ function show_req(req, fit_map = true) {
     `${is_sfbs(req) ? 'SFBS' : 'DARP'} request #${req.reqid} · ${req.is_prebooked ? 'Pre-booked' : 'Dynamic'}\n` +
     `${place_label(req, 'origin')} → ${place_label(req, 'destination')}\n` +
     `Earliest departure ${sec_label(req.earliest_departure)} · Latest arrival ${sec_label(req.latest_arrival)}\n` +
-    `Booked ${sec_label(req.time_stamp)} · Lead ${Math.round(req.lead_time / 60)} min\n` +
+    `Booked ${sec_label(req.order_place_time)} · Lead ${Math.round(req.lead_time / 60)} min\n` +
     `Direct distance ${(req.direct_distance / 1000).toFixed(1)} km · ` +
     `Direct travel ${Math.round(req.direct_travel_time / 60)} min` +
     (!is_sfbs(req) && graph_kind ? `\n${graph_kind} pickup node ${req[`originnode_${graph_kind}`] ?? 'unavailable'} · ` +

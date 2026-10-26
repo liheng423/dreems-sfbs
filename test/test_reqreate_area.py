@@ -73,7 +73,7 @@ def main():
         assert req["direct_travel_time"] == int(req["direct_distance"] / 5.56) > 0
         assert 17100 <= req["earliest_departure"] <= 86510
         assert req["lead_time"] == req["lt_prebooked" if req["is_prebooked"] else "lt_dynamic"]
-        assert req["time_stamp"] == req["earliest_departure"] - req["lead_time"]
+        assert req["order_place_time"] == req["earliest_departure"] - req["lead_time"]
         assert req["latest_arrival"] == req["earliest_departure"] + req["direct_travel_time"] + 600
     # Independently route a sample; avoid routing the entire generated pool twice.
     for req in list(reqs.values())[:20]:

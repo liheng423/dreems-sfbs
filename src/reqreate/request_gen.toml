@@ -10,17 +10,19 @@ start = "08:00:00"
 end = "12:00:00"
 demand_start = "08:00:00"
 
-# Dynamic request time_stamps follow a Poisson process over simulation.start..end.
+# See README.md for details on the definitions of the following parameters.
+# Dynamic order placement times follow a Poisson process over simulation.start..end.
 # Prebooked earliest_departure times independently follow a Poisson process over
-# simulation.demand_start..end; their time_stamps are departure minus lead time.
-# Lead times are in seconds. REQreate field definitions live in generate.py.
+# simulation.demand_start..end; their order placement times are departure minus lead time.
+# Lead times are in seconds. Interval between the time order is placed and the desired pickup time.
 # radial_distance samples the distance from the POI-zone endpoint to the other endpoint.
 # radial_direction samples that endpoint's bearing clockwise from north: 0° north, 90° east.
 # loc is the first degree and scale is the clockwise range; loc=0, scale=360 allows every direction.
 [distributions]
-dynamic_time_stamp = { type = "poisson", rate_per_hour = 12.5 }
+dynamic_order_place_time = { type = "poisson", rate_per_hour = 12.5 }
 prebooked_earliest_departure = { type = "poisson", rate_per_hour = 12.5 }
-lt_dynamic = { type = "uniform", loc = 300, scale = 1500 }
+# TODO: check if what is the minimum lead time for dynamic requests.
+lt_dynamic = { type = "uniform", loc = 300, scale = 1500 } # lead time for dynamic requests
 lt_prebooked = { type = "uniform", loc = 36000, scale = 72000 }
 radial_distance = { type = "uniform", loc = 500, scale = 14500 }          # [m]
 radial_direction = { type = "uniform", loc = 0, scale = 360 }

@@ -39,7 +39,7 @@ REQUEST_FILES = {
     "parameters": "parameters.txt",
 }
 REQUEST_OUTPUT_FIELDS = (
-    "reqid", "is_prebooked", "lead_time", "time_stamp", "earliest_departure",
+    "reqid", "is_prebooked", "lead_time", "order_place_time", "earliest_departure",
     "latest_arrival", "pickup_from", "pickup_to", "dropoff_from", "dropoff_to",
     "service_time", "origin", "destination", "originnode_drive",
     "destinationnode_drive", "direct_distance", "direct_travel_time", "energy_kwh",

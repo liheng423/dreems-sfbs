@@ -11,9 +11,10 @@ railway = ["halt", "station", "tram_stop"]
 shop = true
 tourism = ["apartment", "artwork", "attraction", "camp_site", "caravan_site", "chalet", "gallery", "guest_house", "hostel", "hotel", "museum", "picnic_site", "viewpoint", "zoo"]
 
+# POI sampling settings. We use the grid for 500m x 500m cells.
 [method_pois]
-rows = 50
-columns = 50
+cell_size_m = 500
+# TODO: How would this impact the data
 
 [locations]
 depot = { "name" = "Depot Sales-Lentz Bascharage", "lat" = 49.568613, "lon" = 5.922762 }

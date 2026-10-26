@@ -45,7 +45,7 @@ def main():
         assert req["latest_arrival"] <= meta["simulation_end_s"]
         assert req["is_prebooked"] in (0, 1)
         assert req["lead_time"] == req["lt_prebooked" if req["is_prebooked"] else "lt_dynamic"]
-        assert req["time_stamp"] == req["earliest_departure"] - req["lead_time"]
+        assert req["order_place_time"] == req["earliest_departure"] - req["lead_time"]
         assert req["latest_arrival"] == req["earliest_departure"] + req["direct_travel_time"] + 600
     print(f"Validated {len(reqs)} raw REQreate requests")
 

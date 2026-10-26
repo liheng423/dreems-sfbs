@@ -1,0 +1,8 @@
+# Illustrative mobile charger that can charge other vehicles; replace these
+# placeholder values before using them in an operational model.
+[charging_truck_profiles.dummy_mobile_charger]
+# Separate onboard batteries for driving and for charging other vehicles.
+traction_battery_capacity_kwh = 100
+charging_battery_capacity_kwh = 200
+charging_power_kw = 50
+reference_kwh_per_km = 0.8

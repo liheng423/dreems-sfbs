@@ -34,18 +34,31 @@ def test_output_csv():
         assert "originnode_drive" not in row
 
 
-def test_darp_parameters():
-    with TemporaryDirectory() as directory:
-        write_pool({"task": "DARP", "seed": 42}, None, "Esch", Path(directory),
-                   {"num_data:": 0, "requests": {}})
-        parameters = (Path(directory) / "parameters.txt").read_text()
-        assert "[darp]" in parameters
-        assert "[darp.attribute]" in parameters
-        assert "[darp.operation]" not in parameters
-        assert "[sfbs" not in parameters
-        assert parameters.count("[profiles.") == 1
+def test_operation_profiles():
+    for task in ("DARP", "SFBS"):
+        with TemporaryDirectory() as directory:
+            write_pool({"task": task, "seed": 42}, None, "Esch", Path(directory),
+                       {"num_data:": 0, "requests": {}})
+            instance = Path(directory)
+            parameters = (instance / "parameters.txt").read_text()
+            assert f"[{task.lower()}.attribute]" in parameters
+            assert f"[{'sfbs' if task == 'DARP' else 'darp'}" not in parameters
+            assert parameters.count("[profiles.") == 1
+            assert "[charging_truck_profiles.dummy_mobile_charger]" in parameters
+            operations = json.loads((instance / "operations.json").read_text())
+            trucks = operations[task.lower()]["charging_trucks"]
+            assert trucks == {
+                "count": 1,
+                "type": "dummy_mobile_charger",
+                "profile": {
+                    "traction_battery_capacity_kwh": 100,
+                    "charging_battery_capacity_kwh": 200,
+                    "charging_power_kw": 50,
+                    "reference_kwh_per_km": 0.8,
+                },
+            }
 
 
 if __name__ == "__main__":
     test_output_csv()
-    test_darp_parameters()
+    test_operation_profiles()

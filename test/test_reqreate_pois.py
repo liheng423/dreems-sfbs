@@ -3,8 +3,12 @@
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 from unittest.mock import patch
 import sys
+
+import osmnx as ox
+from shapely.geometry import box
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src/reqreate"))
@@ -13,9 +17,22 @@ from src.output_adapters import graph_dir, graph_path, write_json
 from utils.walking_distance import WalkingDistance
 
 
+def check_meter_grid():
+    net = SimpleNamespace(polygon=box(6.0, 49.5, 6.1, 49.6))
+    generate.set_poi_zones(net, [[49.55, 6.05], [49.55, 6.051], [49.55, 6.06]], 500)
+    assert sorted(net.zones["number_pois"]) == [1, 2]
+    assert abs(net.zones["density_pois"].sum() - 1) < 1e-12
+    for zone in net.zones["polygon"]:
+        projected, _ = ox.projection.project_geometry(zone)
+        min_x, min_y, max_x, max_y = projected.bounds
+        assert abs(max_x - min_x - 500) < 1
+        assert abs(max_y - min_y - 500) < 1
+
+
 def main():
+    check_meter_grid()
     cfg = generate.load_config("SFBS", "550")
-    cfg["distributions"]["dynamic_time_stamp"]["rate_per_hour"] = 0.625
+    cfg["distributions"]["dynamic_order_place_time"]["rate_per_hour"] = 0.625
     cfg["distributions"]["prebooked_earliest_departure"]["rate_per_hour"] = 0.625
     area_path = graph_path("area", graph_dir("550"))
     with TemporaryDirectory() as directory:
@@ -34,8 +51,7 @@ def main():
             pois = generate.load_pois(poi_path)
             pool = generate.generate(cfg, area_path, poi_path)
         assert len(pois) == 3
-        generate.set_poi_zones(net, pois, cfg["method_pois"]["rows"],
-                               cfg["method_pois"]["columns"])
+        generate.set_poi_zones(net, pois, cfg["method_pois"]["cell_size_m"])
         assert net.zones["number_pois"].sum() == len(pois)
         assert abs(net.zones["density_pois"].sum() - 1) < 1e-12
         assert len(pool["requests"]) <= cfg["generated_candidate_count"]

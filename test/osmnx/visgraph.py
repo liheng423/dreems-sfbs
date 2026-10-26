@@ -4,10 +4,15 @@ import argparse
 import json
 import sys
 import tomllib
+from math import ceil
 from pathlib import Path
 
 import osmnx as ox
+from matplotlib.collections import LineCollection
 from matplotlib.patches import Polygon
+from pyproj import Transformer
+from shapely.geometry import LineString, shape
+from shapely.ops import transform
 
 
 root = Path(__file__).resolve().parents[2]
@@ -26,30 +31,30 @@ intersections = [node for node in vertices if node.get("street_count", 0) >= 3]
 config = tomllib.loads((root / "src/reqreate/maps/map_config.toml").read_text())
 area = json.loads(graph_path("area", map_dir).read_text())
 boundary = area["geometry"]["coordinates"][0]
-min_lon, min_lat = map(min, zip(*boundary))
-max_lon, max_lat = map(max, zip(*boundary))
-rows = config["method_pois"]["rows"]
-columns = config["method_pois"]["columns"]
+cell_size_m = config["method_pois"]["cell_size_m"]
+projected_area, crs = ox.projection.project_geometry(shape(area["geometry"]))
+min_x, min_y, max_x, max_y = projected_area.bounds
+unproject = Transformer.from_crs(crs, "EPSG:4326", always_xy=True).transform
+columns = ceil((max_x - min_x) / cell_size_m)
 
 fig, ax = ox.plot_graph(
     graph, node_size=0, edge_linewidth=0.5, edge_color="#555555",
     bgcolor="white", figsize=(14, 14), show=False, close=False,
 )
-# REQreate's POI zones use equal cells across the service area's bounds.
 area_outline = Polygon(boundary, fill=False, edgecolor="#2678a8", linewidth=1.2,
                        zorder=4, label="Service area")
 ax.add_patch(area_outline)
-vertical_lines = ax.vlines(
-    [min_lon + (max_lon - min_lon) * column / columns for column in range(1, columns)],
-    min_lat, max_lat, colors="#2678a8", linewidth=0.35, alpha=0.7,
-    zorder=2, label=f"Zone boundaries ({rows} × {columns})",
-)
-horizontal_lines = ax.hlines(
-    [min_lat + (max_lat - min_lat) * row / rows for row in range(1, rows)],
-    min_lon, max_lon, colors="#2678a8", linewidth=0.35, alpha=0.7, zorder=2,
-)
-vertical_lines.set_clip_path(area_outline)
-horizontal_lines.set_clip_path(area_outline)
+lines = [transform(unproject, LineString([(min_x + column * cell_size_m, min_y),
+                                          (min_x + column * cell_size_m, max_y)]))
+         for column in range(1, columns)]
+lines += [transform(unproject, LineString([(min_x, min_y + row * cell_size_m),
+                                           (max_x, min_y + row * cell_size_m)]))
+          for row in range(1, ceil((max_y - min_y) / cell_size_m))]
+grid = LineCollection([list(line.coords) for line in lines], colors="#2678a8",
+                      linewidths=0.35, alpha=0.7, zorder=2,
+                      label=f"Zone boundaries ({cell_size_m} m cells)")
+grid.set_clip_path(area_outline)
+ax.add_collection(grid)
 ax.scatter(
     [node["x"] for node in vertices],
     [node["y"] for node in vertices],

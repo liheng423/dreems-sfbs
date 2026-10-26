@@ -14,6 +14,7 @@ MAPS_CFG_PATH = ROOT / "src/reqreate/maps/map_config.toml"
 FILTERS_PATH = ROOT / "src/reqreate/filters/filters.toml"
 OPERATIONS_PATH = ROOT / "src/reqreate/operation/operation_profile.toml"
 VEHICLES_PATH = ROOT / "src/reqreate/operation/veh_profile.toml"
+CHARGING_TRUCKS_PATH = ROOT / "src/reqreate/operation/c_truck_profile.toml"
 
 
 def write_requests_csv(path, requests, task):
@@ -34,6 +35,7 @@ def write_pool(cfg, busline_name, graph_name, instance_dir, pool):
     """Write the request pool and its settings; return the pool path."""
     config = tomllib.loads(OPERATIONS_PATH.read_text())
     profiles = tomllib.loads(VEHICLES_PATH.read_text())["profiles"]
+    charging_truck_profiles = tomllib.loads(CHARGING_TRUCKS_PATH.read_text())["charging_truck_profiles"]
     mode = cfg["task"].lower()
     attributes = config[mode]["attribute"]
     operations = {mode: {
@@ -43,6 +45,11 @@ def write_pool(cfg, busline_name, graph_name, instance_dir, pool):
         "temperature_case": attributes["temperature_case"],
         "vehicle": profiles[attributes["profile"]],
         "detour_factor": attributes["detour_factor"],
+        "charging_trucks": {
+            "count": attributes["num_of_charging_trucks"],
+            "type": attributes["charging_truck_profile"],
+            "profile": charging_truck_profiles[attributes["charging_truck_profile"]],
+        },
     }}
     pool_path = write_json(request_path("pool", instance_dir), pool, compact=True)
     write_requests_csv(request_path("csv", instance_dir), pool["requests"], cfg["task"])
@@ -74,5 +81,10 @@ def write_pool(cfg, busline_name, graph_name, instance_dir, pool):
         else:
             rendered = json.dumps(value, ensure_ascii=False)
         settings.append(f"{name} = {rendered}")
+    charging_truck_name = attributes["charging_truck_profile"]
+    settings.extend(("", f"# {CHARGING_TRUCKS_PATH.relative_to(ROOT)}",
+                     f"[charging_truck_profiles.{charging_truck_name}]"))
+    for name, value in charging_truck_profiles[charging_truck_name].items():
+        settings.append(f"{name} = {json.dumps(value, ensure_ascii=False)}")
     parameters_path.write_text("\n".join(settings) + "\n", encoding="utf-8")
     return pool_path

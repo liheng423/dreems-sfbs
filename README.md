@@ -1,15 +1,20 @@
 # Overview
 
-DREEMS-SFBS generates synthetic passenger requests for Semi-Flex Bus (SFBS) and Dial-a-Ride Problem (DARP) services.
+DREEMS-SFBS generates synthetic passenger requests for Semi-Flex Bus (SFBS) and Dial-a-Ride Problem (DARP, also as known as Dynamic Ride Sharing (DRS)) services.
 
 Features:
 
 - 🗺️ Draw an **operation area** on an OpenStreetMap (OSM) map for the driving and walking road graphs. Set a **service area** inside it for points of interest (POIs) and passenger request origins and destinations.
+
+// TODO: (DEFINE HERE OPERATIONAL AND SERVICE)
+
 - 🗺️ Retrieve POIs directly from OSM automatically. 
 - 🎲 Generate POI-based requests with REQreate (see the [REQreate paper](https://arxiv.org/abs/2208.12225) for more details), using bus stops and timetables for SFBS or no bus route for DARP.
 - ⚙️ Tune demand, filters, and vehicle settings through configuration files.
 - 🔎 Inspect road graph previews and explore requests in an interactive browser viewer.
 - 📤 Export graphs and request instances in GraphML, JSON, and CSV for downstream optimization.
+
+// TODO: We need to check [HOW TO TIMEABLE format in KU Leuven]
 
 ## Input and Output Data
 
@@ -22,7 +27,10 @@ Features:
 ### Outputs
 
 - Driving and walking graphs in GraphML and CSV, plus the selected area and POIs, under `outputs/graphs/<map>/`.
-- One JSON and CSV request pool per run under `outputs/requests/<task>_<map>_<number>/`, such as `outputs/requests/darp_my_area_0001/`.
+
+[WALKING GRAPH IS ONLY USED FOR SFBS (to bus)]
+
+- One JSON and CSV request pool (change the word) per run under `outputs/requests/<task>_<map>_<number>/`, such as `outputs/requests/darp_my_area_0001/`.
 
 ## Quick start
 
@@ -96,13 +104,16 @@ For other feeds, consult an open-data portal such as [Belgian Mobility Open Data
 
 [request_gen.toml](src/reqreate/request_gen.toml) sets arrival rates, lead times, and time windows; [operation_profile.toml](src/reqreate/operation/operation_profile.toml) sets vehicle speed and detour factor. The generator then:
 
-1. Draws independent Poisson counts for dynamic and prebooked requests. Dynamic requests sample an appearance time; prebooked requests sample an earliest departure time. Lead time connects the two.
-2. Samples origins and destinations within the service area using OSM POIs, estimates driving time from the directed road graph, and sets pickup and dropoff windows.
-3. Keeps requests that meet area, distance, and time limits. SFBS also checks walking and bus timetable feasibility. With `retry_if_filtered = true`, rejected candidates are resampled.
+1. Draws independent Poisson counts for dynamic and prebooked requests. Dynamic requests sample an order placement time; prebooked requests sample an earliest departure time. Lead time connects the two.
+
+[Poisson different arrival rate rush hour]
+
+1. Samples origins and destinations within the service area using OSM POIs, estimates driving time from the directed road graph, and sets pickup and dropoff windows.
+2. Keeps requests that meet area, distance, and time limits. SFBS also checks walking and bus timetable feasibility. With `retry_if_filtered = true`, rejected candidates are resampled.
 
 ### Time axis
 
-Request times are seconds from service-day midnight. The formulas below show how appearance, pickup, and dropoff times are calculated; `service_time` is sampled per stop and must fit both time windows. This illustrative dynamic request uses a 5-minute lead time, a 15-minute pickup window, 10 minutes of direct driving, a 1.5 detour factor, 30 seconds of stop service, and a 15-minute dropoff window.
+Request times are seconds from service-day midnight. The formulas below show how order placement, pickup, and dropoff times are calculated; `service_time` is sampled per stop and must fit both time windows. This illustrative dynamic request uses a 5-minute lead time, a 15-minute pickup window, 10 minutes of direct driving, a 1.5 detour factor, 30 seconds of stop service, and a 15-minute dropoff window.
 
 ```text
 Time since service-day midnight →
@@ -112,30 +123,30 @@ Time since service-day midnight →
 seconds     32400       32700             33600   33630             34530
 clock       09:00       09:05             09:20   09:20:30          09:35:30
             │           │                 │       │                 │
-            │           │                 │       │                 └─ dropoff_to = latest_arrival
-            │           │                 │       └─ dropoff_from
-            │           │                 └─ pickup_to
-            │           └─ earliest_departure = pickup_from
-            └─ time_stamp (request appears)
+            │           │                 │       │                 └─ dropoff_latest = latest_arrival
+            │           │                 │       └─ dropoff_earliest
+            │           │                 └─ pickup_latest
+            │           └─ earliest_departure = pickup_earliest
+            └─ order_place_time (order is placed)
 
 pickup window:         [32700 ─────────── 33600]
 dropoff window:                                  [33630 ─────────── 34530]
 
-dynamic:   time_stamp          = sampled appearance time       = 32400
-           earliest_departure = time_stamp + lead_time        = 32400 + 300 = 32700
-pickup:    pickup_from         = earliest_departure           = 32700
-           pickup_to           = pickup_from + pickup_window  = 32700 + 900 = 33600
+dynamic:   order_place_time          = sampled order placement time  = 32400
+           earliest_departure = order_place_time + lead_time        = 32400 + 300 = 32700
+pickup:    pickup_earliest         = earliest_departure           = 32700
+           pickup_latest           = pickup_earliest + pickup_window  = 32700 + 900 = 33600
 drive:     direct_travel_time  = int(direct_distance / vehicle_speed_mps) = 600
-dropoff:   dropoff_to          = pickup_to + ceil(direct_travel_time × detour_factor) + service_time
+dropoff:   dropoff_latest          = pickup_latest + ceil(direct_travel_time × detour_factor) + service_time
                                    = 33600 + ceil(600 × 1.5) + 30 = 34530
-           dropoff_from        = dropoff_to - dropoff_window  = 34530 - 900 = 33630
-deadline:  latest_arrival      = dropoff_to                    = 34530
+           dropoff_earliest        = dropoff_latest - dropoff_window  = 34530 - 900 = 33630
+deadline:  latest_arrival      = dropoff_latest                    = 34530
 
 ## Prebooked:
 
 Same 09:05 earliest departure, but PREBOOKED with a 10-hour lead time:
            earliest_departure = sampled departure time       = 32700
-           time_stamp         = earliest_departure - lead_time = 32700 - 36000 = -3300
+           order_place_time         = earliest_departure - lead_time = 32700 - 36000 = -3300
            -3300 seconds means 23:05 on the PREVIOUS day.
 ```
 
@@ -155,10 +166,11 @@ See [Request Outputs](#request-outputs) for the saved field definitions.
 
 Edit these TOML files before running `generate-demand`:
 
-1. [request_gen.toml](src/reqreate/request_gen.toml): Set `simulation.start`, `end`, and `demand_start` as `HH:MM:SS` times. Set the two `rate_per_hour` values for dynamic and prebooked demand. The `lt_*`, `pickup_timewindow`, `dropoff_timewindow`, and `service_time` values are in seconds; `radial_distance` is in metres. For a fixed value, use `type = "uniform"` with `scale = 0`. Set `seed` for repeatable runs and `retry_if_filtered` to choose whether rejected requests are resampled until the number of requests reaches the preset. See [REQreate](https://arxiv.org/abs/2208.12225) for more details. 
-2. [map_config.toml](src/reqreate/maps/map_config.toml): Choose OSM `poi_tags` to collect when saving a map, set `method_pois.rows` and `columns` for the POI sampling grid, and set `locations.depot` with a default name, latitude, and longitude. Add a map name under `[locations.depots]` to override it for one map. After changing `poi_tags` for an existing map, run `python main.py recrawl-pois MAP` to update its saved POIs. Save the area again if you change the depot.
+1. [request_gen.toml](src/reqreate/request_gen.toml): Set `simulation.start`, `end`, and `demand_start` as `HH:MM:SS` times. Set the two `rate_per_hour` values for dynamic and prebooked demand. The `lt_*`, `pickup_timewindow`, `dropoff_timewindow`, and `service_time` values are in seconds; `radial_distance` is in metres. For a fixed value, use `type = "uniform"` with `scale = 0`. Set `seed` for repeatable runs and `retry_if_filtered` to choose whether rejected requests are resampled until the number of requests reaches the preset. See [REQreate](https://arxiv.org/abs/2208.12225) for more details.
+2. [map_config.toml](src/reqreate/maps/map_config.toml): Choose OSM `poi_tags` to collect when saving a map, set `method_pois.cell_size_m` for the POI sampling grid (500 m by default), and set `locations.depot` with a default name, latitude, and longitude. Add a map name under `[locations.depots]` to override it for one map. After changing `poi_tags` for an existing map, run `python main.py recrawl-pois MAP` to update its saved POIs. Save the area again if you change the depot.
 3. [veh_profile.toml](src/reqreate/operation/veh_profile.toml): Use an existing `[profiles.NAME]` or add one with `battery_capacity_kwh`, `passenger_capacity`, and `reference_kwh_per_km`. Add `relative_increase_pct` entries only for temperature cases you intend to select.
 4. [operation_profile.toml](src/reqreate/operation/operation_profile.toml): Edit `[darp.attribute]` or `[sfbs.attribute]` for the task you run. Set `vehicle_speed` in m/s, `detour_factor` (at least 1), `num_of_vehicles`, and `profile` to a `NAME` in `veh_profile.toml`. Use `temperature_case = "reference_20_22_c"` for the unadjusted energy rate, or an `at_*_c` key present in that vehicle's `relative_increase_pct`. Request sampling times come from `request_gen.toml`.
+5. [c_truck_profile.toml](src/reqreate/operation/c_truck_profile.toml): Define mobile trucks that charge other vehicles. The included placeholder has separate traction and charging battery capacities in kWh, charging output power in kW, and driving energy use in kWh/km. Select it with `charging_truck_profile` and set `num_of_charging_trucks` in each task's `operation_profile.toml` attributes.
 
 See [vehicle profile details](src/reqreate/operation/README.md) for the supplied energy values.
 
@@ -208,7 +220,7 @@ Time fields and their calculations are explained in the [Time axis](#time-axis).
 | Field | Meaning |
 | --- | --- |
 | `reqid`, `is_prebooked` | Request ID (the `requests.json` key); `1` = prebooked, `0` = dynamic. |
-| `time_stamp`, `lead_time`, `earliest_departure`, `pickup_*`, `dropoff_*`, `latest_arrival`, `service_time`, `direct_travel_time` | Appearance, lead time, departure, pickup and dropoff windows, deadline, stop service duration, and direct driving time. |
+| `order_place_time`, `lead_time`, `earliest_departure`, `pickup_*`, `dropoff_*`, `latest_arrival`, `service_time`, `direct_travel_time` | Order placement, lead time, departure, pickup and dropoff windows, deadline, stop service duration, and direct driving time. |
 | `origin`, `destination` | Sampled passenger locations, possibly off the road network. |
 | `origin_drive_point`, `destination_drive_point`; `originnode_drive`, `destinationnode_drive` | Nearest driving graph nodes to the passenger locations: coordinates for both tasks, node IDs saved only for DARP. SFBS still uses the nodes internally to calculate `direct_distance`. |
 | `direct_distance`, `energy_kwh` | Directed shortest road distance between those nodes (metres); estimated energy = `(direct_distance / 1000) × reference_kwh_per_km × (1 + temperature_increase_pct / 100)`. The reference case uses 0% increase. |
@@ -219,3 +231,16 @@ Only requests passing area, distance, travel time, and time window checks are sa
 ### Operations
 
 `operations.json` has one top-level key, `darp` or `sfbs`. Its `average_speed_mps`, `vehicle_count`, `vehicle_type`, `temperature_case`, and `detour_factor` come from that task's attributes in [operation_profile.toml](src/reqreate/operation/operation_profile.toml). `vehicle` contains the selected profile from [veh_profile.toml](src/reqreate/operation/veh_profile.toml), including battery capacity, passenger capacity, and reference energy consumption. Optional profile fields vary by vehicle.
+
+`charging_trucks` contains the configured truck count, selected type, and the full profile from [c_truck_profile.toml](src/reqreate/operation/c_truck_profile.toml). These values are exported for downstream use; demand generation does not simulate charging.
+
+
+
+
+
+## TODO
+
+
+
+- ADD CHARGING STATIONS and Optional Stops and Parking Locations WITH GUI and exported in outputs
+- lead time
