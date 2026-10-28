@@ -1,0 +1,103 @@
+task = "DAR"
+map = "leuven"
+busline = null
+effective_seed = 42
+debug = false
+
+# src/reqreate/request_gen.toml
+# REQreate demand settings. Clock times are relative to one service day.
+# Distribution parameters: uniform loc is the minimum and scale is the range width;
+# normal loc is the mean and scale is the standard deviation.
+seed = 42
+# Retry rejected requests until the sampled candidate count is retained.
+retry_if_filtered = true
+
+[simulation]
+start = "08:00:00"
+end = "12:00:00"
+demand_start = "08:00:00"
+
+# See README.md for details on the definitions of the following parameters.
+# Dynamic order placement times follow a Poisson process over simulation.start..end.
+# Prebooked earliest_departure times independently follow a Poisson process over
+# simulation.demand_start..end; their order placement times are departure minus lead time.
+# Lead times are in seconds. Interval between the time order is placed and the desired pickup time.
+# radial_distance samples the distance from the POI-zone endpoint to the other endpoint.
+# radial_direction samples that endpoint's bearing clockwise from north: 0° north, 90° east.
+# loc is the first degree and scale is the clockwise range; loc=0, scale=360 allows every direction.
+[distributions]
+dynamic_order_place_time = { type = "poisson", rate_per_hour = 12.5 }
+prebooked_earliest_departure = { type = "poisson", rate_per_hour = 12.5 }
+# TODO: check if what is the minimum lead time for dynamic requests.
+lt_dynamic = { type = "uniform", loc = 300, scale = 1500 } # lead time for dynamic requests
+lt_prebooked = { type = "uniform", loc = 36000, scale = 72000 }
+radial_distance = { type = "uniform", loc = 500, scale = 14500 }          # [m]
+radial_direction = { type = "uniform", loc = 0, scale = 360 }
+pickup_timewindow = { type = "uniform", loc = 900, scale = 0 }            # 15 min
+dropoff_timewindow = { type = "uniform", loc = 900, scale = 0 }           # 15 min
+service_time = { type = "uniform", loc = 30, scale = 0 }                  # fixed to 30 seconds
+
+# src/reqreate/maps/map_config.toml
+# Map and POI sampling settings. File locations live in output_adapters.py.
+
+[poi_tags]
+amenity = ["arts_centre", "bank", "bar", "cafe", "childcare", "cinema", "clinic", "college", "community_centre", "courthouse", "dentist", "doctors", "fast_food", "hospital", "kindergarten", "library", "marketplace", "nursing_home", "pharmacy", "place_of_worship", "police", "post_office", "pub", "restaurant", "school", "social_facility", "theatre", "townhall", "university"]
+building = ["commercial", "hotel", "office", "retail", "stadium", "supermarket", "train_station"]
+leisure = ["fitness_centre", "park", "pitch", "playground", "sports_centre", "stadium", "swimming_pool"]
+healthcare = ["clinic", "dentist", "doctor", "hospital", "laboratory", "pharmacy", "physiotherapist"]
+historic = ["archaeological_site", "castle", "church", "fort", "monument"]
+office = true
+railway = ["halt", "station", "tram_stop"]
+shop = true
+tourism = ["apartment", "artwork", "attraction", "camp_site", "caravan_site", "chalet", "gallery", "guest_house", "hostel", "hotel", "museum", "picnic_site", "viewpoint", "zoo"]
+
+# POI sampling settings. We use the grid for 500m x 500m cells.
+[method_pois]
+cell_size_m = 500
+# TODO: How would this impact the data
+
+[locations]
+depot = { "name" = "Depot Sales-Lentz Bascharage", "lat" = 49.568613, "lon" = 5.922762 }
+
+# Route 550 uses Emile Weber's Bettembourg vehicle depot at 120 Z.A.E. Wolser A.
+# Address: https://map.geoportail.lu/addresses/Bettembourg/Z.A.E.%20WOLSER%20A/120/?lang=fr
+[locations.depots]
+"550" = { "name" = "Depot Emile Weber Bettembourg", "lat" = 49.502780, "lon" = 6.091030 }
+
+# src/reqreate/filters/filters.toml
+[dar]
+max_walking_distance_m = 1500
+walking_speed_mps = 1.4
+
+[[dar.parameters]]
+name = "min_distance"
+type = "integer"
+value = 100
+length_unit = "m"
+
+# src/reqreate/operation/operation_profile.toml
+[dar.attribute]
+vehicle_speed = 6.111111111111111 # 22 km/h converted to m/s
+detour_factor = 1.5
+num_of_vehicles = 6
+profile = "shuttle_6m_rawsuns_64_8"
+temperature_case = "reference_20_22_c"
+num_of_charging_trucks = 1
+charging_truck_profile = "dummy_mobile_charger"
+
+# src/reqreate/operation/veh_profile.toml
+[profiles.shuttle_6m_rawsuns_64_8]
+manufacturer = "Unspecified"
+battery_system = "Rawsuns RDSLI64.8-432"
+battery_capacity_kwh = 64.8
+battery_type = "NMC"
+bus_type = "shuttle"
+passenger_capacity = 16
+reference_kwh_per_km = 0.4
+
+# src/reqreate/operation/c_truck_profile.toml
+[charging_truck_profiles.dummy_mobile_charger]
+traction_battery_capacity_kwh = 100
+charging_battery_capacity_kwh = 200
+charging_power_kw = 50
+reference_kwh_per_km = 0.8

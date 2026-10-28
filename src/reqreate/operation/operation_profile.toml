@@ -2,8 +2,6 @@
 vehicle_speed = 6.111111111111111 # 22 km/h converted to m/s
 detour_factor = 1.5
 num_of_vehicles = 6
-pickup_timewindow = { type = "uniform", loc = 900, scale = 0 } # 15 min
-dropoff_timewindow = { type = "uniform", loc = 900, scale = 0 } # 15 min
 profile = "shuttle_6m_rawsuns_64_8"
 temperature_case = "reference_20_22_c"
 num_of_charging_trucks = 1

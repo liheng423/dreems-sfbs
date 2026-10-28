@@ -1,0 +1,135 @@
+[
+  {
+    "name": "Stop_301953",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.68076,
+    "lat": 50.86406
+  },
+  {
+    "name": "Stop_302868",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 4.67952,
+    "lat": 50.86452
+  },
+  {
+    "name": "Stop_302885",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.69614,
+    "lat": 50.8661
+  },
+  {
+    "name": "Stop_302887",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.69572,
+    "lat": 50.85913
+  },
+  {
+    "name": "Stop_302902",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.6956,
+    "lat": 50.85539
+  },
+  {
+    "name": "Stop_302924",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.69581,
+    "lat": 50.86315
+  },
+  {
+    "name": "Stop_303035",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.69982,
+    "lat": 50.87304
+  },
+  {
+    "name": "Stop_303059",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.7085,
+    "lat": 50.88021
+  },
+  {
+    "name": "Stop_303078",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.69793,
+    "lat": 50.86813
+  },
+  {
+    "name": "Stop_303111",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.69914,
+    "lat": 50.86989
+  },
+  {
+    "name": "Stop_303113",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.70029,
+    "lat": 50.87617
+  },
+  {
+    "name": "Stop_303131",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.71472,
+    "lat": 50.88207
+  },
+  {
+    "name": "Stop_303228",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.68635,
+    "lat": 50.86086
+  },
+  {
+    "name": "Stop_303232",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.6919,
+    "lat": 50.85642
+  },
+  {
+    "name": "Stop_303236",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.68906,
+    "lat": 50.8587
+  },
+  {
+    "name": "Stop_304183",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.68224,
+    "lat": 50.8611
+  },
+  {
+    "name": "Stop_305444",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.70198,
+    "lat": 50.87921
+  },
+  {
+    "name": "Stop_310673",
+    "type": "location",
+    "class": "mandatory",
+    "lon": 4.70447,
+    "lat": 50.88856
+  },
+  {
+    "name": "Stop_310842",
+    "type": "location",
+    "class": "optional",
+    "lon": 4.70008,
+    "lat": 50.88742
+  }
+]

@@ -187,29 +187,29 @@ function place_label(req, endpoint) {
 function draw_req_timeline(req) {
   const timeline = $('req-timeline');
   timeline.hidden = false;
-  if (req.pickup_from === undefined) {
+  if (req.pickup_earliest === undefined) {
     timeline.innerHTML = `<h3>Request timeline</h3><div class="timeline-track" role="img" aria-label="Order placed ${sec_label(req.order_place_time)}; earliest departure ${sec_label(req.earliest_departure)}; latest arrival ${sec_label(req.latest_arrival)}"><span class="timeline-order"></span></div>
       <div class="timeline-axis"><span>Order placed<br><strong>${sec_label(req.order_place_time)}</strong></span><span>Latest arrival<br><strong>${sec_label(req.latest_arrival)}</strong></span></div>
       <p>Pickup and dropoff windows are absent from this saved instance. Regenerate demand to include them.</p>`;
     return;
   }
-  const { order_place_time: booked, pickup_from, pickup_to, dropoff_from, dropoff_to, service_time } = req;
-  const broken = pickup_from - booked > 3 * (dropoff_to - pickup_from);
-  const position = (second) => broken && second > pickup_from
-    ? 28 + 72 * (second - pickup_from) / (dropoff_to - pickup_from)
-    : broken ? 28 * (second - booked) / (pickup_from - booked)
-      : 100 * (second - booked) / (dropoff_to - booked);
+  const { order_place_time: booked, pickup_earliest, pickup_latest, dropoff_earliest, dropoff_latest, service_time } = req;
+  const broken = pickup_earliest - booked > 3 * (dropoff_latest - pickup_earliest);
+  const position = (second) => broken && second > pickup_earliest
+    ? 28 + 72 * (second - pickup_earliest) / (dropoff_latest - pickup_earliest)
+    : broken ? 28 * (second - booked) / (pickup_earliest - booked)
+      : 100 * (second - booked) / (dropoff_latest - booked);
   timeline.innerHTML = `
     <h3>Request timeline</h3>
-    <div class="timeline-track" role="img" aria-label="Order placed ${sec_label(booked)}. Pickup allowed ${sec_label(pickup_from)} to ${sec_label(pickup_to)}. Dropoff allowed ${sec_label(dropoff_from)} to ${sec_label(dropoff_to)}. Boarding and alighting service ${service_time} seconds each.">
+    <div class="timeline-track" role="img" aria-label="Order placed ${sec_label(booked)}. Pickup allowed ${sec_label(pickup_earliest)} to ${sec_label(pickup_latest)}. Dropoff allowed ${sec_label(dropoff_earliest)} to ${sec_label(dropoff_latest)}. Boarding and alighting service ${service_time} seconds each.">
       <span class="timeline-order"></span>
-      <span class="timeline-pickup" style="left:${position(pickup_from)}%;width:${position(pickup_to) - position(pickup_from)}%"></span>
-      <span class="timeline-dropoff" style="left:${position(dropoff_from)}%;width:${position(dropoff_to) - position(dropoff_from)}%"></span>
+      <span class="timeline-pickup" style="left:${position(pickup_earliest)}%;width:${position(pickup_latest) - position(pickup_earliest)}%"></span>
+      <span class="timeline-dropoff" style="left:${position(dropoff_earliest)}%;width:${position(dropoff_latest) - position(dropoff_earliest)}%"></span>
       ${broken ? '<span class="timeline-break" aria-hidden="true">//</span>' : ''}
     </div>
-    <div class="timeline-axis"><span>Order placed<br><strong>${sec_label(booked)}</strong></span><span>Latest dropoff<br><strong>${sec_label(dropoff_to)}</strong></span></div>
-    <div class="timeline-window"><i class="timeline-key pickup"></i><span>Pickup window</span><strong>${sec_label(pickup_from)}–${sec_label(pickup_to)}</strong></div>
-    <div class="timeline-window"><i class="timeline-key dropoff"></i><span>Dropoff window</span><strong>${sec_label(dropoff_from)}–${sec_label(dropoff_to)}</strong></div>
+    <div class="timeline-axis"><span>Order placed<br><strong>${sec_label(booked)}</strong></span><span>Latest dropoff<br><strong>${sec_label(dropoff_latest)}</strong></span></div>
+    <div class="timeline-window"><i class="timeline-key pickup"></i><span>Pickup window</span><strong>${sec_label(pickup_earliest)}–${sec_label(pickup_latest)}</strong></div>
+    <div class="timeline-window"><i class="timeline-key dropoff"></i><span>Dropoff window</span><strong>${sec_label(dropoff_earliest)}–${sec_label(dropoff_latest)}</strong></div>
     <p>Boarding and alighting service: ${service_time} s each, within their windows.${broken ? ' // marks a compressed booking lead interval.' : ''}</p>`;
 }
 
@@ -233,13 +233,13 @@ function read_reqs(data) {
       : !['originnode_drive', 'destinationnode_drive'].every((field) => Number.isFinite(req[field])))) {
       throw new Error(`Request ${key} has invalid task endpoints.`);
     }
-    const window_fields = ['pickup_from', 'pickup_to', 'dropoff_from', 'dropoff_to', 'service_time'];
+    const window_fields = ['pickup_earliest', 'pickup_latest', 'dropoff_earliest', 'dropoff_latest', 'service_time'];
     if (window_fields.some((field) => field in req) &&
         (!window_fields.every((field) => Number.isFinite(req[field])) ||
-          req.pickup_from !== req.earliest_departure || req.dropoff_to !== req.latest_arrival ||
-          req.pickup_from > req.pickup_to || req.dropoff_from > req.dropoff_to ||
-          req.service_time < 0 || req.pickup_to - req.pickup_from < req.service_time ||
-          req.dropoff_to - req.dropoff_from < req.service_time)) {
+          req.pickup_earliest !== req.earliest_departure || req.dropoff_latest !== req.latest_arrival ||
+          req.pickup_earliest > req.pickup_latest || req.dropoff_earliest > req.dropoff_latest ||
+          req.service_time < 0 || req.pickup_latest - req.pickup_earliest < req.service_time ||
+          req.dropoff_latest - req.dropoff_earliest < req.service_time)) {
       throw new Error(`Request ${key} has invalid pickup or dropoff windows.`);
     }
     return req;

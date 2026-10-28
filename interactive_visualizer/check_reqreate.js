@@ -67,8 +67,8 @@ vm.runInContext('show_req(reqs.find((req) => req.is_prebooked))', context);
 assert.match(elements.get('req-details').textContent, /-3d|\-2d|\-1d/);
 assert.match(elements.get('req-details').textContent, /Direct distance/);
 assert.match(elements.get('req-timeline').innerHTML, /windows are absent/);
-context.windowReq = { ...vm.runInContext('selected_req', context), pickup_from: 36000,
-  pickup_to: 36900, dropoff_from: 37500, dropoff_to: 38400, service_time: 30,
+context.windowReq = { ...vm.runInContext('selected_req', context), pickup_earliest: 36000,
+  pickup_latest: 36900, dropoff_earliest: 37500, dropoff_latest: 38400, service_time: 30,
   earliest_departure: 36000, latest_arrival: 38400 };
 vm.runInContext('draw_req_timeline(windowReq)', context);
 assert.match(elements.get('req-timeline').innerHTML, /Pickup window.*10:00–10:15/s);

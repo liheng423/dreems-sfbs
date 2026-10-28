@@ -30,15 +30,15 @@ def main():
     generate.set_request_times(req, False, 30000, cfg)
     assert (req["order_place_time"], req["earliest_departure"], req["latest_arrival"]) == (
         30000, 30300, 31254)
-    assert (req["pickup_from"], req["pickup_to"], req["dropoff_from"], req["dropoff_to"], req["service_time"]) == (
+    assert (req["pickup_earliest"], req["pickup_latest"], req["dropoff_earliest"], req["dropoff_latest"], req["service_time"]) == (
         30300, 31200, 30354, 31254, 30)
     cfg["distributions"]["pickup_timewindow"]["loc"] = 600
     cfg["distributions"]["dropoff_timewindow"]["loc"] = 300
     cfg["distributions"]["service_time"]["loc"] = 45
     changed = {"lead_time": 300, "direct_travel_time": 12}
     generate.set_request_times(changed, False, 30000, cfg)
-    assert (changed["pickup_to"] - changed["pickup_from"],
-            changed["dropoff_to"] - changed["dropoff_from"], changed["service_time"]) == (600, 300, 45)
+    assert (changed["pickup_latest"] - changed["pickup_earliest"],
+            changed["dropoff_latest"] - changed["dropoff_earliest"], changed["service_time"]) == (600, 300, 45)
     graph = nx.MultiDiGraph()
     graph.add_edge(1, 2, length=120)
     net = AreaNetwork("test", graph, graph, box(0, 0, 1, 1), pd.DataFrame())

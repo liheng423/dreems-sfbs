@@ -9,6 +9,12 @@ type = "integer"
 value = 100
 length_unit = "m"
 
+# Set a filter to false to skip it; filters left out stay on.
+[dar.enabled]
+request_within_area = true
+request_has_min_driving_distance = true
+request_has_positive_travel_time = true
+
 # SFBS also checks stop access, walking dominance, and the bus timetable.
 [sfbs]
 max_walking_distance_m = 1500
@@ -20,3 +26,12 @@ name = "min_distance"
 type = "integer"
 value = 100
 length_unit = "m"
+
+# Set a filter to false to skip it; filters left out stay on.
+[sfbs.enabled]
+request_within_area = true
+request_has_min_driving_distance = true
+request_has_positive_travel_time = true
+request_within_walking_distance = true
+request_not_walk_dominated = true
+request_has_feasible_scheduled_bus = true

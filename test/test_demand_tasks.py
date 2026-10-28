@@ -48,7 +48,9 @@ def test_demand_tasks():
         filters.write_text("[dar]\nmax_walking_distance_m = 100\nwalking_speed_mps = 1\n"
                            "[[dar.parameters]]\nname = 'min_distance'\nvalue = 100\n"
                            "[sfbs]\nmax_walking_distance_m = 500\nwalking_speed_mps = 2\n"
-                           "[[sfbs.parameters]]\nname = 'min_distance'\nvalue = 500\n")
+                           "[[sfbs.parameters]]\nname = 'min_distance'\nvalue = 500\n"
+                           "[sfbs.enabled]\nrequest_not_walk_dominated = false\n"
+                           "request_has_min_driving_distance = false\n")
         with patch.object(generate, "OPERATION_CFG_PATH", operations), patch.object(
             generate, "FILTERS_PATH", filters
         ), patch.object(generate, "busline_dir", return_value=ROOT / "outputs/buslines/550"):
@@ -59,4 +61,15 @@ def test_demand_tasks():
                 10, 1.5, 100, BASE_REQUEST_FILTERS)
     assert (sfbs["vehicle_speed_mps"], sfbs["detour_factor"],
             sfbs["parameters"][0]["value"], sfbs["request_filters"]) == (
-                5, 2, 500, REQUEST_FILTERS)
+                5, 2, 500, tuple(predicate for predicate in REQUEST_FILTERS
+                                 if predicate.__name__ not in ("request_not_walk_dominated",
+                                                               "request_has_min_driving_distance")))
+    assert dar["attributes"]["direct_distance"]["constraints"] == ["direct_distance >= min_distance"]
+    assert sfbs["attributes"]["direct_distance"]["constraints"] == []
+    for switches in ({"request_has_feasible_scheduled_bus": False}, {"request_within_area": 0}):
+        try:
+            generate.enabled_filters(BASE_REQUEST_FILTERS, switches)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"accepted invalid filter switches {switches}")

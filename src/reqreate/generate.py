@@ -24,7 +24,8 @@ from REQreate.passenger_requests import _generate_single_data_impl
 
 from maps.area_network import build_area_net
 from filters.filters import (BASE_REQUEST_FILTERS, REQUEST_FILTERS, passes_filters,
-                             select_scheduled_bus_stops)
+                             request_has_min_driving_distance,
+                             request_has_positive_travel_time, select_scheduled_bus_stops)
 from filters.route_schedule import index_route_departures
 from maps.pois import load_pois, set_poi_zones
 from adapters.pool_output import write_pool
@@ -59,6 +60,7 @@ def clock_seconds(value):
 def request_attributes(cfg, prebooked=False):
     """Build REQreate fields for the sampled request type and trip."""
     distributions = cfg["distributions"]
+    enabled = cfg["request_filters"]
     return {
         "is_prebooked": {"type": "integer", "output_csv": True,
                          "pdf": [{"type": "uniform", "loc": int(prebooked), "scale": 0}]},
@@ -72,11 +74,13 @@ def request_attributes(cfg, prebooked=False):
         "destination": {"type": "location"},
         "direct_distance": {"type": "integer", "length_unit": "m",
                             "expression": "dist_drive(origin,destination)",
-                            "constraints": ["direct_distance >= min_distance"],
+                            "constraints": (["direct_distance >= min_distance"]
+                                            if request_has_min_driving_distance in enabled else []),
                             "output_csv": True},
         "direct_travel_time": {"type": "integer", "time_unit": "s",
                                "expression": "dtt(origin,destination)",
-                               "constraints": ["direct_travel_time > 0"]},
+                               "constraints": (["direct_travel_time > 0"]
+                                               if request_has_positive_travel_time in enabled else [])},
     }
 
 
@@ -134,15 +138,27 @@ def set_request_times(req, prebooked, time, cfg):
         req["earliest_departure"] = req["order_place_time"] + req["lead_time"]
     distributions = cfg["distributions"]
     req["service_time"] = sample_duration(distributions["service_time"])
-    req["pickup_from"] = req["earliest_departure"]
-    req["pickup_to"] = req["pickup_from"] + sample_duration(distributions["pickup_timewindow"])
+    req["pickup_earliest"] = req["earliest_departure"]
+    req["pickup_latest"] = req["pickup_earliest"] + sample_duration(distributions["pickup_timewindow"])
     dropoff_window = sample_duration(distributions["dropoff_timewindow"])
-    if req["service_time"] > min(req["pickup_to"] - req["pickup_from"], dropoff_window):
+    if req["service_time"] > min(req["pickup_latest"] - req["pickup_earliest"], dropoff_window):
         raise ValueError("service time must fit within both stop time windows")
     max_ride_time = ceil(req["direct_travel_time"] * cfg["detour_factor"])
-    req["dropoff_to"] = req["pickup_to"] + max_ride_time + req["service_time"]
-    req["dropoff_from"] = req["dropoff_to"] - dropoff_window
-    req["latest_arrival"] = req["dropoff_to"]
+    req["dropoff_latest"] = req["pickup_latest"] + max_ride_time + req["service_time"]
+    req["dropoff_earliest"] = req["dropoff_latest"] - dropoff_window
+    req["latest_arrival"] = req["dropoff_latest"]
+
+
+def enabled_filters(available, switches):
+    """Return the available filters not switched off in filters.toml, in order."""
+    names = [predicate.__name__ for predicate in available]
+    unknown = sorted(set(switches) - set(names))
+    if unknown:
+        raise ValueError(f"unknown filters in filters.toml: {', '.join(unknown)}; "
+                         f"choose from: {', '.join(names)}")
+    if not all(isinstance(value, bool) for value in switches.values()):
+        raise ValueError("filter switches must be true or false")
+    return tuple(predicate for predicate in available if switches.get(predicate.__name__, True))
 
 
 def load_config(task, busline_name=None):
@@ -158,13 +174,15 @@ def load_config(task, busline_name=None):
         raise ValueError("retry_if_filtered must be true or false")
     cfg.update(tomllib.loads(MAPS_CFG_PATH.read_text()))
     cfg["task"] = task
-    cfg["request_filters"] = REQUEST_FILTERS if task == "SFBS" else BASE_REQUEST_FILTERS
     operation_cfg = tomllib.loads(OPERATION_CFG_PATH.read_text())[task.lower()]["attribute"]
     cfg["vehicle_speed_mps"] = operation_cfg["vehicle_speed"]
     cfg["detour_factor"] = operation_cfg["detour_factor"]
     if cfg["detour_factor"] < 1:
         raise ValueError("detour_factor must be at least 1")
     filter_cfg = tomllib.loads(FILTERS_PATH.read_text())[task.lower()]
+    cfg["request_filters"] = enabled_filters(
+        REQUEST_FILTERS if task == "SFBS" else BASE_REQUEST_FILTERS, filter_cfg.get("enabled", {})
+    )
     cfg["max_walking_distance_m"] = filter_cfg["max_walking_distance_m"]
     cfg["walking_speed_mps"] = filter_cfg["walking_speed_mps"]
     cfg["parameters"] = list(filter_cfg["parameters"])
@@ -278,7 +296,10 @@ def filter_requests(cfg, net, reqs):
     if cfg["task"] == "SFBS":
         stops = {stop["name"].removeprefix("Stop_"): stop for stop in cfg["places"]}
         for req in reqs.values():
-            req.update(select_scheduled_bus_stops(req, net, cfg))
+            selected_stops = select_scheduled_bus_stops(req, net, cfg)
+            if selected_stops is None:
+                continue
+            req.update(selected_stops)
             for role in ("boarding", "alighting"):
                 stop = stops[req[f"{role}_stop_id"]]
                 req[f"{role}_stop_point"] = [stop["lat"], stop["lon"]]

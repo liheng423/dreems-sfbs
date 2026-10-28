@@ -205,8 +205,8 @@ def test_debug_lead_time_fields():
     def candidates(*_):
         return {"0": {"is_prebooked": 0, "lt_dynamic": 300,
                       "lt_prebooked": 36000, "lead_time": 300,
-                      "pickup_from": 300, "pickup_to": 1200,
-                      "dropoff_from": 900, "dropoff_to": 1800, "service_time": 30,
+                      "pickup_earliest": 300, "pickup_latest": 1200,
+                      "dropoff_earliest": 900, "dropoff_latest": 1800, "service_time": 30,
                       "origin": [49.5, 6.1], "originnode_drive": 1,
                       "originx": 6.1, "originzone": 2,
                       "originnode_walk": 3, "seed_location": 42,
@@ -222,8 +222,8 @@ def test_debug_lead_time_fields():
         with patch.object(generate, "DEBUG", True):
             debug = generate.generate({"task": "DAR"}, Path("unused"), Path("unused"))["requests"]["0"]
     assert ordinary == {"is_prebooked": 0, "lead_time": 300,
-                        "pickup_from": 300, "pickup_to": 1200,
-                        "dropoff_from": 900, "dropoff_to": 1800, "service_time": 30,
+                        "pickup_earliest": 300, "pickup_latest": 1200,
+                        "dropoff_earliest": 900, "dropoff_latest": 1800, "service_time": 30,
                         "origin": [49.5, 6.1], "originnode_drive": 1,
                         "origin_drive_point": [49.5, 6.1],
                         "boarding_stop_id": "A"}

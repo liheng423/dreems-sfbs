@@ -39,7 +39,7 @@ REQUEST_FILES = {
 }
 REQUEST_OUTPUT_FIELDS = (
     "reqid", "is_prebooked", "lead_time", "order_place_time", "earliest_departure",
-    "latest_arrival", "pickup_from", "pickup_to", "dropoff_from", "dropoff_to",
+    "latest_arrival", "pickup_earliest", "pickup_latest", "dropoff_earliest", "dropoff_latest",
     "service_time", "origin", "destination", "originnode_drive",
     "destinationnode_drive", "direct_distance", "direct_travel_time", "energy_kwh",
     "boarding_stop_id", "alighting_stop_id", "boarding_walk_distance_m",

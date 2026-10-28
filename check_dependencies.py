@@ -35,6 +35,6 @@ if __name__ == "__main__":
     if missing:
         raise SystemExit(
             f"Missing Python dependencies: {', '.join(missing)}\n"
-            "Install with: uv pip install --python .venv/bin/python -r requirements.txt"
+            "Install with: uv pip install -r requirements.txt"
         )
     print("All direct Python dependencies are installed.")
