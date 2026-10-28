@@ -32,7 +32,11 @@ def missing_dependencies(requirements_path=REQUIREMENTS_PATH):
 
 
 def unpatched_reqreate_files(patch_path=PATCH_PATH):
-    """Return installed REQreate files that lack lines added by the patch."""
+    """Return installed REQreate files that lack lines added by the patch.
+
+    Files missing from the installed package are skipped: the PyPI release
+    of REQreate does not ship schema/config.schema.json.
+    """
     import REQreate
 
     root = Path(REQreate.__file__).parents[1]
@@ -47,7 +51,9 @@ def unpatched_reqreate_files(patch_path=PATCH_PATH):
     unpatched = []
     for target, lines in added.items():
         path = root / target
-        text = path.read_text(encoding="utf-8") if path.exists() else ""
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
         if not all(line in text for line in lines):
             unpatched.append(target)
     return unpatched

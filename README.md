@@ -35,11 +35,14 @@ uv pip install -r requirements.txt
 python check_dependencies.py
 ```
 
-### Patch for REQreate 
+### Patch for REQreate
 
-> This patch is already included in the repo. If the `check_dependencies.py` warns about the missing patch, do the following steps, otherwise, skip them. 
+REQreate needs a one-time [patch](src/reqreate/instance_generator.patch) before it can generate requests. `python check_dependencies.py` (the last step above) tells you whether it is needed:
 
-The published `reqreate==0.1.1` must be patched before generating requests. The [patch](src/reqreate/instance_generator.patch) adds the `mandatory` and `optional` stop classes used by every `stops.json` (SFBS fails without it) and fixes indexing errors under NumPy 2.x. Apply it once to the installed package:
+- `REQreate is patched.`: nothing to do, continue to [Workflow](#workflow).
+- `REQreate is not patched: ...`: apply the patch with the commands below.
+
+On macOS, Linux, or Git Bash on Windows:
 
 ```bash
 patch -p1 -d "$(python -c 'import REQreate, pathlib; print(pathlib.Path(REQreate.__file__).parents[1])')" \
@@ -47,7 +50,7 @@ patch -p1 -d "$(python -c 'import REQreate, pathlib; print(pathlib.Path(REQreate
 python check_dependencies.py
 ```
 
-On Windows, `patch` is not available by default, but [Git for Windows](https://git-scm.com/download/win) includes it. Use the block that matches your shell. Variable syntax differs between shells, so running the PowerShell block in Command Prompt fails with `can't change to directory '$reqreate'`.
+On Windows, install [Git for Windows](https://git-scm.com/download/win) first; it provides `patch`. Then run the bash commands above in Git Bash, or use the block for your shell below.
 
 In **PowerShell** (the prompt starts with `PS`):
 
@@ -65,9 +68,16 @@ for /f "delims=" %d in ('python -c "import REQreate, pathlib; print(pathlib.Path
 python check_dependencies.py
 ```
 
-Alternatively, run the bash commands above unchanged in Git Bash.
+The patch is done when `python check_dependencies.py` prints `REQreate is patched.` Run it again whenever you reinstall REQreate or create a new environment.
 
-Re-apply the patch whenever REQreate is reinstalled. Selecting a new area or importing a GTFS feed from a URL requires internet access.
+If something goes wrong:
+
+- `File to patch:` (or `No file to patch. Skipping`) for `config.schema.json`: press Enter to skip. This is expected.
+- `Reversed (or previously applied) patch detected! Assume -R?`: answer `n`. The patch is already applied.
+- `Hunk #1 FAILED`: reinstall a clean copy with `uv pip install --reinstall reqreate==0.1.1`, then apply the patch again.
+- `can't change to directory '$reqreate'`: you ran the PowerShell block in Command Prompt. Use the block for your shell.
+
+ Selecting a new area or importing a GTFS feed from a URL requires internet access.
 
 
 ## Usage
@@ -80,7 +90,7 @@ python main.py select-area myarea
 
 In the browser, draw the **operation area**; its road networks will be downloaded. The **service area**, where POIs and request endpoints are placed, initially matches the operation area; shrink it if requests should cover a smaller region. Click **Save**, wait for the download to finish, then stop the selector with Ctrl+C. Add `--busline ROUTE` to display an imported route's stops while drawing.
 
-> [NOTE]
+> [!NOTE]
 > The depot may lie outside the service area, so the operation area is larger to ensure the fleet can always reach and leave the depot.
 
 > [!WARNING]
@@ -252,7 +262,7 @@ Because of the time limits, requests with long trips that start close to `simula
 ### Definitions: Types of Time
 
 All times are seconds since service-day midnight. Example dynamic request: 5-minute lead time, 15-minute pickup window, 10 minutes of direct driving, detour factor 1.5, 30 s of stop service, and a 15-minute dropoff window.
-> [!WARNING]
+> [!NOTE]
 > Make sure your markdown render window wide enough to ensure the following diagram is more readable.
 ```text
 seconds     32400       32700             33600   33630             34530
