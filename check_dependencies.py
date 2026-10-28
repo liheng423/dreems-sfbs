@@ -71,6 +71,6 @@ if __name__ == "__main__":
     if unpatched:
         raise SystemExit(
             f"REQreate is not patched: {', '.join(unpatched)}\n"
-            "Apply src/reqreate/instance_generator.patch as described in README.md."
+            "Apply the patch with: python apply_reqreate_patch.py"
         )
     print("REQreate is patched.")

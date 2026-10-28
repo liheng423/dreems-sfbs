@@ -37,45 +37,20 @@ python check_dependencies.py
 
 ### Patch for REQreate
 
-REQreate needs a one-time [patch](src/reqreate/instance_generator.patch) before it can generate requests. `python check_dependencies.py` (the last step above) tells you whether it is needed:
-
-- `REQreate is patched.`: nothing to do, continue to [Workflow](#workflow).
-- `REQreate is not patched: ...`: apply the patch with the commands below.
-
-On macOS, Linux, or Git Bash on Windows:
+REQreate needs a one-time [patch](src/reqreate/instance_generator.patch) before it can generate requests. From the repository root, with the virtual environment active, run:
 
 ```bash
-patch -p1 -d "$(python -c 'import REQreate, pathlib; print(pathlib.Path(REQreate.__file__).parents[1])')" \
-  < src/reqreate/instance_generator.patch
+python apply_reqreate_patch.py
 python check_dependencies.py
 ```
 
-On Windows, install [Git for Windows](https://git-scm.com/download/win) first; it provides `patch`. Then run the bash commands above in Git Bash, or use the block for your shell below.
-
-In **PowerShell** (the prompt starts with `PS`):
-
-```powershell
-$reqreate = python -c "import REQreate, pathlib; print(pathlib.Path(REQreate.__file__).parents[1])"
-& "C:\Program Files\Git\usr\bin\patch.exe" -p1 -d "$reqreate" -i src\reqreate\instance_generator.patch
-python check_dependencies.py
-```
-
-In **Command Prompt** or **Anaconda Prompt** (cmd.exe):
-
-```bat
-for /f "delims=" %d in ('python -c "import REQreate, pathlib; print(pathlib.Path(REQreate.__file__).parents[1])"') do set "REQREATE=%d"
-"C:\Program Files\Git\usr\bin\patch.exe" -p1 -d "%REQREATE%" -i src\reqreate\instance_generator.patch
-python check_dependencies.py
-```
-
-The patch is done when `python check_dependencies.py` prints `REQreate is patched.` Run it again whenever you reinstall REQreate or create a new environment.
+This works the same on macOS, Linux, and Windows (PowerShell, Command Prompt, or Git Bash) and needs no extra tools. The patch is done when `python check_dependencies.py` prints `REQreate is patched.` Run `python apply_reqreate_patch.py` again whenever you reinstall REQreate or create a new environment; on an already patched install it changes nothing.
 
 If something goes wrong:
 
-- `File to patch:` (or `No file to patch. Skipping`) for `config.schema.json`: press Enter to skip. This is expected.
-- `Reversed (or previously applied) patch detected! Assume -R?`: answer `n`. The patch is already applied.
-- `Hunk #1 FAILED`: reinstall a clean copy with `uv pip install --reinstall reqreate==0.1.1`, then apply the patch again.
-- `can't change to directory '$reqreate'`: you ran the PowerShell block in Command Prompt. Use the block for your shell.
+- `config.schema.json: skipped`: expected. The PyPI release of REQreate does not include this file.
+- `hunk at line ... does not match`: the installed REQreate differs from the expected release, and nothing was changed. Reinstall a clean copy with `uv pip install --reinstall reqreate==0.1.1`, then run the script again.
+- `No module named 'REQreate'`: the virtual environment is not active, or the dependencies are not installed. Activate it and run `uv pip install -r requirements.txt`.
 
  Selecting a new area or importing a GTFS feed from a URL requires internet access.
 
