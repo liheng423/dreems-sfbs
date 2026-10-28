@@ -379,7 +379,7 @@ def main() -> None:
                                        else busline_path("stops", route_dir))
     stops = build_stops(result, args.mandatory_stop_id)
     if stops_path.is_file():
-        previous = json.loads(stops_path.read_text())
+        previous = json.loads(stops_path.read_text(encoding="utf-8"))
         classes = {stop["name"]: stop["class"] for stop in previous}
         stops = [{**stop, "class": classes.get(stop["name"], stop["class"])} for stop in stops]
         names = {stop["name"] for stop in stops}

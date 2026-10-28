@@ -23,15 +23,15 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     instance_dir = sorted((ROOT / "data/requests").glob("550_550_[0-9]*"))[-1]
     pool_path = request_path("pool", instance_dir)
-    pool = json.loads(pool_path.read_text())
-    meta = json.loads(request_path("metadata", instance_dir).read_text())
+    pool = json.loads(pool_path.read_text(encoding="utf-8"))
+    meta = json.loads(request_path("metadata", instance_dir).read_text(encoding="utf-8"))
     paths = [ROOT / path for path in meta["inputs_sha256"]]
     area_path = next(path for path in paths if path.suffix == ".geojson")
-    polygon = shape(json.loads(area_path.read_text())["geometry"])
+    polygon = shape(json.loads(area_path.read_text(encoding="utf-8"))["geometry"])
     graph = ox.load_graphml(area_path.with_name("drive.graphml"))
     walk = ox.load_graphml(area_path.with_name("walk.graphml"))
-    filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text())["sfbs"]
-    stops = json.loads(busline_path("stops", busline_dir(meta["busline"])).read_text())
+    filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text(encoding="utf-8"))["sfbs"]
+    stops = json.loads(busline_path("stops", busline_dir(meta["busline"])).read_text(encoding="utf-8"))
     stop_ids = {stop["name"].removeprefix("Stop_") for stop in stops}
     walk_routes = walk.to_undirected()
     source = "Route 550 stops"
@@ -51,7 +51,7 @@ def main():
     assert meta["request_count"] <= meta["candidate_count"]
     if "poi_count" in meta:
         poi_path = graph_path("pois", graph_dir(meta["graph"]))
-        pois = json.loads(poi_path.read_text())["features"]
+        pois = json.loads(poi_path.read_text(encoding="utf-8"))["features"]
         assert len(pois) == meta["poi_count"]
         assert "method_pois" in meta["spatial_sampling"]
     for idx, req in reqs.items():

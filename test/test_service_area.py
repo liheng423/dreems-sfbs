@@ -53,7 +53,7 @@ def test_save_area():
     ) as fetch:
         graph_dir = Path(tmp) / "graphs"
         out_dir = service_area.save_area(geometry, graph_dir)
-        area = json.loads(graph_path("area", graph_dir).read_text())
+        area = json.loads(graph_path("area", graph_dir).read_text(encoding="utf-8"))
         assert area["geometry"] == geometry
         assert out_dir == graph_dir
         assert graph_path("drive_graph", graph_dir).is_file()
@@ -72,12 +72,12 @@ def test_save_area():
             assert edges[["u", "v", "key", "length"]].values.tolist() == [
                 [141925, 141928, 0, 100], [141925, 141928, 1, 120]]
             assert edges.loc[1, "name"] == "Parallel"
-        depot = json.loads(graph_path("depot", graph_dir).read_text())
+        depot = json.loads(graph_path("depot", graph_dir).read_text(encoding="utf-8"))
         assert depot["original_point"] == [49.568613, 5.922762]
         node = graph.nodes[depot["drive_node_id"]]
         assert depot["drive_point"] == [node["y"], node["x"]]
         assert depot["snap_distance_m"] > 0
-        assert json.loads(graph_path("pois", graph_dir).read_text())["features"][0]["tags"] == {"amenity": "cafe"}
+        assert json.loads(graph_path("pois", graph_dir).read_text(encoding="utf-8"))["features"][0]["tags"] == {"amenity": "cafe"}
         assert fetch.call_args.kwargs["tags"]["amenity"]
         assert all(call.args[0].equals(shape(geometry)) for call in download.call_args_list)
         assert all(call.kwargs["retain_all"] for call in download.call_args_list)
@@ -91,7 +91,7 @@ def test_save_area():
         assert {path: path.read_bytes() for path in csv_paths} == original_csvs
         route_dir = graph_dir.parent / "550"
         service_area.save_area(geometry, route_dir)
-        route_depot = json.loads(graph_path("depot", route_dir).read_text())
+        route_depot = json.loads(graph_path("depot", route_dir).read_text(encoding="utf-8"))
         assert route_depot["name"] == "Depot Emile Weber Bettembourg"
         assert route_depot["original_point"] == [49.502780, 6.091030]
 
@@ -118,11 +118,11 @@ def test_distinct_operation_and_service_areas():
     ) as fetch:
         out_dir = Path(tmp)
         service_area.save_area(operation, out_dir, service)
-        assert json.loads(graph_path("area", out_dir).read_text())["geometry"] == service
-        assert graph_path("drive_edges", out_dir).read_text() == "u,v,key\n"
+        assert json.loads(graph_path("area", out_dir).read_text(encoding="utf-8"))["geometry"] == service
+        assert graph_path("drive_edges", out_dir).read_text(encoding="utf-8") == "u,v,key\n"
         assert all(call.args[0].equals(shape(operation)) for call in download.call_args_list)
         assert fetch.call_args.args[0].equals(shape(service))
-        assert [poi["name"] for poi in json.loads(graph_path("pois", out_dir).read_text())["features"]] == ["Inside"]
+        assert [poi["name"] for poi in json.loads(graph_path("pois", out_dir).read_text(encoding="utf-8"))["features"]] == ["Inside"]
 
     outside = {"type": "Polygon", "coordinates": [[
         [6.4, 49.4], [6.5, 49.4], [6.5, 49.5], [6.4, 49.4]
@@ -143,18 +143,18 @@ def test_recrawl_pois_updates_only_pois():
     ]]}
     with TemporaryDirectory() as tmp:
         out_dir = Path(tmp)
-        graph_path("area", out_dir).write_text(json.dumps({"geometry": geometry}))
-        graph_path("drive_graph", out_dir).write_text("existing graph")
+        graph_path("area", out_dir).write_text(json.dumps({"geometry": geometry}), encoding="utf-8")
+        graph_path("drive_graph", out_dir).write_text("existing graph", encoding="utf-8")
         poi_path = graph_path("pois", out_dir)
-        poi_path.write_text("old pois")
+        poi_path.write_text("old pois", encoding="utf-8")
         with patch.object(ox, "features_from_polygon", return_value=sample_pois()) as fetch, patch.object(
             ox, "graph_from_polygon"
         ) as download:
             service_area.recrawl_pois(out_dir)
         assert fetch.call_args.args[0].equals(shape(geometry))
         download.assert_not_called()
-        assert json.loads(poi_path.read_text())["features"][0]["name"] == "Cafe"
-        assert graph_path("drive_graph", out_dir).read_text() == "existing graph"
+        assert json.loads(poi_path.read_text(encoding="utf-8"))["features"][0]["name"] == "Cafe"
+        assert graph_path("drive_graph", out_dir).read_text(encoding="utf-8") == "existing graph"
         with patch.object(ox, "features_from_polygon", side_effect=ValueError("fetch failed")):
             try:
                 service_area.recrawl_pois(out_dir)
@@ -162,7 +162,7 @@ def test_recrawl_pois_updates_only_pois():
                 pass
             else:
                 raise AssertionError("Failed recrawl was accepted")
-        assert json.loads(poi_path.read_text())["features"][0]["name"] == "Cafe"
+        assert json.loads(poi_path.read_text(encoding="utf-8"))["features"][0]["name"] == "Cafe"
 
 
 def test_recrawl_pois_accepts_graph_name_case():

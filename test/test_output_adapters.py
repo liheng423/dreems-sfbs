@@ -23,12 +23,12 @@ def test_output_layout():
         for name in ("businfo", "stops"):
             path = busline_path(name, route_dir)
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(name)
+            path.write_text(name, encoding="utf-8")
         area_dir = graph_dir("550", graphs_dir)
         for name in GRAPH_FILES:
             path = graph_path(name, area_dir)
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(name)
+            path.write_text(name, encoding="utf-8")
         assert available_buslines(buslines_dir) == ["605"]
         assert available_graphs(graphs_dir) == ["550"]
         assert area_dir.parent == graphs_dir
@@ -40,10 +40,10 @@ def test_output_layout():
             for name in REQUEST_FILES:
                 write_json(request_path(name, instance_dir), {"run": number})
             assert {path.name for path in instance_dir.iterdir()} == set(REQUEST_FILES.values())
-        assert request_path("pool", first).read_text() != request_path("pool", second).read_text()
+        assert request_path("pool", first).read_text(encoding="utf-8") != request_path("pool", second).read_text(encoding="utf-8")
         legacy = requests_dir / "legacy"
         legacy.mkdir()
-        (legacy / "raw_requests.json").write_text("{}")
+        (legacy / "raw_requests.json").write_text("{}", encoding="utf-8")
         assert request_path("pool", legacy).name == "raw_requests.json"
 
 

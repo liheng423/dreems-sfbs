@@ -33,9 +33,9 @@ def write_requests_csv(path, requests, task):
 
 def write_pool(cfg, busline_name, graph_name, instance_dir, pool):
     """Write the request pool and its settings; return the pool path."""
-    config = tomllib.loads(OPERATIONS_PATH.read_text())
-    profiles = tomllib.loads(VEHICLES_PATH.read_text())["profiles"]
-    charging_truck_profiles = tomllib.loads(CHARGING_TRUCKS_PATH.read_text())["charging_truck_profiles"]
+    config = tomllib.loads(OPERATIONS_PATH.read_text(encoding="utf-8"))
+    profiles = tomllib.loads(VEHICLES_PATH.read_text(encoding="utf-8"))["profiles"]
+    charging_truck_profiles = tomllib.loads(CHARGING_TRUCKS_PATH.read_text(encoding="utf-8"))["charging_truck_profiles"]
     mode = cfg["task"].lower()
     attributes = config[mode]["attribute"]
     operations = {mode: {

@@ -169,17 +169,17 @@ def load_config(task, busline_name=None):
         raise ValueError("SFBS requires --busline")
     if task == "DAR" and busline_name:
         raise ValueError("DAR does not use --busline")
-    cfg = tomllib.loads(CFG_PATH.read_text())
+    cfg = tomllib.loads(CFG_PATH.read_text(encoding="utf-8"))
     if not isinstance(cfg.get("retry_if_filtered", False), bool):
         raise ValueError("retry_if_filtered must be true or false")
-    cfg.update(tomllib.loads(MAPS_CFG_PATH.read_text()))
+    cfg.update(tomllib.loads(MAPS_CFG_PATH.read_text(encoding="utf-8")))
     cfg["task"] = task
-    operation_cfg = tomllib.loads(OPERATION_CFG_PATH.read_text())[task.lower()]["attribute"]
+    operation_cfg = tomllib.loads(OPERATION_CFG_PATH.read_text(encoding="utf-8"))[task.lower()]["attribute"]
     cfg["vehicle_speed_mps"] = operation_cfg["vehicle_speed"]
     cfg["detour_factor"] = operation_cfg["detour_factor"]
     if cfg["detour_factor"] < 1:
         raise ValueError("detour_factor must be at least 1")
-    filter_cfg = tomllib.loads(FILTERS_PATH.read_text())[task.lower()]
+    filter_cfg = tomllib.loads(FILTERS_PATH.read_text(encoding="utf-8"))[task.lower()]
     cfg["request_filters"] = enabled_filters(
         REQUEST_FILTERS if task == "SFBS" else BASE_REQUEST_FILTERS, filter_cfg.get("enabled", {})
     )
@@ -190,7 +190,7 @@ def load_config(task, busline_name=None):
     cfg["places"] = []
     if task == "SFBS":
         route_dir = busline_dir(busline_name)
-        cfg["places"] = json.loads(busline_path("stops", route_dir).read_text())
+        cfg["places"] = json.loads(busline_path("stops", route_dir).read_text(encoding="utf-8"))
     times = cfg["simulation"]
     start_s = clock_seconds(times["start"])
     end_s = clock_seconds(times["end"])
@@ -225,7 +225,7 @@ def prepare_network(cfg, area_path, poi_path):
     net.radial_direction = start, span
     if cfg["task"] == "SFBS":
         net.route_departures = index_route_departures(
-            json.loads(busline_path("businfo", busline_dir(cfg["busline_name"])).read_text())
+            json.loads(busline_path("businfo", busline_dir(cfg["busline_name"])).read_text(encoding="utf-8"))
         )
     pois = load_pois(poi_path)
     set_poi_zones(net, pois, cfg["method_pois"]["cell_size_m"])
@@ -312,8 +312,8 @@ def generate(cfg, area_path, poi_path):
     reqs = generate_candidates(cfg, net)
     if not cfg.get("retry_if_filtered", False):
         reqs = filter_requests(cfg, net, reqs)
-    operation = tomllib.loads(OPERATION_CFG_PATH.read_text())[cfg["task"].lower()]["attribute"]
-    profiles = tomllib.loads(VEHICLE_CFG_PATH.read_text())["profiles"]
+    operation = tomllib.loads(OPERATION_CFG_PATH.read_text(encoding="utf-8"))[cfg["task"].lower()]["attribute"]
+    profiles = tomllib.loads(VEHICLE_CFG_PATH.read_text(encoding="utf-8"))["profiles"]
     energy_rate = consumption_kwh_per_km({"scenario": operation, "profiles": profiles})
     fields = SFBS_OUTPUT_FIELDS if cfg["task"] == "SFBS" else DAR_OUTPUT_FIELDS
     for req in reqs.values():

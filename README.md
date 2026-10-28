@@ -23,13 +23,21 @@ Bundled maps: `Esch`, `550` (Luxembourg route 550 corridor), and `leuven`. Bundl
 
 ## Installation
 
+### Environment Setup
 Use Python 3.12 and [`uv`](https://docs.astral.sh/uv/). From the repository root, create and activate a virtual environment, then install the dependencies:
+
+> New to `uv`? Follow the [installation guide](https://docs.astral.sh/uv/getting-started/installation/) first. It takes a minute.
 
 ```bash
 uv venv --python 3.12
-source .venv/bin/activate
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
 uv pip install -r requirements.txt
+python check_dependencies.py
 ```
+
+### Patch for REQreate 
+
+> This patch is already included in the repo. If the `check_dependencies.py` warns about the missing patch, do the following steps, otherwise, skip them. 
 
 The published `reqreate==0.1.1` must be patched before generating requests. The [patch](src/reqreate/instance_generator.patch) adds the `mandatory` and `optional` stop classes used by every `stops.json` (SFBS fails without it) and fixes indexing errors under NumPy 2.x. Apply it once to the installed package:
 
@@ -39,20 +47,25 @@ patch -p1 -d "$(python -c 'import REQreate, pathlib; print(pathlib.Path(REQreate
 python check_dependencies.py
 ```
 
+On Windows, `patch` is not available by default, but [Git for Windows](https://git-scm.com/download/win) includes it. In PowerShell:
+
+```powershell
+$reqreate = python -c "import REQreate, pathlib; print(pathlib.Path(REQreate.__file__).parents[1])"
+& "C:\Program Files\Git\usr\bin\patch.exe" -p1 -d $reqreate -i src\reqreate\instance_generator.patch
+python check_dependencies.py
+```
+
+Alternatively, run the bash commands above unchanged in Git Bash.
+
 Re-apply the patch whenever REQreate is reinstalled. Selecting a new area or importing a GTFS feed from a URL requires internet access.
 
-The tests are standalone scripts. Run them from the repository root, for example:
-
-```bash
-PYTHONPATH=. python test/test_reqreate_filters.py
-```
 
 ## Usage
 
 ### 1. Create a map
 
 ```bash
-python main.py select-area my_area
+python main.py select-area myarea
 ```
 
 In the browser, draw the **operation area**; its road networks will be downloaded. The **service area**, where POIs and request endpoints are placed, initially matches the operation area; shrink it if requests should cover a smaller region. Click **Save**, wait for the download to finish, then stop the selector with Ctrl+C. Add `--busline ROUTE` to display an imported route's stops while drawing.
@@ -123,7 +136,7 @@ Use `--route-id 30021` for the return direction. Other De Lijn routes serving KU
 ### 3. Edit bus stops and charging locations
 
 ```bash
-python main.py select-locations my_area [--busline my_route]
+python main.py select-locations myarea [--busline my_route]
 ```
 
 Without `--busline`, the selector opens the route with the same name as the map, if one exists. Otherwise only the **Parking and charging** mode is available.
@@ -145,7 +158,7 @@ Every selection, edit, mode change, and save attempt is logged with a UTC timest
 ### 4. Generate requests
 
 ```bash
-python main.py generate-demand DAR --map my_area
+python main.py generate-demand DAR --map myarea
 python main.py generate-demand SFBS --map 550 --busline 550
 python main.py generate-demand SFBS --map leuven --busline delijn-2-out
 ```
@@ -293,7 +306,7 @@ To get an edge's endpoint coordinates, join `u` and `v` to `osmid` in the matchi
 
 ### Request instances: `outputs/requests/<task>_<map>_<number>/`
 
-Each `generate-demand` run creates a new numbered folder, such as `dar_my_area_0001`.
+Each `generate-demand` run creates a new numbered folder, such as `dar_myarea_0001`.
 
 | File | Contents |
 | --- | --- |

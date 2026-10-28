@@ -67,7 +67,7 @@ class AreaNetwork(Network):
 
 def build_area_net(area_path, stops, max_walking_distance_m):
     """Load the service area and graphs, then attach stop walking distances."""
-    polygon = shape(json.loads(area_path.read_text())["geometry"])
+    polygon = shape(json.loads(area_path.read_text(encoding="utf-8"))["geometry"])
     net = AreaNetwork(
         "Bus route service area",
         ox.load_graphml(area_path.with_name("drive.graphml")),

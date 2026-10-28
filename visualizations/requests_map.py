@@ -20,32 +20,32 @@ def draw_requests_map(graph_name, instance, output_file=None):
            for name in (graph_name, instance)):
         raise ValueError("Map and instance must be folder names")
     requests_file = ROOT / "outputs" / "requests" / instance / "requests.json"
-    requests = list(json.loads(requests_file.read_text())["requests"].values())
+    requests = list(json.loads(requests_file.read_text(encoding="utf-8"))["requests"].values())
     settings = dict(line.split(" = ", 1) for line in
-                    (requests_file.parent / "parameters.txt").read_text().splitlines()[:3])
+                    (requests_file.parent / "parameters.txt").read_text(encoding="utf-8").splitlines()[:3])
     busline = json.loads(settings["busline"]) if json.loads(settings["task"]) == "SFBS" else None
     if busline:
-        info = json.loads((busline_dir(busline, ROOT / "outputs" / "buslines") / "buslines.json").read_text())
+        info = json.loads((busline_dir(busline, ROOT / "outputs" / "buslines") / "buslines.json").read_text(encoding="utf-8"))
         stops = {stop["stop_id"]: (stop["stop_lon"], stop["stop_lat"])
                  for stop in info["stops"]}
         stops_path = busline_dir(busline, ROOT / "outputs" / "buslines") / "stops.json"
         if stops_path.is_file():
-            for stop in json.loads(stops_path.read_text()):
+            for stop in json.loads(stops_path.read_text(encoding="utf-8")):
                 stops[stop["name"].removeprefix("Stop_")] = (stop["lon"], stop["lat"])
         route_lines = [[stops[stop_id] for stop_id in pattern.get("selected_stop_ids", pattern["stop_ids"])]
                        for pattern in info["patterns"]]
     graph_dir = ROOT / "outputs" / "graphs" / graph_name
     output_file = Path(output_file) if output_file else ROOT / "visualizations" / f"{requests_file.parent.name}_requests_map.png"
 
-    with (graph_dir / "drive_nodes.csv").open(newline="") as source:
+    with (graph_dir / "drive_nodes.csv").open(newline="", encoding="utf-8") as source:
         nodes = {row["osmid"]: (float(row["x"]), float(row["y"]))
                  for row in csv.DictReader(source)}
     roads = []
-    with (graph_dir / "drive_edges.csv").open(newline="") as source:
+    with (graph_dir / "drive_edges.csv").open(newline="", encoding="utf-8") as source:
         for edge in csv.DictReader(source):
             roads.append(list(wkt.loads(edge["geometry"]).coords) if edge.get("geometry")
                          else [nodes[edge["u"]], nodes[edge["v"]]])
-    pois = json.loads((graph_dir / "pois.json").read_text())["features"]
+    pois = json.loads((graph_dir / "pois.json").read_text(encoding="utf-8"))["features"]
     locations = {"parking": [], "charging": []}
     locations_path = graph_dir / "locations.csv"
     if locations_path.is_file():
@@ -53,9 +53,9 @@ def draw_requests_map(graph_name, instance, output_file=None):
             for row in csv.DictReader(source):
                 if row["type"] in locations:
                     locations[row["type"]].append((float(row["x"]), float(row["y"])))
-    depot = json.loads((graph_dir / "depot.json").read_text())
+    depot = json.loads((graph_dir / "depot.json").read_text(encoding="utf-8"))
     depot_lat, depot_lon = depot["drive_point"]
-    area = json.loads((graph_dir / "service_area.geojson").read_text())["geometry"]
+    area = json.loads((graph_dir / "service_area.geojson").read_text(encoding="utf-8"))["geometry"]
     polygons = [area["coordinates"]] if area["type"] == "Polygon" else area["coordinates"]
     boundaries = [ring for polygon in polygons for ring in polygon]
 

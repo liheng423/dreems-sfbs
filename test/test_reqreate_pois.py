@@ -56,7 +56,7 @@ def main():
         assert abs(net.zones["density_pois"].sum() - 1) < 1e-12
         assert len(pool["requests"]) <= cfg["generated_candidate_count"]
         assert all(call.args[5] is True for call in sample.call_args_list)
-        snapshot = json.loads(poi_path.read_text())
+        snapshot = json.loads(poi_path.read_text(encoding="utf-8"))
         assert [poi["name"] for poi in snapshot["features"]] == ["School", "Cafe", "Museum"]
         assert snapshot["features"][0]["tags"] == {"amenity": "school"}
         with patch.object(WalkingDistance, "within_limit", return_value=False) as walkable:

@@ -72,10 +72,10 @@ def read_locations(directory):
 def location_data(directory, route_directory=None):
     """Return graph nodes, route stops, and selections still on this graph."""
     nodes = drive_nodes(directory)
-    stops = (json.loads(busline_path("stops", route_directory).read_text())
+    stops = (json.loads(busline_path("stops", route_directory).read_text(encoding="utf-8"))
              if route_directory else [])
     if route_directory:
-        timetable = json.loads(busline_path("businfo", route_directory).read_text())
+        timetable = json.loads(busline_path("businfo", route_directory).read_text(encoding="utf-8"))
         source_stops = {f"Stop_{stop['stop_id']}": stop for stop in timetable["stops"]}
         for stop in stops:
             stop["original_name"] = stop["name"]
@@ -115,8 +115,8 @@ def read_legacy_stops(path):
 
 def edited_route(route_directory, edited_stops, edited_patterns, nodes):
     """Validate editable stop records and separate route order from GTFS times."""
-    existing = json.loads(busline_path("stops", route_directory).read_text())
-    businfo = json.loads(busline_path("businfo", route_directory).read_text())
+    existing = json.loads(busline_path("stops", route_directory).read_text(encoding="utf-8"))
+    businfo = json.loads(busline_path("businfo", route_directory).read_text(encoding="utf-8"))
     if not isinstance(edited_stops, list) or not all(isinstance(stop, dict) for stop in edited_stops):
         raise ValueError("Stops must be a list of records")
     old_stops = {stop["name"]: stop for stop in existing}
@@ -196,7 +196,7 @@ def save_locations(directory, locations, route_directory=None, stop_classes=None
             ):
                 raise ValueError("Stop classes must map stop names to mandatory or optional")
             stops_path = busline_path("stops", route_directory)
-            existing = json.loads(stops_path.read_text())
+            existing = json.loads(stops_path.read_text(encoding="utf-8"))
             existing_names = {stop["name"] for stop in existing}
             for name in stop_classes:
                 if name not in existing_names and not (
@@ -254,7 +254,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/":
-            self.respond(200, PAGE_PATH.read_text().replace("__MAP__", escape(self.map_name)),
+            self.respond(200, PAGE_PATH.read_text(encoding="utf-8").replace("__MAP__", escape(self.map_name)),
                          "text/html; charset=utf-8")
         elif self.path == "/data":
             try:
@@ -264,7 +264,7 @@ class Handler(BaseHTTPRequestHandler):
             except FileNotFoundError as error:
                 self.respond(404, str(error))
         elif self.path in ("/sfbs_route.js", "/sfbs_route.css"):
-            self.respond(200, (ROUTE_ASSETS / self.path[1:]).read_text(),
+            self.respond(200, (ROUTE_ASSETS / self.path[1:]).read_text(encoding="utf-8"),
                          "text/javascript; charset=utf-8" if self.path.endswith(".js")
                          else "text/css; charset=utf-8")
         else:

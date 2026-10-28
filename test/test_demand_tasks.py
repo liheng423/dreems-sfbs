@@ -32,7 +32,7 @@ def test_demand_tasks():
     for args in (["--map", "Esch"], ["DAR", "--map", "Esch", "--busline", "550"],
                  ["SFBS", "--map", "Esch"]):
         result = subprocess.run([sys.executable, str(ROOT / "main.py"), "generate-demand", *args],
-                                capture_output=True, text=True)
+                                capture_output=True, text=True, encoding="utf-8")
         assert result.returncode != 0
 
     with patch.object(sys, "argv", ["main.py", "generate-demand", "SFBS", "--map", "550",
@@ -43,14 +43,14 @@ def test_demand_tasks():
     with TemporaryDirectory() as directory:
         operations = Path(directory) / "operations.toml"
         operations.write_text("[dar.attribute]\nvehicle_speed = 10\ndetour_factor = 1.5\n"
-                              "[sfbs.attribute]\nvehicle_speed = 5\ndetour_factor = 2\n")
+                              "[sfbs.attribute]\nvehicle_speed = 5\ndetour_factor = 2\n", encoding="utf-8")
         filters = Path(directory) / "filters.toml"
         filters.write_text("[dar]\nmax_walking_distance_m = 100\nwalking_speed_mps = 1\n"
                            "[[dar.parameters]]\nname = 'min_distance'\nvalue = 100\n"
                            "[sfbs]\nmax_walking_distance_m = 500\nwalking_speed_mps = 2\n"
                            "[[sfbs.parameters]]\nname = 'min_distance'\nvalue = 500\n"
                            "[sfbs.enabled]\nrequest_not_walk_dominated = false\n"
-                           "request_has_min_driving_distance = false\n")
+                           "request_has_min_driving_distance = false\n", encoding="utf-8")
         with patch.object(generate, "OPERATION_CFG_PATH", operations), patch.object(
             generate, "FILTERS_PATH", filters
         ), patch.object(generate, "busline_dir", return_value=ROOT / "outputs/buslines/550"):

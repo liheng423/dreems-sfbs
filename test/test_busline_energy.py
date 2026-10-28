@@ -72,7 +72,7 @@ def test_command_selects_route():
                 {"stop_id": "B", "stop_name": "Second", "stop_lon": 6.01, "stop_lat": 49.0},
             ],
             "patterns": [{"pattern_id": "out", "stop_ids": ["A", "B"]}],
-        }))
+        }), encoding="utf-8")
         graph = nx.MultiDiGraph(crs="epsg:4326")
         graph.add_node(1, x=6.0, y=49.0)
         graph.add_node(2, x=6.01, y=49.0)
@@ -88,7 +88,7 @@ def test_command_selects_route():
 
         selected_route.assert_called_once_with("605")
         selected_graph.assert_called_once_with("605")
-        result = json.loads((route_dir / "energy.json").read_text())
+        result = json.loads((route_dir / "energy.json").read_text(encoding="utf-8"))
         assert result["segments"][0]["distance_m"] == 1000
         assert result["segments"][0]["energy_kwh"] > 0
         assert (result["segments"][0]["origin"], result["segments"][0]["destination"]) == ("A", "B")

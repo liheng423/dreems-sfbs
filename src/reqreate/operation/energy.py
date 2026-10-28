@@ -83,11 +83,11 @@ def main():
         config["scenario"] = tomllib.load(file)["sfbs"]["attribute"]
     route_dir = busline_dir(args.route)
     drive_path = graph_path("drive_graph", graph_dir(args.route))
-    businfo = json.loads(busline_path("businfo", route_dir).read_text())
+    businfo = json.loads(busline_path("businfo", route_dir).read_text(encoding="utf-8"))
     stops_path = busline_path("stops", route_dir)
     if stops_path.is_file():
         source_ids = {source["stop_id"] for source in businfo["stops"]}
-        for stop in json.loads(stops_path.read_text()):
+        for stop in json.loads(stops_path.read_text(encoding="utf-8")):
             stop_id = stop["name"].removeprefix("Stop_")
             if stop_id not in source_ids:
                 businfo["stops"].append({"stop_id": stop_id, "stop_name": stop["name"],

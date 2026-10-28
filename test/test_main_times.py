@@ -14,7 +14,7 @@ def test_generate_demand_times():
         main.main()
     command = [sys.executable, str(main.COMMANDS["generate-demand"]),
                "SFBS", "--map", "550", "--busline", "605", "--debug"]
-    seed = tomllib.loads((main.ROOT / "src/reqreate/request_gen.toml").read_text())["seed"]
+    seed = tomllib.loads((main.ROOT / "src/reqreate/request_gen.toml").read_text(encoding="utf-8"))["seed"]
     assert run.call_args_list == [
         call([*command, "--seed", str(seed + offset)], check=True)
         for offset in range(3)

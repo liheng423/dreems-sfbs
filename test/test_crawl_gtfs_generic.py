@@ -64,19 +64,19 @@ class GenericGTFS(unittest.TestCase):
                 "--service-date", "2026-10-19", "--output", str(output),
                 "--source-url", "https://example.org/feed.zip", "--license", "Example license",
             ]
-            subprocess.run(command, check=True, capture_output=True, text=True, cwd=ROOT)
-            result = json.loads(output.read_text())
+            subprocess.run(command, check=True, capture_output=True, text=True, cwd=ROOT, encoding="utf-8")
+            result = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(result["source"]["source_url"], "https://example.org/feed.zip")
             self.assertEqual(result["source"]["license"], "Example license")
             self.assertTrue(output.with_name("stops.json").is_file())
             stops_path = output.with_name("stops.json")
-            stops = json.loads(stops_path.read_text())
+            stops = json.loads(stops_path.read_text(encoding="utf-8"))
             stops[0]["class"] = "optional"
             stops.append({"name": "Stop_OSM_42", "type": "location", "class": "mandatory",
                           "lon": 4.4, "lat": 50.4})
-            stops_path.write_text(json.dumps(stops))
-            subprocess.run(command, check=True, capture_output=True, text=True, cwd=ROOT)
-            preserved = json.loads(stops_path.read_text())
+            stops_path.write_text(json.dumps(stops), encoding="utf-8")
+            subprocess.run(command, check=True, capture_output=True, text=True, cwd=ROOT, encoding="utf-8")
+            preserved = json.loads(stops_path.read_text(encoding="utf-8"))
             self.assertEqual(preserved[0]["class"], "optional")
             self.assertEqual(preserved[-1]["name"], "Stop_OSM_42")
 

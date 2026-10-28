@@ -7,12 +7,13 @@ import re
 
 
 REQUIREMENTS_PATH = Path(__file__).with_name("requirements.txt")
+PATCH_PATH = Path(__file__).parent / "src" / "reqreate" / "instance_generator.patch"
 
 
 def missing_dependencies(requirements_path=REQUIREMENTS_PATH):
     """Return requirements whose packages cannot be imported by this Python."""
     missing = []
-    for line in requirements_path.read_text().splitlines():
+    for line in requirements_path.read_text(encoding="utf-8").splitlines():
         requirement = line.split("#", 1)[0].strip()
         if not requirement:
             continue
@@ -30,6 +31,28 @@ def missing_dependencies(requirements_path=REQUIREMENTS_PATH):
     return missing
 
 
+def unpatched_reqreate_files(patch_path=PATCH_PATH):
+    """Return installed REQreate files that lack lines added by the patch."""
+    import REQreate
+
+    root = Path(REQreate.__file__).parents[1]
+    added = {}
+    target = None
+    for line in patch_path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("+++ b/"):
+            target = line[len("+++ b/"):]
+            added[target] = []
+        elif line.startswith("+") and target and line[1:].strip():
+            added[target].append(line[1:].strip())
+    unpatched = []
+    for target, lines in added.items():
+        path = root / target
+        text = path.read_text(encoding="utf-8") if path.exists() else ""
+        if not all(line in text for line in lines):
+            unpatched.append(target)
+    return unpatched
+
+
 if __name__ == "__main__":
     missing = missing_dependencies()
     if missing:
@@ -38,3 +61,10 @@ if __name__ == "__main__":
             "Install with: uv pip install -r requirements.txt"
         )
     print("All direct Python dependencies are installed.")
+    unpatched = unpatched_reqreate_files()
+    if unpatched:
+        raise SystemExit(
+            f"REQreate is not patched: {', '.join(unpatched)}\n"
+            "Apply src/reqreate/instance_generator.patch as described in README.md."
+        )
+    print("REQreate is patched.")

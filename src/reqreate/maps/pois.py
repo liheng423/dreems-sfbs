@@ -12,7 +12,7 @@ from shapely.ops import transform
 def load_pois(poi_path):
     """Return sampling coordinates from the selected map's saved POIs."""
     return [[poi["lat"], poi["lon"]]
-            for poi in json.loads(poi_path.read_text())["features"]]
+            for poi in json.loads(poi_path.read_text(encoding="utf-8"))["features"]]
 
 
 def set_poi_zones(net, pois, cell_size_m):

@@ -21,7 +21,7 @@ def main():
     """A changed profile must change road travel and derived arrival times."""
     with TemporaryDirectory() as directory:
         profile_path = Path(directory) / "operation_profile.toml"
-        profile_path.write_text("[dar.attribute]\nvehicle_speed = 10.0\ndetour_factor = 2.0\n")
+        profile_path.write_text("[dar.attribute]\nvehicle_speed = 10.0\ndetour_factor = 2.0\n", encoding="utf-8")
         with patch.object(generate, "OPERATION_CFG_PATH", profile_path):
             cfg = generate.load_config("DAR")
 

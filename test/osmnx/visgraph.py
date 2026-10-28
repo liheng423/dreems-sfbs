@@ -28,8 +28,8 @@ map_dir = graph_dir(args.map)
 graph = ox.load_graphml(graph_path("drive_graph", map_dir))
 vertices = [data for _, data in graph.nodes(data=True)]
 intersections = [node for node in vertices if node.get("street_count", 0) >= 3]
-config = tomllib.loads((root / "src/reqreate/maps/map_config.toml").read_text())
-area = json.loads(graph_path("area", map_dir).read_text())
+config = tomllib.loads((root / "src/reqreate/maps/map_config.toml").read_text(encoding="utf-8"))
+area = json.loads(graph_path("area", map_dir).read_text(encoding="utf-8"))
 boundary = area["geometry"]["coordinates"][0]
 cell_size_m = config["method_pois"]["cell_size_m"]
 projected_area, crs = ox.projection.project_geometry(shape(area["geometry"]))

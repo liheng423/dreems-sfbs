@@ -89,12 +89,12 @@ def recrawl_pois(out_dir):
     area_path = graph_path("area", out_dir)
     if not area_path.is_file():
         raise ValueError(f"Saved service area not found: {area_path}")
-    service = shape(json.loads(area_path.read_text())["geometry"])
+    service = shape(json.loads(area_path.read_text(encoding="utf-8"))["geometry"])
     if service.geom_type != "Polygon" or not service.is_valid or service.is_empty:
         raise ValueError(f"Invalid saved service area: {area_path}")
     import osmnx as ox
     ox.settings.use_cache = False
-    tags = tomllib.loads(MAPS_CFG_PATH.read_text())["poi_tags"]
+    tags = tomllib.loads(MAPS_CFG_PATH.read_text(encoding="utf-8"))["poi_tags"]
     write_json(graph_path("pois", out_dir), {"features": crawl_pois(service, tags)})
 
 
@@ -108,7 +108,7 @@ def save_area(geometry, out_dir, service_geometry=None):
     operation, service = validate_areas(geometry, service_geometry)
     ox.settings.use_cache = False
 
-    map_config = tomllib.loads(MAPS_CFG_PATH.read_text())
+    map_config = tomllib.loads(MAPS_CFG_PATH.read_text(encoding="utf-8"))
     tags = map_config["poi_tags"]
     # OSMnx appends /interpreter to these API base URLs.
     for overpass_url in OVERPASS_URLS:
@@ -147,10 +147,10 @@ def render_page(map_name, busline_name=None, buslines_dir=BUSLINES_DIR):
     route_name = busline_name or map_name
     businfo_path = busline_path("businfo", busline_dir(route_name, buslines_dir))
     if busline_name or businfo_path.is_file():
-        stops = json.loads(businfo_path.read_text())["stops"]
+        stops = json.loads(businfo_path.read_text(encoding="utf-8"))["stops"]
     else:
         stops = []
-    return (PAGE_PATH.read_text()
+    return (PAGE_PATH.read_text(encoding="utf-8")
             .replace("__MAP__", map_name)
             .replace("__STOPS__", json.dumps(stops))).encode()
 

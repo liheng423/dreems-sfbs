@@ -60,7 +60,7 @@ def test_route_pipeline():
             "--gtfs-zip", str(gtfs_path), "--service-date", "2026-10-06",
             "--output", str(busline_path("businfo", route_dir)),
             "--stops-output", str(busline_path("stops", route_dir)),
-        ], check=True, capture_output=True, text=True)
+        ], check=True, capture_output=True, text=True, encoding="utf-8")
         default_dir = data_dir / "default/605"
         with patch("src.output_adapters.busline_dir", return_value=default_dir), patch.object(
             sys, "argv", ["crawl_busline.py", "--route", "605",
@@ -70,8 +70,8 @@ def test_route_pipeline():
         assert busline_path("businfo", default_dir).is_file()
         assert busline_path("stops", default_dir).is_file()
 
-        businfo = json.loads(busline_path("businfo", route_dir).read_text())
-        stops = json.loads(busline_path("stops", route_dir).read_text())
+        businfo = json.loads(busline_path("businfo", route_dir).read_text(encoding="utf-8"))
+        stops = json.loads(busline_path("stops", route_dir).read_text(encoding="utf-8"))
         assert businfo["route"]["route_short_name"] == "605"
         assert b"Map 605 operation and service areas" in render_page("605", buslines_dir=buslines_dir)
         named_page = render_page("test", "605", buslines_dir)
@@ -130,33 +130,33 @@ def test_route_pipeline():
             "requests.json", "requests.csv", "operations.json", "parameters.txt",
         }
         parameters_path = request_path("parameters", instance_dir)
-        parameters = parameters_path.read_text()
+        parameters = parameters_path.read_text(encoding="utf-8")
         assert 'task = "SFBS"\nmap = "550"\nbusline = "605"\neffective_seed = 43' in parameters
         for path in (generate.CFG_PATH, generate.MAPS_CFG_PATH):
-            assert f"# {path.relative_to(ROOT)}\n{path.read_text().rstrip()}" in parameters
+            assert f"# {path.relative_to(ROOT)}\n{path.read_text(encoding="utf-8").rstrip()}" in parameters
         filter_marker = f"# {generate.FILTERS_PATH.relative_to(ROOT)}\n"
         operation_marker = f"# {generate.OPERATION_CFG_PATH.relative_to(ROOT)}\n"
         vehicle_marker = f"# {generate.VEHICLE_CFG_PATH.relative_to(ROOT)}\n"
         filter_section = parameters.split(filter_marker, 1)[1].split(operation_marker, 1)[0]
         operation_section = parameters.split(operation_marker, 1)[1].split(vehicle_marker, 1)[0]
-        assert tomllib.loads(filter_section) == {"sfbs": tomllib.loads(generate.FILTERS_PATH.read_text())["sfbs"]}
-        assert tomllib.loads(operation_section) == {"sfbs": tomllib.loads(generate.OPERATION_CFG_PATH.read_text())["sfbs"]}
+        assert tomllib.loads(filter_section) == {"sfbs": tomllib.loads(generate.FILTERS_PATH.read_text(encoding="utf-8"))["sfbs"]}
+        assert tomllib.loads(operation_section) == {"sfbs": tomllib.loads(generate.OPERATION_CFG_PATH.read_text(encoding="utf-8"))["sfbs"]}
         assert "[dar" not in parameters
-        operations = json.loads(request_path("operations", instance_dir).read_text())
+        operations = json.loads(request_path("operations", instance_dir).read_text(encoding="utf-8"))
         assert set(operations) == {"sfbs"}
         assert "start_time" not in operations["sfbs"]
         assert "end_time" not in operations["sfbs"]
         assert operations["sfbs"]["average_speed_mps"] == 6.111111111111111
         assert operations["sfbs"]["vehicle_count"] == 6
-        operation_cfg = tomllib.loads(generate.OPERATION_CFG_PATH.read_text())
-        vehicle_cfg = tomllib.loads(generate.VEHICLE_CFG_PATH.read_text())
+        operation_cfg = tomllib.loads(generate.OPERATION_CFG_PATH.read_text(encoding="utf-8"))
+        vehicle_cfg = tomllib.loads(generate.VEHICLE_CFG_PATH.read_text(encoding="utf-8"))
         profile = operation_cfg["sfbs"]["attribute"]["profile"]
         assert operations["sfbs"]["vehicle_type"] == profile
         assert operations["sfbs"]["vehicle"] == vehicle_cfg["profiles"][profile]
         vehicle_section = parameters.split(f"[profiles.{profile}]\n", 1)[1]
         assert tomllib.loads(f"[profiles.{profile}]\n{vehicle_section}")["profiles"][profile] == operations["sfbs"]["vehicle"]
         assert parameters.count("[profiles.") == 1
-        assert list(csv.DictReader(request_path("csv", instance_dir).open(newline=""))) == []
+        assert list(csv.DictReader(request_path("csv", instance_dir).open(newline="", encoding="utf-8"))) == []
 
 
 def test_generate_demand_command():
@@ -238,11 +238,11 @@ def test_generated_request_energy_uses_driving_distance_and_selected_vehicle():
         operation_path = Path(directory) / "operation.toml"
         operation_path.write_text('[dar.attribute]\nprofile = "bus"\ntemperature_case = "at_9_c"\n'
                                   '[sfbs.attribute]\nprofile = "semi_flex_bus"\n'
-                                  'temperature_case = "reference_20_22_c"\n')
+                                  'temperature_case = "reference_20_22_c"\n', encoding="utf-8")
         vehicle_path = Path(directory) / "vehicles.toml"
         vehicle_path.write_text('[profiles.bus]\nreference_kwh_per_km = 0.8\n'
                                 'relative_increase_pct = { at_9_c = 25 }\n'
-                                '[profiles.semi_flex_bus]\nreference_kwh_per_km = 2.0\n')
+                                '[profiles.semi_flex_bus]\nreference_kwh_per_km = 2.0\n', encoding="utf-8")
         with patch.object(generate, "prepare_network"), patch.object(
             generate, "generate_candidates", return_value={"0": req}
         ), patch.object(generate, "filter_requests", side_effect=lambda _, __, requests: requests), patch.object(
@@ -291,7 +291,7 @@ def test_generate_without_busline():
         area_dir = graph_dir("Esch", data_dir / "graphs")
         area_dir.mkdir(parents=True)
         for name in ("area", "drive_graph", "walk_graph"):
-            graph_path(name, area_dir).write_text(name)
+            graph_path(name, area_dir).write_text(name, encoding="utf-8")
         poi_path = graph_path("pois", area_dir)
         write_json(poi_path, {"features": []})
         write_json(graph_path("depot", area_dir), {"original_point": [49.5, 6.1]})
@@ -309,12 +309,12 @@ def test_generate_without_busline():
             generate.main()
         instance_dir = data_dir / "requests/dar_Esch_0001"
         assert not request_path("metadata", instance_dir).exists()
-        parameters = request_path("parameters", instance_dir).read_text()
+        parameters = request_path("parameters", instance_dir).read_text(encoding="utf-8")
         assert 'busline = null' in parameters
         assert "[dar.attribute]" in parameters
         assert "[sfbs" not in parameters
-        assert json.loads(request_path("pool", instance_dir).read_text()) == pool
-        with request_path("csv", instance_dir).open(newline="") as file:
+        assert json.loads(request_path("pool", instance_dir).read_text(encoding="utf-8")) == pool
+        with request_path("csv", instance_dir).open(newline="", encoding="utf-8") as file:
             rows = list(csv.DictReader(file))
         assert len(rows) == 1
         assert rows[0]["reqid"] == "0"
@@ -322,13 +322,13 @@ def test_generate_without_busline():
         assert rows[0]["direct_distance"] == str(valid_req["direct_distance"])
         assert "boarding_stop_id" not in rows[0]
         assert request_path("operations", instance_dir).is_file()
-        assert set(json.loads(request_path("operations", instance_dir).read_text())) == {"dar"}
+        assert set(json.loads(request_path("operations", instance_dir).read_text(encoding="utf-8"))) == {"dar"}
 
 
 def test_generate_with_busline_saves_stop_points():
     cfg = {
         "requests": 1, "seed": 42, "busline_name": "550",
-        "places": json.loads(busline_path("stops", busline_dir("550")).read_text()),
+        "places": json.loads(busline_path("stops", busline_dir("550")).read_text(encoding="utf-8")),
         "max_walking_distance_m": 1000, "simulation_end_s": 43200,
         "distributions": {"radial_direction": {"type": "uniform", "loc": 0, "scale": 360},
                           "radial_distance": {"type": "uniform", "loc": 500, "scale": 0}},
@@ -374,7 +374,7 @@ def test_demand_time_window():
             pass
         else:
             raise AssertionError(f"accepted invalid clock time {value}")
-    source = generate.CFG_PATH.read_text()
+    source = generate.CFG_PATH.read_text(encoding="utf-8")
     with TemporaryDirectory() as directory:
         cfg_path = Path(directory) / "request_gen.toml"
         for start, end, demand in (("01:00", "01:00", "01:00"),
@@ -384,7 +384,7 @@ def test_demand_time_window():
             changed = source.replace('start = "08:00:00"', f'start = "{start}"')
             changed = changed.replace('end = "12:00:00"', f'end = "{end}"')
             cfg_path.write_text(re.sub(r'^demand_start = .*$', f'demand_start = "{demand}"',
-                                       changed, count=1, flags=re.MULTILINE))
+                                       changed, count=1, flags=re.MULTILINE), encoding="utf-8")
             with patch.object(generate, "CFG_PATH", cfg_path):
                 try:
                     generate.load_config("DAR")
@@ -395,7 +395,7 @@ def test_demand_time_window():
         changed = source.replace('start = "08:00:00"', 'start = "01:00"')
         changed = changed.replace('end = "12:00:00"', 'end = "02:00"')
         cfg_path.write_text(re.sub(r'^demand_start = .*$', 'demand_start = "01:30"',
-                                   changed, count=1, flags=re.MULTILINE))
+                                   changed, count=1, flags=re.MULTILINE), encoding="utf-8")
         with patch.object(generate, "CFG_PATH", cfg_path):
             cfg = generate.load_config("DAR")
     assert (cfg["demand_start_s"], cfg["simulation_end_s"]) == (5400, 7200)
@@ -425,7 +425,7 @@ def test_demand_time_window():
 
 def test_request_distributions_from_toml():
     """Changing TOML lead times and arrival rates changes sampling settings."""
-    source = generate.CFG_PATH.read_text()
+    source = generate.CFG_PATH.read_text(encoding="utf-8")
     source = re.sub(r'^lt_dynamic = .*$',
                     'lt_dynamic = { type = "uniform", loc = 60, scale = 120 }',
                     source, count=1, flags=re.MULTILINE)
@@ -434,7 +434,7 @@ def test_request_distributions_from_toml():
                     source, count=1, flags=re.MULTILINE)
     with TemporaryDirectory() as directory:
         cfg_path = Path(directory) / "request_gen.toml"
-        cfg_path.write_text(source)
+        cfg_path.write_text(source, encoding="utf-8")
         with patch.object(generate, "CFG_PATH", cfg_path):
             cfg = generate.load_config("DAR")
     assert cfg["attributes"]["lt_dynamic"]["pdf"] == [
@@ -445,13 +445,13 @@ def test_request_distributions_from_toml():
 
 
 def test_event_time_distribution_requires_poisson():
-    source = generate.CFG_PATH.read_text()
+    source = generate.CFG_PATH.read_text(encoding="utf-8")
     source = re.sub(r'^dynamic_order_place_time = .*$',
                     'dynamic_order_place_time = { type = "uniform", rate_per_hour = 10 }',
                     source, count=1, flags=re.MULTILINE)
     with TemporaryDirectory() as directory:
         cfg_path = Path(directory) / "request_gen.toml"
-        cfg_path.write_text(source)
+        cfg_path.write_text(source, encoding="utf-8")
         with patch.object(generate, "CFG_PATH", cfg_path):
             try:
                 generate.load_config("DAR")
@@ -497,13 +497,13 @@ def test_retry_if_filtered_keeps_sampled_request_count():
 
 def test_distance_distribution_from_request_config():
     """The demand distance sampler uses the distribution from request_gen.toml."""
-    source = generate.CFG_PATH.read_text()
+    source = generate.CFG_PATH.read_text(encoding="utf-8")
     source = re.sub(r'^radial_distance = .*$',
                     'radial_distance = { type = "normal", loc = 900, scale = 100 }',
                     source, count=1, flags=re.MULTILINE)
     with TemporaryDirectory() as directory:
         cfg_path = Path(directory) / "request_gen.toml"
-        cfg_path.write_text(source)
+        cfg_path.write_text(source, encoding="utf-8")
         with patch.object(generate, "CFG_PATH", cfg_path):
             cfg = generate.load_config("DAR")
     assert cfg["distributions"]["radial_distance"] == {

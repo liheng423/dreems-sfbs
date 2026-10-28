@@ -17,7 +17,7 @@ META_PATH = request_path("metadata", INSTANCE_DIR)
 
 
 def read_json(path):
-    return json.loads(path.read_text())
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def sha256(path):
@@ -25,7 +25,7 @@ def sha256(path):
 
 
 def main():
-    filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text())
+    filter_cfg = tomllib.loads((ROOT / "src/reqreate/filters/filters.toml").read_text(encoding="utf-8"))
     pool = read_json(POOL_PATH)
     meta = read_json(META_PATH)
     params = {param["name"]: param["value"] for param in filter_cfg["sfbs"]["parameters"]}

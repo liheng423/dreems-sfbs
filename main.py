@@ -39,7 +39,7 @@ def generate_demand(args):
         step_args.extend(["--busline", args.busline])
     if args.debug:
         step_args.append("--debug")
-    seed = (tomllib.loads((ROOT / "src/reqreate/request_gen.toml").read_text())["seed"]
+    seed = (tomllib.loads((ROOT / "src/reqreate/request_gen.toml").read_text(encoding="utf-8"))["seed"]
             if args.times > 1 else None)
     for offset in range(args.times):
         run_args = [*step_args, "--seed", str(seed + offset)] if seed is not None else step_args

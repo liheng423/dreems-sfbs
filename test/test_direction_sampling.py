@@ -14,7 +14,7 @@ from maps.area_network import AreaNetwork
 
 
 def test_direction_sampling():
-    direction = tomllib.loads((ROOT / "src/reqreate/request_gen.toml").read_text())[
+    direction = tomllib.loads((ROOT / "src/reqreate/request_gen.toml").read_text(encoding="utf-8"))[
         "distributions"]["radial_direction"]
     assert direction == {"type": "uniform", "loc": 0, "scale": 360}
     net = object.__new__(AreaNetwork)
