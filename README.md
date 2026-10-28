@@ -50,15 +50,7 @@ patch -p1 -d "$(python -c 'import REQreate, pathlib; print(pathlib.Path(REQreate
 python check_dependencies.py
 ```
 
-On Windows, install [Git for Windows](https://git-scm.com/download/win) first; it provides `patch`. Then run the bash commands above in Git Bash, or use the block for your shell below.
-
-In **PowerShell** (the prompt starts with `PS`):
-
-```powershell
-$reqreate = python -c "import REQreate, pathlib; print(pathlib.Path(REQreate.__file__).parents[1])"
-& "C:\Program Files\Git\usr\bin\patch.exe" -p1 -d "$reqreate" -i src\reqreate\instance_generator.patch
-python check_dependencies.py
-```
+On Windows, install [Git for Windows](https://git-scm.com/download/win) first; it provides `patch`. Then run the bash commands above in Git Bash, or use the block below.
 
 In **Command Prompt** or **Anaconda Prompt** (cmd.exe):
 
@@ -69,13 +61,6 @@ python check_dependencies.py
 ```
 
 The patch is done when `python check_dependencies.py` prints `REQreate is patched.` Run it again whenever you reinstall REQreate or create a new environment.
-
-If something goes wrong:
-
-- `File to patch:` (or `No file to patch. Skipping`) for `config.schema.json`: press Enter to skip. This is expected.
-- `Reversed (or previously applied) patch detected! Assume -R?`: answer `n`. The patch is already applied.
-- `Hunk #1 FAILED`: reinstall a clean copy with `uv pip install --reinstall reqreate==0.1.1`, then apply the patch again.
-- `can't change to directory '$reqreate'`: you ran the PowerShell block in Command Prompt. Use the block for your shell.
 
  Selecting a new area or importing a GTFS feed from a URL requires internet access.
 
