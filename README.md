@@ -1,6 +1,6 @@
-# DREEMS-SFBS
+# DREEMS Instance Generator
 
-DREEMS-SFBS generates synthetic passenger requests for Semi-Flex Bus (SFBS) and Dial-a-Ride (DAR, also known as Dynamic Ride Sharing, DRS) services.
+DREEMS-InstanceGenerator generates synthetic passenger requests for Semi-Flex Bus (SFBS) and Dial-a-Ride (DAR, also known as Dynamic Ride Sharing, DRS) services.
 
 - 🗺️ Draw an area on an OpenStreetMap (OSM) map to download its driving and walking road graphs and points of interest (POIs).
 - 🚌 Import bus stops and timetables from GTFS feeds for SFBS, and edit stops, parking, and charging locations on the map.
