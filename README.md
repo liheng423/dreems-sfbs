@@ -47,11 +47,21 @@ patch -p1 -d "$(python -c 'import REQreate, pathlib; print(pathlib.Path(REQreate
 python check_dependencies.py
 ```
 
-On Windows, `patch` is not available by default, but [Git for Windows](https://git-scm.com/download/win) includes it. In PowerShell:
+On Windows, `patch` is not available by default, but [Git for Windows](https://git-scm.com/download/win) includes it. Use the block that matches your shell. Variable syntax differs between shells, so running the PowerShell block in Command Prompt fails with `can't change to directory '$reqreate'`.
+
+In **PowerShell** (the prompt starts with `PS`):
 
 ```powershell
 $reqreate = python -c "import REQreate, pathlib; print(pathlib.Path(REQreate.__file__).parents[1])"
-& "C:\Program Files\Git\usr\bin\patch.exe" -p1 -d $reqreate -i src\reqreate\instance_generator.patch
+& "C:\Program Files\Git\usr\bin\patch.exe" -p1 -d "$reqreate" -i src\reqreate\instance_generator.patch
+python check_dependencies.py
+```
+
+In **Command Prompt** or **Anaconda Prompt** (cmd.exe):
+
+```bat
+for /f "delims=" %d in ('python -c "import REQreate, pathlib; print(pathlib.Path(REQreate.__file__).parents[1])"') do set "REQREATE=%d"
+"C:\Program Files\Git\usr\bin\patch.exe" -p1 -d "%REQREATE%" -i src\reqreate\instance_generator.patch
 python check_dependencies.py
 ```
 
